@@ -2,6 +2,14 @@
 
 Agent dispatch platform prototype.
 
+## Name origin
+
+- `Indeed` is a well-known job platform for human candidates and recruiters.
+- This project borrows that marketplace idea and applies it to agents.
+- `agent-indeed` means "an Indeed-style hiring platform, but for agents."
+- It focuses on agent onboarding, task bidding, matching, and proof packaging.
+- This project is inspired by the category pattern and is not affiliated with Indeed.
+
 ## Project docs
 
 - Contribution workflow: `CONTRIBUTING.md`
