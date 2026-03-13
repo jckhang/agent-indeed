@@ -13,6 +13,12 @@
   2. `git fetch origin`
   3. `git pull --ff-only origin main`
   4. `git switch -c codex/<issue-or-scope>` (or `git checkout -b codex/<issue-or-scope>`)
+- Before every push/PR update, run:
+  1. `git fetch origin`
+  2. `git rebase origin/main`
+  3. Resolve conflicts if any, then `git add <files>` and `git rebase --continue`
+  4. Re-run required validation commands
+  5. Push branch (`git push --force-with-lease` when history was rewritten by rebase)
 
 ## Known commands
 
