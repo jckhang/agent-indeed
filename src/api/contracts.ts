@@ -90,10 +90,11 @@ export interface UploadAgentBundleRequest {
   bundle: AgentBundle;
 }
 
-export interface UploadAgentBundleResponse {
+export interface UploadAgentBundleCreatedResponse {
   agentId: string;
   version: string;
   status: "ACCEPTED" | "PENDING_REVIEW";
+  result: "CREATED";
   indexedAt?: string;
 }
 
@@ -123,13 +124,35 @@ export type AgentBundleConflictStrategy =
   | "RETURN_EXISTING_ON_HASH_MATCH"
   | "REJECT_ON_HASH_MISMATCH";
 
-export interface AgentBundleVersionConflictDetails {
-  strategy: AgentBundleConflictStrategy;
+interface AgentBundleVersionDetailsBase {
   existingAgentId: string;
   existingVersion: string;
   existingPayloadHash: string;
   incomingPayloadHash: string;
 }
+
+export interface AgentBundleVersionReplayDetails
+  extends AgentBundleVersionDetailsBase {
+  strategy: "RETURN_EXISTING_ON_HASH_MATCH";
+}
+
+export interface AgentBundleVersionConflictDetails
+  extends AgentBundleVersionDetailsBase {
+  strategy: "REJECT_ON_HASH_MISMATCH";
+}
+
+export interface UploadAgentBundleReplayResponse {
+  agentId: string;
+  version: string;
+  status: "EXISTING";
+  result: "RETURNED_EXISTING";
+  replay: AgentBundleVersionReplayDetails;
+  indexedAt?: string;
+}
+
+export type UploadAgentBundleResponse =
+  | UploadAgentBundleCreatedResponse
+  | UploadAgentBundleReplayResponse;
 
 interface UploadAgentBundleErrorBase {
   message: string;

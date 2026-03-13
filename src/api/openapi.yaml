@@ -28,6 +28,12 @@ paths:
             schema:
               $ref: '#/components/schemas/UploadAgentBundleRequest'
       responses:
+        '200':
+          description: Idempotent replay matched an existing bundle version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadAgentBundleReplayResponse'
         '201':
           description: Agent bundle accepted and versioned
           content:
@@ -185,7 +191,7 @@ components:
     UploadAgentBundleResponse:
       type: object
       additionalProperties: false
-      required: [agentId, version, status]
+      required: [agentId, version, status, result]
       properties:
         agentId:
           type: string
@@ -196,6 +202,32 @@ components:
         status:
           type: string
           enum: [ACCEPTED, PENDING_REVIEW]
+        result:
+          type: string
+          enum: [CREATED]
+        indexedAt:
+          type: string
+          format: date-time
+
+    UploadAgentBundleReplayResponse:
+      type: object
+      additionalProperties: false
+      required: [agentId, version, status, result, replay]
+      properties:
+        agentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        version:
+          type: string
+          pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+        status:
+          type: string
+          enum: [EXISTING]
+        result:
+          type: string
+          enum: [RETURNED_EXISTING]
+        replay:
+          $ref: '#/components/schemas/AgentBundleVersionReplay'
         indexedAt:
           type: string
           format: date-time
@@ -264,6 +296,33 @@ components:
         conflict:
           $ref: '#/components/schemas/AgentBundleVersionConflict'
 
+    AgentBundleVersionReplay:
+      type: object
+      additionalProperties: false
+      required:
+        - strategy
+        - existingAgentId
+        - existingVersion
+        - existingPayloadHash
+        - incomingPayloadHash
+      properties:
+        strategy:
+          type: string
+          enum: [RETURN_EXISTING_ON_HASH_MATCH]
+          description: Deterministic strategy for idempotent same-payload replays.
+        existingAgentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        existingVersion:
+          type: string
+          pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+        existingPayloadHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+        incomingPayloadHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+
     AgentBundleVersionConflict:
       type: object
       additionalProperties: false
@@ -276,8 +335,8 @@ components:
       properties:
         strategy:
           type: string
-          enum: [RETURN_EXISTING_ON_HASH_MATCH, REJECT_ON_HASH_MISMATCH]
-          description: Deterministic conflict handling for duplicate (agent, version).
+          enum: [REJECT_ON_HASH_MISMATCH]
+          description: Deterministic strategy for duplicate (agent, version) with mismatched payload hash.
         existingAgentId:
           type: string
           pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
