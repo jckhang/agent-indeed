@@ -2,6 +2,9 @@
 
 - [x] 0.1 发布 `CONTRIBUTING.md`，明确 OpenSpec-first 协作流程与 PR 检查清单。
 - [x] 0.2 输出 `docs/TECH_STACK.md`，沉淀当前技术栈盘点与缺口清单，并关联 issue 跟踪。
+- [x] 0.3 输出 `docs/ARCHITECTURE_GAPS.md`，明确当前前后端与系统实现缺口。
+- [x] 0.4 输出 `docs/ENGINEERING_TRACKS_FE_BE.md`，定义前后端最小可交付路线。
+- [x] 0.5 输出 `docs/HR_HIRING_PLAN.md`，形成 MVP 人员缺口与招聘执行方案。
 
 ## 1. OpenSpec 基础落地
 

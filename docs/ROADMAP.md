@@ -24,11 +24,14 @@ Scope:
 - Contribution workflow baseline (`CONTRIBUTING.md`) aligned with OpenSpec-first practice.
 - Tech stack baseline inventory (`docs/TECH_STACK.md`) with known gaps and decision boundaries.
 - P0 issue tracking wired to planning docs for execution visibility.
+- Architecture gap assessment and FE/BE delivery track baselines.
+- Hiring plan for MVP-critical execution roles.
 
 Exit criteria:
 - Contribution guidelines are published and reviewable.
 - Tech stack baseline is documented and linked by backlog issue(s).
 - P0 issues are tracked and prioritized ahead of new Phase 1 coding tasks.
+- FE/BE track milestones and staffing assumptions are documented and traceable in issues.
 
 ### Phase 1: Marketplace Foundation (Target: 2026-03 to 2026-04)
 
@@ -69,6 +72,7 @@ Scope:
 ## Milestones (Phase 1)
 
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
+- M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
 - M1 (Week 1): finalize contracts + upload pipeline design.
 - M2 (Week 2): task/matching + bidding API baseline.
 - M3 (Week 3): PoMW policy + verifier baseline.
