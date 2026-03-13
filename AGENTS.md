@@ -6,11 +6,13 @@
 - Keep the API draft in sync across `src/api/openapi.yaml`, `src/api/contracts.ts`, and the related OpenSpec specs.
 - When changing scope or acceptance criteria, also review `docs/PHASE1_GOALS.md`, `docs/ROADMAP.md`, and `docs/issues/PHASE1_ISSUES.md`.
 - One issue/scope should map to exactly one focused PR; do not mix unrelated changes.
+- Never develop or commit directly on `main`; `main` is only the sync baseline.
+- For every new task, start from updated `main`, then immediately create a fresh branch before editing files.
 - Before writing code for each task, run:
   1. `git switch main`
   2. `git fetch origin`
   3. `git pull --ff-only origin main`
-  4. `git switch -c codex/<issue-or-scope>`
+  4. `git switch -c codex/<issue-or-scope>` (or `git checkout -b codex/<issue-or-scope>`)
 
 ## Known commands
 
