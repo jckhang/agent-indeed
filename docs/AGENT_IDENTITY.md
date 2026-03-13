@@ -1,16 +1,15 @@
-# Multi-Agent GitHub Identity Playbook
+# Multi-Agent Git Commit Identity Playbook
 
-This document explains how to keep **commit identity**, **push identity**, and **PR/comment identity** separated when multiple agents share one machine.
+This document covers the current baseline for this repo: keep git commit identity isolated per agent/worktree.
 
 ## Why this matters
 
-If all agents share the same global git/gh setup, commit and PR metadata may appear under the wrong account.
+If all agents share one global git config, commits can be authored with the wrong identity.
 
-Identity surfaces are different:
+Commit identity is controlled by:
 
-- Commit identity: controlled by `git user.name` and `git user.email`.
-- PR/comment/review identity: controlled by the authenticated `gh` account (`GH_TOKEN` or `gh auth login` profile).
-- Push identity: controlled by SSH key or token used for `git push`.
+- `git user.name`
+- `git user.email`
 
 ## Recommended baseline in this repo
 
@@ -22,73 +21,37 @@ Identity surfaces are different:
      --github-user kestrel-dev-agent
    ```
 
-2. Login GitHub CLI for this agent profile:
-
-   ```bash
-   GH_CONFIG_DIR="$PWD/workspace-kestrel/memory/gh-config" gh auth login -h github.com
-   ```
-
-3. Use the wrapper for all PR/comment/review operations:
-
-   ```bash
-   bash scripts/agent_gh.sh kestrel pr create --fill
-   bash scripts/agent_gh.sh kestrel pr comment 123 --body $'Done.\n\n--kestrel'
-   ```
-
-4. Run guard checks before every push:
+2. Before every push, run guard checks:
 
    ```bash
    bash scripts/agent_prepush_check.sh \
-     --agent-name kestrel \
      --github-user kestrel-dev-agent
    ```
 
-## Strict per-account separation patterns
+3. Verify latest commit author/committer when needed:
 
-### Option A: Per-agent fork (recommended)
+   ```bash
+   git show -s --format='Author: %an <%ae>%nCommitter: %cn <%ce>' HEAD
+   ```
 
-- Each agent GitHub account creates its own fork.
-- Add a remote for that fork and push there.
-- Open PR from `<agent-account>:codex/<branch>` to upstream `main`.
+## What the scripts enforce
 
-Pros:
+- `scripts/agent_identity_bootstrap.sh`
+  - Enables `extensions.worktreeConfig=true`.
+  - Sets `git config --worktree user.name/user.email`.
+  - Ensures `workspace-<agent-name>/memory/` exists.
+- `scripts/agent_prepush_check.sh`
+  - Branch is not `main` and uses `codex/` prefix.
+  - Branch contains latest `origin/main`.
+  - `git user.name/user.email` match the expected account.
 
-- Clean author attribution.
-- No shared push permissions required on upstream.
-
-### Option B: Shared upstream with per-agent write access
-
-- Add each agent account as upstream collaborator.
-- Use per-agent SSH key + host alias.
-- Push directly to upstream branch with that account key.
-
-Pros:
-
-- No fork sync overhead.
-
-Trade-off:
-
-- Requires upstream collaborator management.
-
-## SSH host alias example
-
-```sshconfig
-Host github-kestrel
-  HostName github.com
-  User git
-  IdentityFile ~/.ssh/id_ed25519_kestrel
-  IdentitiesOnly yes
-```
-
-Then set remote URL:
-
-```bash
-git remote set-url origin git@github-kestrel:<owner>/<repo>.git
-```
-
-## Rules used in this repo
+## Current repo rules
 
 - One issue/scope per PR.
 - Branch name prefix must be `codex/`.
 - Before each push, fetch + rebase `origin/main`.
 - PR comments/review replies must end with `--<agent-name>`.
+
+## Future extension (not enabled now)
+
+If later you need strict push/PR/comment account isolation, you can add per-agent SSH key and `gh` profile separation on top of this baseline.

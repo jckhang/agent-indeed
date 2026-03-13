@@ -9,8 +9,8 @@ Usage:
 What this does:
   1) Enables worktree-local git config.
   2) Sets git author/committer identity with git config --worktree.
-  3) Creates workspace-<agent-name>/memory/gh-config for per-agent gh auth.
-  4) Verifies current git and (if logged in) gh identity.
+  3) Ensures workspace-<agent-name>/memory exists.
+  4) Prints current git author identity for verification.
 EOF
 }
 
@@ -64,29 +64,12 @@ git config extensions.worktreeConfig true
 git config --worktree user.name "$github_user"
 git config --worktree user.email "$email"
 
-gh_config_dir="$repo_root/workspace-$agent_name/memory/gh-config"
-mkdir -p "$gh_config_dir"
+workspace_memory_dir="$repo_root/workspace-$agent_name/memory"
+mkdir -p "$workspace_memory_dir"
 
 echo "[ok] Worktree git identity configured:"
 echo "  user.name=$github_user"
 echo "  user.email=$email"
 echo "  config=$(git rev-parse --git-path config.worktree)"
 echo "  author=$(git var GIT_AUTHOR_IDENT)"
-echo "  gh_config_dir=$gh_config_dir"
-
-if command -v gh >/dev/null 2>&1; then
-  if GH_CONFIG_DIR="$gh_config_dir" gh auth status >/dev/null 2>&1; then
-    gh_user="$(GH_CONFIG_DIR="$gh_config_dir" gh api user --jq .login 2>/dev/null || true)"
-    if [[ "$gh_user" == "$github_user" ]]; then
-      echo "[ok] gh identity matches expected account: $gh_user"
-    else
-      echo "[warn] gh is logged in as '$gh_user', expected '$github_user'."
-    fi
-  else
-    echo "[warn] gh is not logged in for this agent profile yet."
-    echo "       Login with:"
-    echo "       GH_CONFIG_DIR=\"$gh_config_dir\" gh auth login -h github.com"
-  fi
-else
-  echo "[warn] gh command not found; skipped GitHub account verification."
-fi
+echo "  workspace_memory_dir=$workspace_memory_dir"

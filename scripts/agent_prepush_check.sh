@@ -4,27 +4,21 @@ set -euo pipefail
 usage() {
   cat <<'EOF'
 Usage:
-  bash scripts/agent_prepush_check.sh --agent-name <agent-name> --github-user <github-user> [--email <email>] [--skip-fetch]
+  bash scripts/agent_prepush_check.sh --github-user <github-user> [--email <email>] [--skip-fetch]
 
 Checks:
   - Current branch is not main and uses codex/ prefix.
   - Branch includes latest origin/main history (rebase requirement).
   - Worktree git user.name/user.email match expected identity.
-  - gh account in workspace-<agent-name>/memory/gh-config matches expected user (if gh is installed/logged in).
 EOF
 }
 
-agent_name=""
 github_user=""
 email=""
 skip_fetch=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --agent-name)
-      agent_name="${2:-}"
-      shift 2
-      ;;
     --github-user)
       github_user="${2:-}"
       shift 2
@@ -49,8 +43,8 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -z "$agent_name" || -z "$github_user" ]]; then
-  echo "Both --agent-name and --github-user are required." >&2
+if [[ -z "$github_user" ]]; then
+  echo "--github-user is required." >&2
   usage >&2
   exit 1
 fi
@@ -119,22 +113,6 @@ if [[ "$actual_email" == "$email" ]]; then
   ok "git user.email matches expected account ($actual_email)."
 else
   fail "git user.email is '$actual_email', expected '$email'."
-fi
-
-if command -v gh >/dev/null 2>&1; then
-  gh_config_dir="$repo_root/workspace-$agent_name/memory/gh-config"
-  if GH_CONFIG_DIR="$gh_config_dir" gh auth status >/dev/null 2>&1; then
-    gh_user="$(GH_CONFIG_DIR="$gh_config_dir" gh api user --jq .login 2>/dev/null || true)"
-    if [[ "$gh_user" == "$github_user" ]]; then
-      ok "gh user matches expected account ($gh_user)."
-    else
-      fail "gh user is '$gh_user', expected '$github_user' (config: $gh_config_dir)."
-    fi
-  else
-    fail "gh is not logged in for this agent profile (config: $gh_config_dir)."
-  fi
-else
-  warn "gh command not found; skipped PR/comment identity verification."
 fi
 
 if [[ "$failures" -gt 0 ]]; then
