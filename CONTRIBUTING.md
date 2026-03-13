@@ -16,12 +16,18 @@ Thanks for contributing. This repository is currently API/spec-first, so most ch
 
 ## Branch and PR Flow
 
-1. Create a branch using `codex/<topic>` prefix.
-2. Update OpenSpec artifacts first (or in the same PR as implementation).
-3. Update API contracts and docs in the same change set.
-4. Run validation:
+1. Sync from `main` before each new task:
+   - `git switch main`
+   - `git fetch origin`
+   - `git pull --ff-only origin main`
+2. Create a new branch using `codex/<topic>` prefix:
+   - `git switch -c codex/<topic>` (or `git checkout -b codex/<topic>`)
+3. Never develop or commit directly on `main`.
+4. Update OpenSpec artifacts first (or in the same PR as implementation).
+5. Update API contracts and docs in the same change set.
+6. Run validation:
    - `openspec validate --all`
-5. Open a PR with linked issue(s), scope notes, and verification output.
+7. Open a PR with linked issue(s), scope notes, and verification output.
 
 ## Commit and Change Scope
 
@@ -36,6 +42,7 @@ Before requesting review, ensure:
 - [ ] OpenSpec artifacts are updated for behavior/scope changes.
 - [ ] `openapi.yaml` and `contracts.ts` remain aligned.
 - [ ] Roadmap/goals/issues docs are updated when planning scope changes.
+- [ ] Work is on a dedicated `codex/<topic>` branch (not `main`).
 - [ ] `openspec validate --all` passes locally.
 - [ ] Related issue links are added in the PR description.
 
