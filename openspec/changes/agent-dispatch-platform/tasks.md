@@ -1,3 +1,8 @@
+## 0. P0 协作与工程基线
+
+- [x] 0.1 发布 `CONTRIBUTING.md`，明确 OpenSpec-first 协作流程与 PR 检查清单。
+- [x] 0.2 输出 `docs/TECH_STACK.md`，沉淀当前技术栈盘点与缺口清单，并关联 issue 跟踪。
+
 ## 1. OpenSpec 基础落地
 
 - [ ] 1.1 完成 proposal/design/specs/tasks 四类工件并通过 `openspec validate`。
