@@ -7,3 +7,4 @@ Agent dispatch platform prototype.
 - Contribution workflow: `CONTRIBUTING.md`
 - Tech stack baseline: `docs/TECH_STACK.md`
 - MVP roadmap: `docs/ROADMAP.md`
+- Organization and member profiles: `docs/ORGANIZATION.md`
