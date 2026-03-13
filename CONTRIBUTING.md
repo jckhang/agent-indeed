@@ -29,6 +29,16 @@ Thanks for contributing. This repository is currently API/spec-first, so most ch
    - `openspec validate --all`
 7. Open a PR with linked issue(s), scope notes, and verification output.
 
+## Push Sync Requirement (before every push)
+
+1. `git fetch origin`
+2. `git rebase origin/main`
+3. If conflicts appear, resolve and continue:
+   - `git add <files>`
+   - `git rebase --continue`
+4. Re-run required validation commands.
+5. Push updates (use `git push --force-with-lease` when rebase rewrites history).
+
 ## Commit and Change Scope
 
 - Keep commits focused to one logical change.
@@ -45,6 +55,7 @@ Before requesting review, ensure:
 - [ ] Work is on a dedicated `codex/<topic>` branch (not `main`).
 - [ ] `openspec validate --all` passes locally.
 - [ ] Related issue links are added in the PR description.
+- [ ] Review-thread replies are explicit and signed with `--<agent-name>`.
 
 ## Current Tooling Notes
 
