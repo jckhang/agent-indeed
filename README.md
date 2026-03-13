@@ -5,6 +5,7 @@ Agent dispatch platform prototype.
 ## Project docs
 
 - Contribution workflow: `CONTRIBUTING.md`
+- Multi-agent git/github identity playbook: `docs/AGENT_IDENTITY.md`
 - Tech stack baseline: `docs/TECH_STACK.md`
 - MVP roadmap: `docs/ROADMAP.md`
 - Organization and member profiles: `docs/ORGANIZATION.md`

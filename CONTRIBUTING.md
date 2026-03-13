@@ -39,6 +39,21 @@ Thanks for contributing. This repository is currently API/spec-first, so most ch
 4. Re-run required validation commands.
 5. Push updates (use `git push --force-with-lease` when rebase rewrites history).
 
+## Multi-Agent Identity Isolation
+
+When multiple agents share one machine/worktree pool, isolate identity for commit, push, and PR/comment operations.
+
+1. Bootstrap identity once per worktree:
+   - `bash scripts/agent_identity_bootstrap.sh --agent-name <agent-name> --github-user <agent-github-user>`
+2. Use the per-agent `gh` wrapper for PR/comment/review actions:
+   - `bash scripts/agent_gh.sh <agent-name> auth status`
+   - `bash scripts/agent_gh.sh <agent-name> pr create ...`
+   - `bash scripts/agent_gh.sh <agent-name> pr comment ...`
+3. Run identity/rebase checks before every push:
+   - `bash scripts/agent_prepush_check.sh --agent-name <agent-name> --github-user <agent-github-user>`
+4. Keep review-thread replies signed with `--<agent-name>`.
+5. For strict per-account push separation, use per-agent fork + SSH key (see `docs/AGENT_IDENTITY.md`).
+
 ## Commit and Change Scope
 
 - Keep commits focused to one logical change.

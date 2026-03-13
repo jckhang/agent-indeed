@@ -39,11 +39,14 @@
   - `agents.md`
   - `memory/`
 - Do not edit or delete files in other agents' workspaces unless explicitly asked.
-- Before first commit on a branch, set git identity to the agent identity:
-  1. `git config user.name "<agent-name>"`
-  2. `git config user.email "<agent-github-noreply-email>"`
-- Verify identity before push:
-  - `git show -s --format='Author: %an <%ae>%nCommitter: %cn <%ce>' HEAD`
+- Before first commit on a branch, bootstrap agent identity in this worktree:
+  - `bash scripts/agent_identity_bootstrap.sh --agent-name <agent-name> --github-user <agent-github-user>`
+- The bootstrap script writes `git config --worktree user.name/user.email`, so identities stay isolated across worktrees.
+- For PR/comment/review actions, always use per-agent GitHub CLI config:
+  - `bash scripts/agent_gh.sh <agent-name> auth status`
+  - `bash scripts/agent_gh.sh <agent-name> pr comment <pr-number> --body "..."`
+- Before every push, run the guard check:
+  - `bash scripts/agent_prepush_check.sh --agent-name <agent-name> --github-user <agent-github-user>`
 - If identity is wrong, amend before opening/updating PR:
   - `git commit --amend --no-edit --reset-author`
 - For all PR comments/review replies, append an explicit signature line at the end:
