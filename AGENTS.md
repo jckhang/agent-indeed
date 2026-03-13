@@ -6,7 +6,7 @@
 - When changing scope or acceptance criteria, also review `docs/PHASE1_GOALS.md`, `docs/ROADMAP.md`, and `docs/issues/PHASE1_ISSUES.md`.
 
 ## Known commands
-- Validate OpenSpec changes with `openspec validate`.
+- Validate OpenSpec changes with `openspec validate --all`.
 
 ## Repo layout
 - `openspec/changes/agent-dispatch-platform/`: proposal, design, tasks, and capability specs for the MVP.
