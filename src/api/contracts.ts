@@ -1,49 +1,144 @@
 export type IdentityTier = "T0" | "T1" | "T2";
 
+export type AgentRuntime = "OPENCLAW" | "CUSTOM_CONTAINER" | "WASM";
+export type AgentMemoryMode = "INDEX_ONLY" | "ENCRYPTED_REF" | "FULL";
+export type AgentMemoryScope = "DISCOVERY_ONLY" | "MATCHING_ONLY" | "TASK_RUNTIME";
+export type SignatureAlgorithm = "ED25519" | "SECP256K1";
+
+export interface AgentManifest {
+  name: string;
+  version: string;
+  runtime: AgentRuntime;
+  entrypoint: string;
+  image?: string;
+  checksum?: string;
+}
+
+export interface AgentIdentityAttestation {
+  type: string;
+  value: string;
+}
+
+export interface AgentIdentity {
+  did: string;
+  publicKey: string;
+  credentialLevel: IdentityTier;
+  issuer?: string;
+  trustScore?: number;
+  attestations?: AgentIdentityAttestation[];
+}
+
+export interface AgentSkillMetadata {
+  skillId: string;
+  version: string;
+  tags?: string[];
+  inputSchema: Record<string, unknown>;
+  outputSchema: Record<string, unknown>;
+}
+
+export interface AgentMemoryAccessPolicy {
+  scope: AgentMemoryScope;
+  ttlSeconds: number;
+}
+
+interface BaseAgentMemoryRef {
+  summaryHash: string;
+  accessPolicy?: AgentMemoryAccessPolicy;
+}
+
+export interface AgentMemoryRefIndexOnly extends BaseAgentMemoryRef {
+  mode: "INDEX_ONLY";
+  vectorIndexUri: string;
+  encryptedBlobUri?: never;
+}
+
+export interface AgentMemoryRefEncrypted extends BaseAgentMemoryRef {
+  mode: "ENCRYPTED_REF";
+  encryptedBlobUri: string;
+  vectorIndexUri?: string;
+}
+
+export interface AgentMemoryRefFull extends BaseAgentMemoryRef {
+  mode: "FULL";
+  encryptedBlobUri: string;
+  vectorIndexUri?: string;
+}
+
+export type AgentMemoryRef =
+  | AgentMemoryRefIndexOnly
+  | AgentMemoryRefEncrypted
+  | AgentMemoryRefFull;
+
+export interface AgentBundleSignature {
+  algorithm: SignatureAlgorithm;
+  payloadHash: string;
+  signature: string;
+  signerDid: string;
+  signedAt?: string;
+}
+
 export interface AgentBundle {
-  manifest: {
-    name: string;
-    version: string;
-    runtime: "OPENCLAW" | "CUSTOM_CONTAINER" | "WASM";
-    entrypoint: string;
-    image?: string;
-    checksum?: string;
-  };
-  identity: {
-    did: string;
-    publicKey: string;
-    credentialLevel: IdentityTier;
-    issuer?: string;
-    trustScore?: number;
-    attestations?: Array<{
-      type: string;
-      value: string;
-    }>;
-  };
-  skills: Array<{
-    skillId: string;
-    version: string;
-    tags?: string[];
-    inputSchema: Record<string, unknown>;
-    outputSchema: Record<string, unknown>;
-  }>;
-  memoryRef: {
-    mode: "INDEX_ONLY" | "ENCRYPTED_REF" | "FULL";
-    summaryHash: string;
-    vectorIndexUri?: string;
-    encryptedBlobUri?: string;
-    accessPolicy?: {
-      scope: "DISCOVERY_ONLY" | "MATCHING_ONLY" | "TASK_RUNTIME";
-      ttlSeconds: number;
-    };
-  };
-  signature: {
-    algorithm: "ED25519" | "SECP256K1";
-    payloadHash: string;
-    signature: string;
-    signerDid: string;
-    signedAt?: string;
-  };
+  manifest: AgentManifest;
+  identity: AgentIdentity;
+  skills: AgentSkillMetadata[];
+  memoryRef: AgentMemoryRef;
+  signature: AgentBundleSignature;
+}
+
+export interface UploadAgentBundleRequest {
+  idempotencyKey: string;
+  bundle: AgentBundle;
+}
+
+export interface UploadAgentBundleResponse {
+  agentId: string;
+  version: string;
+  status: "ACCEPTED" | "PENDING_REVIEW";
+  indexedAt?: string;
+}
+
+export type AgentBundleValidationErrorCode =
+  | "AGENT_BUNDLE_SCHEMA_INVALID"
+  | "AGENT_BUNDLE_SCHEMA_UNSUPPORTED_VERSION"
+  | "AGENT_BUNDLE_SIGNATURE_INVALID"
+  | "AGENT_BUNDLE_SIGNATURE_SIGNER_MISMATCH"
+  | "AGENT_BUNDLE_SIGNATURE_PAYLOAD_MISMATCH";
+
+export type AgentBundleConflictErrorCode = "AGENT_BUNDLE_VERSION_CONFLICT";
+
+export type AgentBundleErrorCode =
+  | AgentBundleValidationErrorCode
+  | AgentBundleConflictErrorCode;
+
+export type AgentBundleErrorCategory = "SCHEMA" | "SIGNATURE" | "VERSION";
+
+export interface AgentBundleValidationErrorDetails {
+  fieldPath?: string;
+  rule?: string;
+  expected?: string;
+  actual?: string;
+}
+
+export type AgentBundleConflictStrategy =
+  | "RETURN_EXISTING_ON_HASH_MATCH"
+  | "REJECT_ON_HASH_MISMATCH";
+
+export interface AgentBundleVersionConflictDetails {
+  strategy: AgentBundleConflictStrategy;
+  existingAgentId: string;
+  existingVersion: string;
+  existingPayloadHash: string;
+  incomingPayloadHash: string;
+}
+
+export interface UploadAgentBundleErrorResponse {
+  code: AgentBundleErrorCode;
+  category: AgentBundleErrorCategory;
+  message: string;
+  auditId: string;
+  retryable: boolean;
+  details?: AgentBundleValidationErrorDetails;
+  conflict?: AgentBundleVersionConflictDetails;
 }
 
 export interface TaskSpec {

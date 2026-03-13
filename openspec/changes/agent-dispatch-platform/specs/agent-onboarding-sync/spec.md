@@ -12,6 +12,22 @@
 - **WHEN** 上传包签名校验失败
 - **THEN** 平台拒绝入库并返回可审计错误码
 
+#### Scenario: Invalid schema is rejected
+- **WHEN** 上传包缺少必填字段、字段格式不合法，或 schema 版本不受支持
+- **THEN** 平台拒绝入库并返回稳定 schema 错误码与字段路径
+
+### Requirement: Bundle Version Conflict Must Follow Deterministic Strategy
+
+平台 MUST 对 `(agent_id, manifest.version)` 冲突采用确定性策略，避免重复上传产生不一致状态。
+
+#### Scenario: Replayed upload with identical payload hash
+- **WHEN** 同一 `agent_id` 与 `manifest.version` 已存在，且 `payload_hash` 一致
+- **THEN** 平台返回已存在版本信息，并标记冲突策略 `RETURN_EXISTING_ON_HASH_MATCH`
+
+#### Scenario: Duplicate version with different payload hash
+- **WHEN** 同一 `agent_id` 与 `manifest.version` 已存在，但 `payload_hash` 不一致
+- **THEN** 平台拒绝上传并返回版本冲突错误码与策略 `REJECT_ON_HASH_MISMATCH`
+
 ### Requirement: Memory Synchronization Must Preserve Privacy Boundary
 
 平台 MUST 支持 memory 的索引级同步，并允许原始 memory 保持在 agent 控制域内。

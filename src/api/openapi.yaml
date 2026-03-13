@@ -39,13 +39,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/UploadAgentBundleValidationErrorResponse'
         '409':
           description: Duplicate bundle version
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/UploadAgentBundleVersionConflictResponse'
 
   /v1/tasks:
     post:
@@ -200,6 +200,97 @@ components:
           type: string
           format: date-time
 
+    UploadAgentBundleValidationErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [code, category, message, auditId, retryable]
+      properties:
+        code:
+          type: string
+          enum:
+            - AGENT_BUNDLE_SCHEMA_INVALID
+            - AGENT_BUNDLE_SCHEMA_UNSUPPORTED_VERSION
+            - AGENT_BUNDLE_SIGNATURE_INVALID
+            - AGENT_BUNDLE_SIGNATURE_SIGNER_MISMATCH
+            - AGENT_BUNDLE_SIGNATURE_PAYLOAD_MISMATCH
+        category:
+          type: string
+          enum: [SCHEMA, SIGNATURE]
+        message:
+          type: string
+        auditId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+        retryable:
+          type: boolean
+          default: false
+        details:
+          $ref: '#/components/schemas/AgentBundleValidationErrorDetails'
+
+    AgentBundleValidationErrorDetails:
+      type: object
+      additionalProperties: false
+      properties:
+        fieldPath:
+          type: string
+          description: Dot path to the rejected field, e.g. bundle.identity.did.
+        rule:
+          type: string
+          description: Validation rule identifier for programmatic handling.
+        expected:
+          type: string
+        actual:
+          type: string
+
+    UploadAgentBundleVersionConflictResponse:
+      type: object
+      additionalProperties: false
+      required: [code, category, message, auditId, retryable, conflict]
+      properties:
+        code:
+          type: string
+          enum: [AGENT_BUNDLE_VERSION_CONFLICT]
+        category:
+          type: string
+          enum: [VERSION]
+        message:
+          type: string
+        auditId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+        retryable:
+          type: boolean
+          default: false
+        conflict:
+          $ref: '#/components/schemas/AgentBundleVersionConflict'
+
+    AgentBundleVersionConflict:
+      type: object
+      additionalProperties: false
+      required:
+        - strategy
+        - existingAgentId
+        - existingVersion
+        - existingPayloadHash
+        - incomingPayloadHash
+      properties:
+        strategy:
+          type: string
+          enum: [RETURN_EXISTING_ON_HASH_MATCH, REJECT_ON_HASH_MISMATCH]
+          description: Deterministic conflict handling for duplicate (agent, version).
+        existingAgentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        existingVersion:
+          type: string
+          pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+        existingPayloadHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+        incomingPayloadHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+
     CreateTaskRequest:
       type: object
       additionalProperties: false
@@ -314,6 +405,7 @@ components:
               type: string
               minLength: 3
               maxLength: 120
+              pattern: '^[a-zA-Z][a-zA-Z0-9_-]{2,119}$'
             version:
               type: string
               pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
@@ -323,11 +415,14 @@ components:
             entrypoint:
               type: string
               minLength: 1
+              maxLength: 260
             image:
               type: string
+              format: uri
               description: OCI image or runtime artifact URI.
             checksum:
               type: string
+              pattern: '^sha256:[a-f0-9]{64}$'
               description: Content digest for immutable verification.
         identity:
           type: object
@@ -336,13 +431,17 @@ components:
           properties:
             did:
               type: string
+              pattern: '^did:[a-z0-9]+:[a-zA-Z0-9._:%-]+$'
             publicKey:
               type: string
+              minLength: 16
+              maxLength: 512
             credentialLevel:
               type: string
               enum: [T0, T1, T2]
             issuer:
               type: string
+              pattern: '^did:[a-z0-9]+:[a-zA-Z0-9._:%-]+$'
             trustScore:
               type: number
               minimum: 0
@@ -356,11 +455,14 @@ components:
                 properties:
                   type:
                     type: string
+                    minLength: 1
                   value:
                     type: string
+                    minLength: 1
         skills:
           type: array
           minItems: 1
+          uniqueItems: true
           items:
             type: object
             additionalProperties: false
@@ -368,8 +470,10 @@ components:
             properties:
               skillId:
                 type: string
+                pattern: '^skill_[a-zA-Z0-9._-]{2,64}$'
               version:
                 type: string
+                pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
               tags:
                 type: array
                 items:
@@ -381,29 +485,10 @@ components:
                 type: object
                 description: JSON Schema fragment for skill output.
         memoryRef:
-          type: object
-          additionalProperties: false
-          required: [mode, summaryHash]
-          properties:
-            mode:
-              type: string
-              enum: [INDEX_ONLY, ENCRYPTED_REF, FULL]
-            summaryHash:
-              type: string
-            vectorIndexUri:
-              type: string
-            encryptedBlobUri:
-              type: string
-            accessPolicy:
-              type: object
-              additionalProperties: false
-              properties:
-                scope:
-                  type: string
-                  enum: [DISCOVERY_ONLY, MATCHING_ONLY, TASK_RUNTIME]
-                ttlSeconds:
-                  type: integer
-                  minimum: 60
+          oneOf:
+            - $ref: '#/components/schemas/MemoryRefIndexOnly'
+            - $ref: '#/components/schemas/MemoryRefEncrypted'
+            - $ref: '#/components/schemas/MemoryRefFull'
         signature:
           type: object
           additionalProperties: false
@@ -414,13 +499,86 @@ components:
               enum: [ED25519, SECP256K1]
             payloadHash:
               type: string
+              pattern: '^sha256:[a-f0-9]{64}$'
             signature:
               type: string
+              minLength: 32
             signerDid:
               type: string
+              pattern: '^did:[a-z0-9]+:[a-zA-Z0-9._:%-]+$'
+              description: Must match identity.did for a valid bundle signature.
             signedAt:
               type: string
               format: date-time
+
+    MemoryRefAccessPolicy:
+      type: object
+      additionalProperties: false
+      required: [scope, ttlSeconds]
+      properties:
+        scope:
+          type: string
+          enum: [DISCOVERY_ONLY, MATCHING_ONLY, TASK_RUNTIME]
+        ttlSeconds:
+          type: integer
+          minimum: 60
+
+    MemoryRefIndexOnly:
+      type: object
+      additionalProperties: false
+      required: [mode, summaryHash, vectorIndexUri]
+      properties:
+        mode:
+          type: string
+          const: INDEX_ONLY
+        summaryHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+        vectorIndexUri:
+          type: string
+          format: uri
+        accessPolicy:
+          $ref: '#/components/schemas/MemoryRefAccessPolicy'
+
+    MemoryRefEncrypted:
+      type: object
+      additionalProperties: false
+      required: [mode, summaryHash, encryptedBlobUri]
+      properties:
+        mode:
+          type: string
+          const: ENCRYPTED_REF
+        summaryHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+        vectorIndexUri:
+          type: string
+          format: uri
+        encryptedBlobUri:
+          type: string
+          format: uri
+        accessPolicy:
+          $ref: '#/components/schemas/MemoryRefAccessPolicy'
+
+    MemoryRefFull:
+      type: object
+      additionalProperties: false
+      required: [mode, summaryHash, encryptedBlobUri]
+      properties:
+        mode:
+          type: string
+          const: FULL
+        summaryHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+        vectorIndexUri:
+          type: string
+          format: uri
+        encryptedBlobUri:
+          type: string
+          format: uri
+        accessPolicy:
+          $ref: '#/components/schemas/MemoryRefAccessPolicy'
 
     TaskSpec:
       type: object
