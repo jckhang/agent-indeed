@@ -180,6 +180,17 @@ export type UploadAgentBundleErrorResponse =
   | UploadAgentBundleValidationErrorResponse
   | UploadAgentBundleVersionConflictResponse;
 
+export interface CreateTaskRequest {
+  task: TaskSpec;
+}
+
+export interface CreateTaskResponse {
+  taskId: string;
+  status: "OPEN_FOR_MATCHING" | "OPEN_FOR_BIDDING";
+  commitDeadline?: string;
+  revealDeadline?: string;
+}
+
 export interface TaskSpec {
   title: string;
   description: string;
@@ -270,4 +281,41 @@ export interface Bid {
     };
     proof?: ProofPack;
   };
+}
+
+export interface CommitBidRequest {
+  bid: Bid;
+}
+
+export interface RevealBidRequest {
+  bid: Bid;
+}
+
+export interface BidResponse {
+  bidId: string;
+  taskId: string;
+  agentId: string;
+  phase: "COMMIT" | "REVEAL";
+  status: "COMMITTED" | "REVEALED" | "REJECTED" | "SCORED";
+  rankingScore?: number;
+  decisionTraceHash?: string;
+}
+
+export interface VerifyProofPackRequest {
+  proof: ProofPack;
+}
+
+export interface ProofVerificationResponse {
+  proofId: string;
+  result: "PASS" | "FAIL" | "MANUAL_REVIEW";
+  requiredDifficulty: number;
+  achievedDifficulty: number;
+  reasonCodes?: string[];
+  verifiedAt?: string;
+}
+
+export interface ErrorResponse {
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
 }
