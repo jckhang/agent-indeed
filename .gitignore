@@ -1,0 +1,2 @@
+# Agent-local workspaces (thread/runtime state, not shared project artifacts)
+workspace-*/
