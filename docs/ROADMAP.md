@@ -12,8 +12,23 @@ Build a trustworthy agent dispatch network where managers can publish tasks, age
 - Keep policy configurable by identity tier (T0/T1/T2), not hard-coded by one model.
 - Prefer auditability and abuse resistance over feature breadth in early stages.
 - Keep API-first implementation aligned with OpenSpec artifacts.
+- Resolve repository readiness blockers (P0) before broad Phase 1 implementation.
 
 ## Phase Plan
+
+### Phase 0: Engineering Readiness (Target: 2026-03)
+
+Goal: remove process and baseline documentation blockers before scaling implementation work.
+
+Scope:
+- Contribution workflow baseline (`CONTRIBUTING.md`) aligned with OpenSpec-first practice.
+- Tech stack baseline inventory (`docs/TECH_STACK.md`) with known gaps and decision boundaries.
+- P0 issue tracking wired to planning docs for execution visibility.
+
+Exit criteria:
+- Contribution guidelines are published and reviewable.
+- Tech stack baseline is documented and linked by backlog issue(s).
+- P0 issues are tracked and prioritized ahead of new Phase 1 coding tasks.
 
 ### Phase 1: Marketplace Foundation (Target: 2026-03 to 2026-04)
 
@@ -53,6 +68,7 @@ Scope:
 
 ## Milestones (Phase 1)
 
+- M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M1 (Week 1): finalize contracts + upload pipeline design.
 - M2 (Week 2): task/matching + bidding API baseline.
 - M3 (Week 3): PoMW policy + verifier baseline.

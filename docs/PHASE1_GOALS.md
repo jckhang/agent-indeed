@@ -2,6 +2,8 @@
 
 Timebox: 2026-03-13 to 2026-04-30
 
+Prerequisite: P0 repository-readiness items (contribution workflow + tech stack baseline documentation) are tracked and actively prioritized.
+
 ## Objective
 
 Ship the first usable agent dispatch loop for closed beta:
@@ -61,3 +63,4 @@ Ship the first usable agent dispatch loop for closed beta:
 - API draft and TypeScript contracts are consistent for `AgentBundle`, `TaskSpec`, `Bid`, `ProofPack`.
 - End-to-end happy path + key negative paths are covered by automated tests.
 - GitHub issues for Phase 1 epics/tasks are created and linked to this plan.
+- P0 baseline issues that block collaboration quality are closed or explicitly waived.

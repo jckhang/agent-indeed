@@ -1,7 +1,10 @@
-# Phase 1 Issue Backlog
+# MVP Issue Backlog (P0 + P1)
 
 ## GitHub Tracking (created)
 
+- P0-00 #14 (closed): https://github.com/jckhang/agent-indeed/issues/14
+- P0-01 #15: https://github.com/jckhang/agent-indeed/issues/15
+- P0-02 #16: https://github.com/jckhang/agent-indeed/issues/16
 - Epic #2: https://github.com/jckhang/agent-indeed/issues/2
 - P1-01 #3: https://github.com/jckhang/agent-indeed/issues/3
 - P1-02 #4: https://github.com/jckhang/agent-indeed/issues/4
@@ -13,7 +16,46 @@
 - P1-08 #10: https://github.com/jckhang/agent-indeed/issues/10
 - P1-09 #11: https://github.com/jckhang/agent-indeed/issues/11
 
-## Epic
+## P0 Readiness
+
+### P0-00 Repository baseline unblockers
+
+Description:
+- Fix high-priority process/documentation gaps that can cause invalid changes to slip through review.
+- Establish a repeatable contribution workflow and stack baseline before scaling feature implementation.
+
+Acceptance criteria:
+- Repository guidance commands are executable and verified.
+- Contribution process documentation exists and is linked from issue tracking.
+- Tech stack baseline and current gaps are documented and linked from issue tracking.
+
+## P0 Delivery Issues
+
+### P0-01 Publish contribution workflow baseline (`CONTRIBUTING.md`)
+
+References:
+- `CONTRIBUTING.md`
+- `AGENTS.md`
+- `docs/ROADMAP.md`
+
+Acceptance criteria:
+- Branching, OpenSpec-first flow, validation command, and PR checklist are documented.
+- Guidelines explicitly require contract sync for `openapi.yaml` and `contracts.ts`.
+- Document is linked by a tracked GitHub issue.
+
+### P0-02 Publish repository tech stack baseline (`docs/TECH_STACK.md`)
+
+References:
+- `docs/TECH_STACK.md`
+- `src/api/openapi.yaml`
+- `src/api/contracts.ts`
+
+Acceptance criteria:
+- Current stack choices are enumerated by layer and mapped to repository paths.
+- Unresolved technology decisions and quality-gate gaps are explicitly listed.
+- Document is linked by a tracked GitHub issue.
+
+## P1 Epic
 
 ### P1-00 MVP: Agent Dispatch Foundation
 
