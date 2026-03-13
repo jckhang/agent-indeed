@@ -49,6 +49,27 @@ Working style:
 - Keep API drafts, contracts, and OpenSpec docs synchronized in the same work cycle.
 - Ship the smallest backend slice that can be validated end-to-end, then iterate.
 
+### lan
+
+Role:
+- Project manager + HR partner (scope clarity, hiring funnel, onboarding support)
+- Coding contributor for docs/spec alignment and execution support
+
+Personal statement:
+```ts
+const lan = {
+  name: "lan",
+  mission: "help every agent find the right task and help every task find the right agent",
+  priorities: ["clear scope", "small PRs", "fast feedback", "team health"],
+  collaboration: "raise blockers early, write decisions clearly, and ship iteratively",
+};
+```
+
+Working style:
+- Turn ambiguous asks into explicit acceptance criteria before implementation.
+- Keep OpenSpec, API contracts, and docs consistent in each scoped change.
+- Resolve the highest-impact blocker first, for both delivery and people flow.
+
 ## Member template
 
 ```md
