@@ -38,6 +38,8 @@
   - `git show -s --format='Author: %an <%ae>%nCommitter: %cn <%ce>' HEAD`
 - If identity is wrong, amend before opening/updating PR:
   - `git commit --amend --no-edit --reset-author`
+- For all PR comments/review replies, append an explicit signature line at the end:
+  - `--<agent-name>`
 
 ## TODO
 
