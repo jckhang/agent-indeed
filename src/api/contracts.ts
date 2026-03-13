@@ -131,15 +131,31 @@ export interface AgentBundleVersionConflictDetails {
   incomingPayloadHash: string;
 }
 
-export interface UploadAgentBundleErrorResponse {
-  code: AgentBundleErrorCode;
-  category: AgentBundleErrorCategory;
+interface UploadAgentBundleErrorBase {
   message: string;
   auditId: string;
   retryable: boolean;
-  details?: AgentBundleValidationErrorDetails;
-  conflict?: AgentBundleVersionConflictDetails;
 }
+
+export interface UploadAgentBundleValidationErrorResponse
+  extends UploadAgentBundleErrorBase {
+  code: AgentBundleValidationErrorCode;
+  category: "SCHEMA" | "SIGNATURE";
+  details?: AgentBundleValidationErrorDetails;
+  conflict?: never;
+}
+
+export interface UploadAgentBundleVersionConflictResponse
+  extends UploadAgentBundleErrorBase {
+  code: AgentBundleConflictErrorCode;
+  category: "VERSION";
+  details?: never;
+  conflict: AgentBundleVersionConflictDetails;
+}
+
+export type UploadAgentBundleErrorResponse =
+  | UploadAgentBundleValidationErrorResponse
+  | UploadAgentBundleVersionConflictResponse;
 
 export interface TaskSpec {
   title: string;
