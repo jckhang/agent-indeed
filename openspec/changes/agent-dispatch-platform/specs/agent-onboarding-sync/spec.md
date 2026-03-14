@@ -10,11 +10,11 @@
 
 #### Scenario: Invalid signature is rejected
 - **WHEN** 上传包签名校验失败
-- **THEN** 平台拒绝入库并返回可审计错误码
+- **THEN** 平台拒绝入库并返回可审计错误码（`AGENT_BUNDLE_SIGNATURE_INVALID` 或同类签名错误码）
 
 #### Scenario: Invalid schema is rejected
 - **WHEN** 上传包缺少必填字段、字段格式不合法，或 schema 版本不受支持
-- **THEN** 平台拒绝入库并返回稳定 schema 错误码与字段路径
+- **THEN** 平台拒绝入库并返回稳定 schema 错误码（`AGENT_BUNDLE_SCHEMA_INVALID` / `AGENT_BUNDLE_SCHEMA_UNSUPPORTED_VERSION`）与字段路径
 
 ### Requirement: Bundle Version Conflict Must Follow Deterministic Strategy
 
@@ -26,7 +26,11 @@
 
 #### Scenario: Duplicate version with different payload hash
 - **WHEN** 同一 `agent_id` 与 `manifest.version` 已存在，但 `payload_hash` 不一致
-- **THEN** 平台拒绝上传并返回版本冲突错误码与策略 `REJECT_ON_HASH_MISMATCH`
+- **THEN** 平台拒绝上传并返回 `AGENT_BUNDLE_VERSION_CONFLICT` 与策略 `REJECT_ON_HASH_MISMATCH`
+
+#### Scenario: Upload replay with identical idempotency key is deterministic
+- **WHEN** 客户端因网络抖动重试同一个 `idempotencyKey` 且 payload hash 不变
+- **THEN** 平台返回稳定重放结果而不是创建新版本，并保证响应可用于幂等恢复
 
 ### Requirement: Memory Synchronization Must Preserve Privacy Boundary
 

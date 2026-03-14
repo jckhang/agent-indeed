@@ -180,6 +180,63 @@ export type UploadAgentBundleErrorResponse =
   | UploadAgentBundleValidationErrorResponse
   | UploadAgentBundleVersionConflictResponse;
 
+export type ApiErrorCategory =
+  | AgentBundleErrorCategory
+  | "VALIDATION"
+  | "IDEMPOTENCY"
+  | "WINDOW"
+  | "PRECONDITION"
+  | "POLICY"
+  | "VERIFICATION"
+  | "AUDIT";
+
+export type TaskCreateErrorCode =
+  | "TASK_SPEC_CONSTRAINTS_MISSING"
+  | "TASK_SPEC_POLICY_INVALID"
+  | "TASK_CREATE_IDEMPOTENCY_CONFLICT";
+
+export type BidCommitErrorCode =
+  | "BID_COMMIT_PAYLOAD_INVALID"
+  | "BID_COMMIT_TASK_MISMATCH"
+  | "BID_COMMIT_WINDOW_CLOSED"
+  | "BID_COMMIT_DUPLICATE";
+
+export type BidRevealErrorCode =
+  | "BID_REVEAL_PAYLOAD_INVALID"
+  | "BID_REVEAL_COMMIT_NOT_FOUND"
+  | "BID_REVEAL_HASH_MISMATCH"
+  | "BID_REVEAL_WINDOW_CLOSED";
+
+export type ProofVerifyErrorCode =
+  | "PROOF_VERIFY_PAYLOAD_INVALID"
+  | "PROOF_VERIFY_POLICY_INVALID"
+  | "PROOF_VERIFY_FAILED"
+  | "PROOF_VERIFY_NEEDS_REVIEW";
+
+export type AwardAuditErrorCode =
+  | "TASK_AWARD_PRECONDITION_FAILED"
+  | "TASK_AWARD_PROOF_NOT_VERIFIED"
+  | "TASK_AWARD_CANDIDATE_NOT_ELIGIBLE"
+  | "AUDIT_QUERY_NOT_FOUND";
+
+export type ApiErrorCode =
+  | AgentBundleErrorCode
+  | TaskCreateErrorCode
+  | BidCommitErrorCode
+  | BidRevealErrorCode
+  | ProofVerifyErrorCode
+  | AwardAuditErrorCode;
+
+export interface ApiErrorResponse {
+  code: ApiErrorCode;
+  category: ApiErrorCategory;
+  message: string;
+  auditId: string;
+  retryable: boolean;
+  retryAfterSeconds?: number;
+  details?: Record<string, unknown>;
+}
+
 export interface TaskSpec {
   title: string;
   description: string;

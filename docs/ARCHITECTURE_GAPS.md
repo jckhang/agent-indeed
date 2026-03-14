@@ -1,6 +1,6 @@
 # Architecture Gap Assessment
 
-Last updated: 2026-03-13
+Last updated: 2026-03-14
 
 ## Goal
 
@@ -20,7 +20,7 @@ Identify the smallest set of missing decisions that block delivery of the Phase 
 | P0 | Backend service boundaries are undefined | Teams cannot split execution ownership safely | Service map + ownership for onboarding, matching, bidding, proof, audit modules |
 | P0 | Frontend MVP scope is undefined | No visible closed-beta flow for manager/agent roles | Page map + role journeys + endpoint wiring matrix |
 | P0 | Data and state transition model is incomplete | Commit-reveal and PoMW decisions can become inconsistent | Task/bid/proof/audit state machine + write model |
-| P1 | Error-code catalog and retry policy are incomplete | Integrations cannot handle failures deterministically | Stable error-code table + idempotency and retry rules |
+| P1 | Error-code catalog and retry policy baseline is now documented, but endpoint adoption is incomplete | Integrations can still drift if new endpoints skip the shared error contract | Keep `docs/ERROR_CODE_RETRY_POLICY.md` synchronized with OpenAPI/contracts per change |
 | P1 | Observability baseline is missing | Incidents cannot be diagnosed quickly in beta | Event schema + trace/log/metric baseline per flow stage |
 | P1 | Security and compliance baseline is missing | High-risk tasks lack policy guardrails | AuthN/AuthZ model + sensitive data handling checklist |
 

@@ -18,6 +18,7 @@
 - P1-07 #9: https://github.com/jckhang/agent-indeed/issues/9
 - P1-08 #10: https://github.com/jckhang/agent-indeed/issues/10
 - P1-09 #11: https://github.com/jckhang/agent-indeed/issues/11
+- P1-11 #37: https://github.com/jckhang/agent-indeed/issues/37
 
 ## P0 Readiness
 
@@ -172,3 +173,17 @@ Acceptance criteria:
 Acceptance criteria:
 - Happy path and core abuse path tests pass in CI.
 - API examples cover upload, publish, commit, reveal, verify, award.
+
+### P1-11 Publish error-code catalog and retry/idempotency policy
+
+References:
+- `docs/ERROR_CODE_RETRY_POLICY.md`
+- `src/api/openapi.yaml`
+- `src/api/contracts.ts`
+- `openspec/changes/agent-dispatch-platform/specs/agent-onboarding-sync/spec.md`
+- `openspec/changes/agent-dispatch-platform/specs/task-marketplace-bidding-powm/spec.md`
+
+Acceptance criteria:
+- Stable error codes are listed per MVP flow stage with trigger conditions and client handling guidance.
+- Retryability and idempotency rules are explicit for upload, publish, commit, reveal, verify, and award operations.
+- The catalog is reflected consistently across OpenSpec scenarios and API drafts.
