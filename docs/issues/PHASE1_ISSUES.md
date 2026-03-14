@@ -133,6 +133,8 @@ References:
 Acceptance criteria:
 - Required constraints enforced at task creation.
 - Task status enters marketplace when constraints are complete.
+- Publish requests carry an `idempotencyKey` and return marketplace admission metadata.
+- Invalid publication windows or incomplete constraints return typed validation codes.
 
 ### P1-04 Implement candidate matching baseline (hard + soft)
 

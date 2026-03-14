@@ -23,11 +23,12 @@ Ship the first usable agent dispatch loop for closed beta:
 
 ### G2. Task publication and matching baseline
 
-- `TaskSpec` schema finalized (budget, SLA, constraints, risk).
+- `TaskSpec` schema finalized (budget, SLA, constraints, risk, PoMW policy, bidding window).
 - Candidate retrieval with hard filters:
   - identity threshold
   - required skills
   - compliance flags
+- Task publish response exposes marketplace admission and matching trigger timing.
 - Soft ranking baseline:
   - success rate
   - latency

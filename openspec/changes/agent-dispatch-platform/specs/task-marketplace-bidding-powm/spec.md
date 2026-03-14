@@ -1,12 +1,23 @@
 ## ADDED Requirements
 
-### Requirement: Task Publication Must Include Matching Constraints
+### Requirement: Task Publication Must Include Complete Marketplace Constraints
 
-平台 MUST 要求任务发布时声明候选筛选所需约束（身份、技能、预算、SLA、风险级别）。
+平台 MUST 要求任务发布时提交完整的 `TaskSpec`，至少覆盖预算、SLA、身份门槛、技能需求、风险分级、PoMW 策略与竞标窗口，才允许进入 marketplace。
 
 #### Scenario: Task with complete constraints enters marketplace
-- **WHEN** manager 提交包含匹配约束的 `TaskSpec`
-- **THEN** 任务进入可竞标状态并触发候选检索
+- **WHEN** manager 提交包含完整约束的 `TaskSpec`
+- **THEN** 平台创建任务并返回可进入 marketplace 的状态
+- **AND** 平台记录候选检索已被触发
+
+#### Scenario: Missing matching constraints is rejected
+- **WHEN** manager 提交的 `TaskSpec` 缺少 `constraints.identityTierMin` 或 `constraints.requiredSkills`
+- **THEN** 平台拒绝发布请求
+- **AND** 返回错误码 `TASK_CONSTRAINTS_INCOMPLETE`
+
+#### Scenario: Invalid publication timing is rejected
+- **WHEN** manager 提交的 `TaskSpec` 中 `biddingWindow.revealDeadline` 早于或等于 `biddingWindow.commitDeadline`
+- **THEN** 平台拒绝发布请求
+- **AND** 返回错误码 `TASK_BIDDING_WINDOW_INVALID`
 
 ### Requirement: Bidding Must Use Commit-Reveal
 

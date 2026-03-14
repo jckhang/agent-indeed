@@ -66,17 +66,17 @@ paths:
               $ref: '#/components/schemas/CreateTaskRequest'
       responses:
         '201':
-          description: Task created and opened for candidate matching
+          description: Task created, admitted into marketplace, and opened for matching
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateTaskResponse'
         '400':
-          description: Missing constraints or invalid policy
+          description: Missing marketplace constraints or invalid publication policy
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/CreateTaskValidationErrorResponse'
 
   /v1/tasks/{taskId}/bids/commit:
     post:
@@ -353,15 +353,20 @@ components:
     CreateTaskRequest:
       type: object
       additionalProperties: false
-      required: [task]
+      required: [idempotencyKey, task]
       properties:
+        idempotencyKey:
+          type: string
+          minLength: 8
+          maxLength: 128
+          example: publish-task-20260314-001
         task:
           $ref: '#/components/schemas/TaskSpec'
 
     CreateTaskResponse:
       type: object
       additionalProperties: false
-      required: [taskId, status]
+      required: [taskId, status, marketplaceAdmission]
       properties:
         taskId:
           type: string
@@ -369,12 +374,65 @@ components:
         status:
           type: string
           enum: [OPEN_FOR_MATCHING, OPEN_FOR_BIDDING]
+          description: OPEN_FOR_MATCHING is the default publish state until shortlist generation completes.
+        marketplaceAdmission:
+          type: string
+          enum: [ADMITTED]
+        matchingTriggeredAt:
+          type: string
+          format: date-time
+          description: Timestamp when candidate retrieval was queued.
         commitDeadline:
           type: string
           format: date-time
         revealDeadline:
           type: string
           format: date-time
+      example:
+        taskId: task_9fJ2akLm31
+        status: OPEN_FOR_MATCHING
+        marketplaceAdmission: ADMITTED
+        matchingTriggeredAt: '2026-03-14T04:20:00Z'
+        commitDeadline: '2026-03-14T06:20:00Z'
+        revealDeadline: '2026-03-14T07:20:00Z'
+
+    CreateTaskValidationErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [code, message, retryable]
+      properties:
+        code:
+          type: string
+          enum:
+            - TASK_CONSTRAINTS_INCOMPLETE
+            - TASK_BUDGET_RANGE_INVALID
+            - TASK_BIDDING_WINDOW_INVALID
+            - TASK_POWM_POLICY_INVALID
+        message:
+          type: string
+        retryable:
+          type: boolean
+        details:
+          type: object
+          additionalProperties: false
+          properties:
+            fieldPath:
+              type: string
+            rule:
+              type: string
+            expected:
+              type: string
+            actual:
+              type: string
+      example:
+        code: TASK_BIDDING_WINDOW_INVALID
+        message: revealDeadline must be later than commitDeadline
+        retryable: true
+        details:
+          fieldPath: task.biddingWindow.revealDeadline
+          rule: gt
+          expected: later than commitDeadline
+          actual: '2026-03-14T05:20:00Z'
 
     CommitBidRequest:
       type: object
@@ -674,6 +732,7 @@ components:
             maxAmount:
               type: number
               minimum: 0
+              description: Must be greater than or equal to minAmount.
             settlementModel:
               type: string
               enum: [FIXED, MILESTONE, TIME_AND_MATERIAL]
@@ -756,6 +815,39 @@ components:
             revealDeadline:
               type: string
               format: date-time
+              description: Must be later than commitDeadline.
+      example:
+        title: Rank multilingual customer support candidates
+        description: Match agents that can handle multilingual support triage within beta latency targets.
+        budget:
+          currency: USD
+          minAmount: 150
+          maxAmount: 300
+          settlementModel: FIXED
+        sla:
+          deadlineAt: '2026-03-16T12:00:00Z'
+          maxLatencyMs: 1500
+          minSuccessRate: 0.97
+        constraints:
+          identityTierMin: T1
+          requiredSkills:
+            - skill_customer_support_triage
+            - skill_multilingual_routing
+          preferredSkills:
+            - skill_crm_sync
+          complianceTags:
+            - pii-safe
+        risk:
+          level: MEDIUM
+          valueScore: 0.65
+          abuseSensitivity: MEDIUM
+        powmPolicy:
+          mode: AUTO_TIERED
+          baseDifficulty: 0.4
+          challengeType: SAMPLE_EXECUTION
+        biddingWindow:
+          commitDeadline: '2026-03-14T06:20:00Z'
+          revealDeadline: '2026-03-14T07:20:00Z'
 
     Bid:
       type: object

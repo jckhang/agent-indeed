@@ -180,6 +180,19 @@ export type UploadAgentBundleErrorResponse =
   | UploadAgentBundleValidationErrorResponse
   | UploadAgentBundleVersionConflictResponse;
 
+export type TaskCreationErrorCode =
+  | "TASK_CONSTRAINTS_INCOMPLETE"
+  | "TASK_BUDGET_RANGE_INVALID"
+  | "TASK_BIDDING_WINDOW_INVALID"
+  | "TASK_POWM_POLICY_INVALID";
+
+export interface TaskCreationValidationErrorDetails {
+  fieldPath?: string;
+  rule?: string;
+  expected?: string;
+  actual?: string;
+}
+
 export interface TaskSpec {
   title: string;
   description: string;
@@ -215,6 +228,27 @@ export interface TaskSpec {
     commitDeadline: string;
     revealDeadline: string;
   };
+}
+
+export interface CreateTaskRequest {
+  idempotencyKey: string;
+  task: TaskSpec;
+}
+
+export interface CreateTaskResponse {
+  taskId: string;
+  status: "OPEN_FOR_MATCHING" | "OPEN_FOR_BIDDING";
+  marketplaceAdmission: "ADMITTED";
+  matchingTriggeredAt?: string;
+  commitDeadline?: string;
+  revealDeadline?: string;
+}
+
+export interface CreateTaskValidationErrorResponse {
+  code: TaskCreationErrorCode;
+  message: string;
+  retryable: boolean;
+  details?: TaskCreationValidationErrorDetails;
 }
 
 export interface ProofPack {
