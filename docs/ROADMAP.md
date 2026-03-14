@@ -43,6 +43,7 @@ Scope:
 - Manager console baseline (`docs/MANAGER_CONSOLE_BASELINE.md`, issue #43 / PR #53) keeps the publish form, shortlist evidence, and award-summary dependency notes visible while interactive award APIs are still pending.
 - Commit-reveal bidding workflow.
 - Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps commit/reveal workspace expectations and async refresh gaps explicit until polling/event-stream support lands.
+- Audit visibility console baseline (`docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`, issue #47) keeps task/bid timeline review, failure translation, and missing-field alert requirements visible while audit query and award-read contracts are still pending.
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.
 - Lifecycle observability baseline for `upload -> match -> bid -> verify -> award`.
