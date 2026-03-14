@@ -32,6 +32,16 @@
 - **WHEN** 客户端因网络抖动重试同一个 `idempotencyKey` 且 payload hash 不变
 - **THEN** 平台返回稳定重放结果而不是创建新版本，并保证响应可用于幂等恢复
 
+### Requirement: Onboarding Pipeline Must Publish Matching-Ready Skill Indexes
+
+平台 MUST 在 bundle 被接受后同步生成 matching-ready 的 skill 索引记录，而不是要求下游模块重新解析原始 bundle。
+
+#### Scenario: Accepted upload reports indexed skills
+- **WHEN** bundle 通过签名、schema、版本冲突校验并被平台接受
+- **THEN** 成功响应包含 `indexing.status = INDEXED`
+- **AND** 成功响应回显 `indexing.indexedSkillCount`
+- **AND** 成功响应列出每个被索引的 `skillId`、`version`、`sourceAgentId`、`sourceVersion`
+
 ### Requirement: Memory Synchronization Must Preserve Privacy Boundary
 
 平台 MUST 支持 memory 的索引级同步，并允许原始 memory 保持在 agent 控制域内。

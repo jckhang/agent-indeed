@@ -1,0 +1,69 @@
+# Agent Onboarding Pipeline
+
+Last updated: 2026-03-14
+
+## Goal
+
+Define the MVP control-plane pipeline for `POST /v1/agents/bundles` so backend,
+API, and matching work all share one deterministic onboarding contract.
+
+## Pipeline Stages
+
+| Stage | Check | Output |
+| --- | --- | --- |
+| 1. Idempotency gate | Look up `idempotencyKey` within the caller's identity scope before mutating state. | Replay existing success response when the same request is retried. |
+| 2. Signature verification | Verify `signature.signerDid == identity.did`, confirm `payloadHash`, then validate the cryptographic signature. | Reject invalid or mismatched signatures with stable audit-friendly error codes. |
+| 3. Schema validation | Validate required fields, field formats, and supported bundle version rules. | Reject invalid payloads with `fieldPath`, rule, expected, and actual details. |
+| 4. Version conflict policy | Compare `(agent identity, manifest.version, payloadHash)` with stored bundle metadata. | Return existing version on hash match; reject on hash mismatch. |
+| 5. Bundle persistence | Persist manifest, identity, memory boundary metadata, and accepted bundle version record. | Produce canonical `agentId` and accepted `version`. |
+| 6. Skill indexing | Expand each `skills[]` entry into matching-ready index records. | Matching can hard-filter by `skillId` and version without reading raw bundle artifacts. |
+| 7. Response assembly | Return success or replay payload including indexing summary. | Clients can confirm what the backend accepted and indexed. |
+
+## Deterministic Rules
+
+- Validation order is fixed: idempotency -> signature -> schema -> version
+  conflict -> persistence -> indexing.
+- Bundle replay is keyed by the same accepted caller + `idempotencyKey`; clients
+  should reuse the same key only when retrying the same logical upload.
+- Version conflict is evaluated on the accepted identity plus
+  `manifest.version`.
+- Matching consumes skill index records, not raw bundle uploads.
+- Memory sync remains metadata-only at onboarding time; raw memory content stays
+  in the agent control domain.
+
+## Skill Index Contract
+
+Each accepted upload creates one index record per skill:
+
+| Field | Meaning |
+| --- | --- |
+| `skillId` | Stable capability identifier used by task hard filters |
+| `version` | Uploaded skill version |
+| `sourceAgentId` | Accepted agent identifier |
+| `sourceVersion` | Accepted bundle version |
+| `tags` | Optional search/filter hints copied from the bundle |
+
+The upload response reports:
+
+- `indexing.status`: `INDEXED` for MVP synchronous indexing
+- `indexing.indexedSkillCount`: number of created skill index records
+- `indexing.skills[]`: exact skill records published to matching
+- `indexing.memoryMode`: uploaded memory synchronization mode for downstream
+  policy checks
+
+## Retry Guidance
+
+| Outcome | HTTP | Retry guidance |
+| --- | --- | --- |
+| New bundle accepted | `201` | Safe to retry with the same `idempotencyKey` if the client is unsure whether the response was delivered. |
+| Same payload replayed | `200` | Do not generate a new key; this is the stable replay path. |
+| Signature/schema failure | `400` | Fix the payload first; do not blindly retry. |
+| Version conflict | `409` | Do not retry unchanged payload; upload a new bundle version or reuse the stored artifact. |
+
+## Backend Handoff
+
+- Registry owns persistence for bundle metadata and version history.
+- Matching owns skill index consumption but receives its source-of-truth records
+  from onboarding.
+- Audit must log the rejected or accepted outcome with a stable `auditId` for
+  every terminal pipeline result.

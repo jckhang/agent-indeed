@@ -95,7 +95,23 @@ export interface UploadAgentBundleCreatedResponse {
   version: string;
   status: "ACCEPTED" | "PENDING_REVIEW";
   result: "CREATED";
+  indexing: UploadAgentBundleIndexingSummary;
   indexedAt?: string;
+}
+
+export interface AgentSkillIndexRecord {
+  skillId: string;
+  version: string;
+  sourceAgentId: string;
+  sourceVersion: string;
+  tags?: string[];
+}
+
+export interface UploadAgentBundleIndexingSummary {
+  status: "INDEXED";
+  indexedSkillCount: number;
+  memoryMode: AgentMemoryMode;
+  skills: AgentSkillIndexRecord[];
 }
 
 export type AgentBundleValidationErrorCode =
@@ -146,6 +162,7 @@ export interface UploadAgentBundleReplayResponse {
   version: string;
   status: "EXISTING";
   result: "RETURNED_EXISTING";
+  indexing: UploadAgentBundleIndexingSummary;
   replay: AgentBundleVersionReplayDetails;
   indexedAt?: string;
 }
