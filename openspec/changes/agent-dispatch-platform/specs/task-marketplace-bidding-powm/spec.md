@@ -75,3 +75,7 @@
 #### Scenario: Award review can locate proof and ranking evidence
 - **WHEN** 操作方回放一次中标决策
 - **THEN** 相关事件和日志包含 `audit_id`、评分摘要、PoMW 结果码、阶段化时间戳以及触发回放/覆写的 `actor_type`，足以解释中标或拒绝原因
+
+#### Scenario: Downstream implementation work is mapped to telemetry obligations
+- **WHEN** 团队推进匹配、竞标、校验或审计等后续 issue / PR
+- **THEN** 平台维护一份可审阅的 handoff 清单，明确每个活跃工作项必须补齐的事件、指标、trace 字段，以及仍阻塞观测接入的 `job_id` / async read / `audit_id` 等合同缺口
