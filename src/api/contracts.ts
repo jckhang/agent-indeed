@@ -958,8 +958,7 @@ export interface RefreshPolicy {
 }
 
 export type BidStatusReasonCode =
-  | "BID_COMMIT_WINDOW_CLOSED"
-  | "BID_COMMIT_DUPLICATE"
+  | BidCommitErrorCode
   | BidRevealErrorCode
   | "PROOF_VERIFY_FAILED"
   | "PROOF_VERIFY_NEEDS_REVIEW";
