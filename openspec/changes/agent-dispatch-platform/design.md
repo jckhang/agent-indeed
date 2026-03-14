@@ -37,6 +37,7 @@
 3. 任务匹配采用“硬过滤 + 软排序”
    - 硬过滤：身份门槛、必需技能、合规约束。
    - 软排序：历史成功率、延迟、预算拟合度、相似任务表现。
+   - 匹配结果对外暴露 `matching_trace_id`、硬过滤检查项、以及评分因子拆解，便于审计与后续中标复核。
 
 4. 竞标采用 commit-reveal
    - Commit 阶段提交 `bid_hash` 与写入幂等键，避免抄袭、围标以及网络重放导致的重复状态。
@@ -90,6 +91,7 @@ MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立�
 - 负责 `TaskSpec` 校验、任务创建、候选硬过滤/软排序、以及任务进入 marketplace 的状态切换。
 - 拥有 task lifecycle 中 `draft -> marketplace` 的写入权。
 - 依赖 Onboarding Registry 暴露的可检索 skills/identity 元数据，不直接改写 agent 注册数据。
+- 候选查询输出 MUST 区分“未通过硬过滤”和“通过过滤后参与排序”的结果，并为每个候选提供可回放的 `matching_trace_id` 与评分拆解。
 
 ### Bid Ledger
 
