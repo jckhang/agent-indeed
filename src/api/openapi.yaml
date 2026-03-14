@@ -183,6 +183,19 @@ paths:
                       rule: supported_schema_version
                       expected: '1.0'
                       actual: '2.0'
+                payloadHashMismatch:
+                  summary: Signature payload hash does not match the uploaded bundle
+                  value:
+                    code: AGENT_BUNDLE_SIGNATURE_PAYLOAD_MISMATCH
+                    category: SIGNATURE
+                    message: signature.payloadHash must match the canonical bundle payload hash
+                    auditId: audit_bundle_upload_payload_hash_mismatch
+                    retryable: false
+                    details:
+                      fieldPath: bundle.signature.payloadHash
+                      rule: payload_hash_matches_bundle
+                      expected: sha256:3333333333333333333333333333333333333333333333333333333333333333
+                      actual: sha256:5555555555555555555555555555555555555555555555555555555555555555
         '409':
           description: Duplicate bundle version
           content:
