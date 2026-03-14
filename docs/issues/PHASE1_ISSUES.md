@@ -24,6 +24,7 @@
 - P1-09 #11: https://github.com/jckhang/agent-indeed/issues/11
 - P1-14 #43: https://github.com/jckhang/agent-indeed/issues/43
 - P1-11 #37: https://github.com/jckhang/agent-indeed/issues/37
+- P1-15 #44: https://github.com/jckhang/agent-indeed/issues/44
 - P1-12 #38: https://github.com/jckhang/agent-indeed/issues/38
 - P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
 
@@ -274,6 +275,18 @@ Acceptance criteria:
 - Closed-beta guardrails and minimum compliance checklist are explicit and testable.
 - The baseline identifies follow-on implementation issues needed before beta readiness.
 
+### P1-15 Build agent bidding console baseline
+
+References:
+- `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`
+- Agent can complete commit and reveal flows from UI with deadline/status feedback.
+- ProofPack entry or upload inputs reflect current API contract and validation hints.
+- Verification outcome and failure reasons are rendered in a timeline/status view.
+- Missing async-update requirements (polling/event stream) are explicitly documented if they block UX completion.
+
+Backlog notes:
+- Bid status refresh still needs a task-scoped bid read model before the UI can survive browser refreshes or cross-device resume.
+- Proof verification status still needs a proof read endpoint and polling/event guidance before the timeline can promise live updates.
 ### P1-14 Build manager console baseline for task publish and award
 
 References:
