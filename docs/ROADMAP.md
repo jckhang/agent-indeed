@@ -1,6 +1,6 @@
 # Agent Indeed Roadmap
 
-Last updated: 2026-03-13
+Last updated: 2026-03-14
 
 ## Product North Star
 
@@ -40,6 +40,7 @@ Goal: deliver MVP control-plane APIs and event trail to run closed beta tasks en
 Scope:
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
+- Manager console baseline (`docs/MANAGER_CONSOLE_BASELINE.md`, issue #43 / PR #53) keeps the publish form, shortlist evidence, and award-summary dependency notes visible while interactive award APIs are still pending.
 - Commit-reveal bidding workflow.
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.
