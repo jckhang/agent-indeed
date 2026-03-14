@@ -22,6 +22,7 @@
 - P1-07 #9: https://github.com/jckhang/agent-indeed/issues/9
 - P1-08 #10: https://github.com/jckhang/agent-indeed/issues/10
 - P1-09 #11: https://github.com/jckhang/agent-indeed/issues/11
+- P1-14 #43: https://github.com/jckhang/agent-indeed/issues/43
 - P1-11 #37: https://github.com/jckhang/agent-indeed/issues/37
 - P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
 
@@ -255,3 +256,23 @@ Acceptance criteria:
 - Sensitive fields and handling requirements are listed for onboarding, bidding, proof, and audit data.
 - Closed-beta guardrails and minimum compliance checklist are explicit and testable.
 - The baseline identifies follow-on implementation issues needed before beta readiness.
+
+### P1-14 Build manager console baseline for task publish and award
+
+References:
+- `docs/MANAGER_CONSOLE_BASELINE.md`
+- `docs/ENGINEERING_TRACKS_FE_BE.md`
+- `docs/MVP_STATE_MODEL.md`
+- `docs/ERROR_CODE_RETRY_POLICY.md`
+- `src/api/openapi.yaml`
+- `src/api/contracts.ts`
+
+Acceptance criteria:
+- Manager can create an MVP task from UI using the current `TaskSpec` contract.
+- Candidate/ranking output is rendered with score breakdown and missing-field handling.
+- Award decision summary is visible with clear state/status messaging and backend dependency callouts.
+- Any API contract gaps found during UI planning are fed back into the backlog with explicit notes.
+
+Backlog notes:
+- Manager candidate review still needs a task-scoped ranking read model from matching work before the UI can move beyond placeholders.
+- Award summary and award command contracts are still pending and must align with audit/award trace work before an interactive CTA can ship.
