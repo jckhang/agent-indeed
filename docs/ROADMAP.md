@@ -1,6 +1,6 @@
 # Agent Indeed Roadmap
 
-Last updated: 2026-03-13
+Last updated: 2026-03-14
 
 ## Product North Star
 
@@ -41,6 +41,7 @@ Scope:
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
 - Commit-reveal bidding workflow.
+- Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps commit/reveal workspace expectations and async refresh gaps explicit until polling/event-stream support lands.
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.
 
