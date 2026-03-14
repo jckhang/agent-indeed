@@ -53,6 +53,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
    - Re-run or override proof decisions with trace context.
 3. `/operator/tasks/{taskId}/audit`
    - Inspect timeline from task creation to award.
+   - Baseline behavior and dependency notes live in `docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`.
 
 ## API-to-UI Wiring Matrix
 

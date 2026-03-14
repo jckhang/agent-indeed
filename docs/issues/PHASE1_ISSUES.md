@@ -279,6 +279,8 @@ Acceptance criteria:
 
 References:
 - `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`
+
+Acceptance criteria:
 - Agent can complete commit and reveal flows from UI with deadline/status feedback.
 - ProofPack entry or upload inputs reflect current API contract and validation hints.
 - Verification outcome and failure reasons are rendered in a timeline/status view.
@@ -287,6 +289,7 @@ References:
 Backlog notes:
 - Bid status refresh still needs a task-scoped bid read model before the UI can survive browser refreshes or cross-device resume.
 - Proof verification status still needs a proof read endpoint and polling/event guidance before the timeline can promise live updates.
+
 ### P1-14 Build manager console baseline for task publish and award
 
 References:
@@ -306,3 +309,22 @@ Acceptance criteria:
 Backlog notes:
 - Manager candidate review still needs a task-scoped ranking read model from matching work before the UI can move beyond placeholders.
 - Award summary and award command contracts are still pending and must align with audit/award trace work before an interactive CTA can ship.
+
+### P1-16 Build audit visibility console baseline
+
+References:
+- `docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`
+- `docs/FRONTEND_MVP_SURFACE.md`
+- `docs/MVP_STATE_MODEL.md`
+- `docs/OBSERVABILITY_BASELINE.md`
+- `docs/ERROR_CODE_RETRY_POLICY.md`
+
+Acceptance criteria:
+- Task and bid audit timelines are rendered in a readable sequence with clear event names and timestamps.
+- Proof, commit, reveal, and award failure reasons are translated into operator-friendly UI states.
+- UI explicitly highlights missing audit/event fields that block stakeholder review.
+- The slice stays queue-ready until backend audit/query contracts are stable enough to integrate.
+
+Backlog notes:
+- Task-scoped audit event reads still need a normalized event stream contract before the UI can move beyond documented placeholders.
+- Award trace and shortlist-read dependencies must stay aligned with issue `#10` and issue `#58` so audit review does not infer missing backend evidence.
