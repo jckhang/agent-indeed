@@ -46,7 +46,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - `TASK_CREATED`
   - `BID_COMMITTED`
   - `BID_REVEALED`
-  - `POWM_VERIFIED`
+  - `POMW_VERIFIED`
   - `TASK_AWARDED`
 - Award decision includes score summary + proof result trace.
 

@@ -9,6 +9,7 @@
 - P0-04 #22: https://github.com/jckhang/agent-indeed/issues/22
 - P0-05 #23: https://github.com/jckhang/agent-indeed/issues/23
 - P0-06 #32: https://github.com/jckhang/agent-indeed/issues/32
+- P0-08 #34: https://github.com/jckhang/agent-indeed/issues/34
 - Epic #2: https://github.com/jckhang/agent-indeed/issues/2
 - P1-01 #3: https://github.com/jckhang/agent-indeed/issues/3
 - P1-02 #4: https://github.com/jckhang/agent-indeed/issues/4
@@ -108,6 +109,19 @@ Acceptance criteria:
 - Service/module map is documented with clear responsibilities.
 - Each MVP flow stage has an owning backend module.
 - Cross-module contract dependencies and sequencing risks are called out.
+
+### P0-08 Freeze MVP state model and write sequencing (`docs/MVP_STATE_MODEL.md`)
+
+References:
+- `docs/MVP_STATE_MODEL.md`
+- `src/api/openapi.yaml`
+- `openspec/changes/agent-dispatch-platform/specs/task-marketplace-bidding-powm/spec.md`
+
+Acceptance criteria:
+- Task, bid, proof, and audit state transitions are documented.
+- Invalid or out-of-order transitions are explicitly rejected.
+- Write sequencing and idempotency expectations are defined for commit/reveal/verify/award.
+- Output provides direct implementation direction for follow-on P1 issues.
 
 ## P1 Epic
 
