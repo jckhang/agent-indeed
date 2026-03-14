@@ -44,6 +44,30 @@
 - **WHEN** 候选身份为 T2 且任务风险等级高
 - **THEN** 平台要求高强度 PoMW（样本执行 + 更高挑战或质押要求）
 
+### Requirement: Bid And Proof Status Reads Must Be Deterministic
+
+平台 MUST 提供稳定的 bid/proof 读模型，使 agent 与 operator 前端无需猜测隐藏状态或自行拼接写接口结果。
+
+#### Scenario: Agent fetches bid status after reveal
+- **WHEN** agent 使用 `task_id` 与 `bid_id` 查询竞标状态
+- **THEN** 响应包含 `commitState`、`revealState`、`proofState`、`awardState`、稳定 failure reason codes、审计引用，以及当前刷新策略
+
+#### Scenario: Operator fetches proof verification status
+- **WHEN** operator 或 agent 使用 `task_id` 与 `proof_id` 查询 proof 状态
+- **THEN** 响应包含验证阶段、reason codes、decision trace、最近更新时间，以及轮询建议
+
+### Requirement: MVP Async Refresh Strategy Must Be Explicit
+
+平台 MUST 在 MVP 阶段显式声明状态刷新策略，避免前端默认依赖未冻结的事件流。
+
+#### Scenario: Status response declares polling contract
+- **WHEN** 任一 bid/proof 状态读接口返回成功
+- **THEN** 响应明确给出 `refresh.mode = POLL`、`pollAfterSeconds`、`manualRefreshAllowed` 与 `lastUpdatedAt`
+
+#### Scenario: Event stream remains deferred in MVP
+- **WHEN** 前端实现验证时间线或 proof 队列刷新
+- **THEN** 平台文档将事件流视为后续增强，而不是当前必须存在的 contract
+
 #### Scenario: Proof verification failure returns stable code
 - **WHEN** 提交的 `ProofPack` 未满足任务要求的 PoMW 强度
 - **THEN** 平台返回稳定验证错误码（`PROOF_VERIFY_FAILED` 或 `PROOF_VERIFY_NEEDS_REVIEW`）并附带可审计标识

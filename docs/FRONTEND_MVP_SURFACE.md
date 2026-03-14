@@ -70,9 +70,10 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | Page | API endpoint | Required request fields from UI | Response fields required by UI | Contract status |
 | --- | --- | --- | --- | --- |
 | `/agent/onboarding` | `POST /v1/agents/bundles` | `idempotencyKey`, `bundle.manifest.*`, `bundle.identity.*`, `bundle.skills[]`, `bundle.memoryRef.*`, `bundle.signature.*` | `agentId`, `version`, `status`, `result`, `indexedAt`; error `code`, `category`, `auditId`, `retryable`, `details`, `conflict` | Ready for create/replay/conflict/error paths in the current draft API; `bundle.schemaVersion` stays pending until the AgentBundle contract update in PR #31 lands |
-| `/agent/tasks/{taskId}/commit` | `POST /v1/tasks/{taskId}/bids/commit` | `idempotencyKey`, `commit.bidId`, `commit.taskId`, `commit.agentId`, `commit.bidHash`, `commit.committedAt` | `bidId`, `taskId`, `agentId`, `phase`, `status`, `result`, `window.*` | Ready for write path with typed commit reason codes and explicit window snapshot |
-| `/agent/tasks/{taskId}/reveal` | `POST /v1/tasks/{taskId}/bids/reveal` | `idempotencyKey`, `reveal.bidId`, `reveal.taskId`, `reveal.agentId`, `reveal.nonce`, `reveal.price.*`, `reveal.executionPlan.*`, `reveal.proof.*` | `bidId`, `phase`, `status`, `result`, `rankingScore`, `decisionTraceHash`, `proofSubmission.*`, `window.*` | Ready for write path with typed reveal failures; proof read endpoint still needed for refresh |
-| `/agent/tasks/{taskId}/verification` | `GET /v1/tasks/{taskId}/proofs/{proofId}` (proposed read endpoint) | `taskId`, `proofId` | `result`, `requiredDifficulty`, `achievedDifficulty`, `reasonCodes`, `verifiedAt` | Missing read endpoint; only `POST /v1/tasks/{taskId}/proofs/verify` exists |
+| `/agent/tasks/{taskId}/commit` | `POST /v1/tasks/{taskId}/bids/commit` | `bid.bidId`, `bid.taskId`, `bid.agentId`, `bid.phase`, `bid.commit.bidHash`, `bid.commit.committedAt` | success: `bidId`, `taskId`, `agentId`, `phase`, `status`, `statusChangedAt`; failure: `code`, `auditId`, `retryable` | Ready for write path; closed-window and duplicate branches use typed error codes |
+| `/agent/tasks/{taskId}/reveal` | `POST /v1/tasks/{taskId}/bids/reveal` | `bid.bidId`, `bid.taskId`, `bid.agentId`, `bid.phase`, `bid.reveal.nonce`, `bid.reveal.price.*`, `bid.reveal.executionPlan.*`, `bid.reveal.proof.*` | success: `bidId`, `phase`, `status`, `rankingScore`, `decisionTraceHash`, `proofId`; failure: `code`, `auditId`, `retryable` | Ready for write path; frontend should hand off to the read model for async status after submit |
+| `/agent/tasks/{taskId}/verification` | `GET /v1/tasks/{taskId}/proofs/{proofId}` | `taskId`, `proofId` | `verificationState`, `requiredDifficulty`, `achievedDifficulty`, `reasonCodes`, `decisionTraceHash`, `refresh.*` | Ready in contract: MVP refresh is explicit polling via `refresh.mode=POLL` |
+| `/agent/tasks/{taskId}/status` | `GET /v1/tasks/{taskId}/bids/{bidId}` | `taskId`, `bidId` | `commitState`, `revealState`, `proofState`, `awardState`, `failureReasonCodes`, `proof.*`, `refresh.*` | Ready in contract: shared status projection for agent timeline and retry UX |
 
 ### Operator pages
 
@@ -97,12 +98,13 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 | --- | --- | --- |
 | Missing candidate retrieval endpoint | Manager cannot inspect ranking before award | Add `GET /v1/tasks/{taskId}/candidates` with score breakdown |
 | Missing award write/read endpoints | Closed loop cannot finish in UI | Add award APIs with `decisionTraceHash` and `auditEventId` |
-| Missing list/read endpoints for bids/proofs after write success | UI cannot refresh long-running verification without ad-hoc polling hacks | Add read endpoints for bid/proof status by `taskId`, `bidId`, `proofId` |
+| Proof queue and audit event list endpoints are still missing | Operator queue and full timeline screens cannot refresh without custom backend work | Add list/read endpoints beyond the new bid/proof detail projections |
+| Generic `ErrorResponse` for commit/reveal/verify failures | User-facing reason code mapping is unstable | Publish stable error code catalog with category + retryability |
 | No idempotency support beyond bundle upload | Retry-safe UX cannot be guaranteed for task publish/award | Add idempotency key contract to task and award writes |
 | No audit event query contract | Operator and manager cannot verify decisions without logs | Add task/bid event stream endpoint with pagination |
 
 ## Recommended Contract Follow-Ups
 
-1. Add frontend-critical read APIs before Manager F1 and Agent F2 implementation starts.
+1. Build agent verification UX on top of `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` instead of inferring async state from write responses.
 2. Standardize error shape (`code`, `category`, `message`, `retryable`, `details`, `auditId`) across all write endpoints.
-3. Freeze state enums for task, bid, proof, and award in `openapi.yaml` and `contracts.ts` to reduce UI branching drift.
+3. Add operator queue and audit event list APIs so the new polling contract can scale beyond single bid/proof detail pages.

@@ -230,7 +230,10 @@ export type ProofVerifyErrorCode =
   | "PROOF_VERIFY_PAYLOAD_INVALID"
   | "PROOF_VERIFY_POLICY_INVALID"
   | "PROOF_VERIFY_FAILED"
-  | "PROOF_VERIFY_NEEDS_REVIEW";
+  | "PROOF_VERIFY_NEEDS_REVIEW"
+  | "PROOF_STATUS_NOT_FOUND";
+
+export type BidStatusErrorCode = "BID_STATUS_NOT_FOUND";
 
 export type AwardAuditErrorCode =
   | "TASK_AWARD_PRECONDITION_FAILED"
@@ -243,6 +246,7 @@ export type ApiErrorCode =
   | TaskCreateErrorCode
   | BidCommitErrorCode
   | BidRevealErrorCode
+  | BidStatusErrorCode
   | ProofVerifyErrorCode
   | AwardAuditErrorCode;
 
@@ -487,4 +491,124 @@ export interface ProofVerificationResponse {
   achievedDifficulty: number;
   reasonCodes?: string[];
   verifiedAt?: string;
+}
+
+export type BidPhase = "COMMIT" | "REVEAL";
+export type BidWriteStatus = "COMMITTED" | "REVEALED" | "REJECTED" | "SCORED";
+export type ProofResult = "PASS" | "FAIL" | "MANUAL_REVIEW";
+export type RefreshMode = "POLL";
+
+export interface RefreshPolicy {
+  mode: RefreshMode;
+  pollAfterSeconds: number;
+  manualRefreshAllowed: boolean;
+  lastUpdatedAt: string;
+}
+
+export type BidStatusReasonCode =
+  | BidCommitErrorCode
+  | BidRevealErrorCode
+  | "PROOF_VERIFY_FAILED"
+  | "PROOF_VERIFY_NEEDS_REVIEW"
+  | BidStatusErrorCode;
+
+export type ProofStatusReasonCode =
+  | "PROOF_VERIFY_FAILED"
+  | "PROOF_VERIFY_NEEDS_REVIEW"
+  | "PROOF_VERIFY_PAYLOAD_INVALID"
+  | "PROOF_VERIFY_POLICY_INVALID"
+  | "PROOF_STATUS_NOT_FOUND";
+
+export interface BidResponse {
+  bidId: string;
+  taskId: string;
+  agentId: string;
+  phase: BidPhase;
+  status: BidWriteStatus;
+  rankingScore?: number;
+  decisionTraceHash?: string;
+  proofId?: string;
+  statusChangedAt?: string;
+  failureReasonCodes?: BidStatusReasonCode[];
+  auditId?: string;
+}
+
+export interface ProofVerificationResponse {
+  proofId: string;
+  result: ProofResult;
+  requiredDifficulty: number;
+  achievedDifficulty: number;
+  reasonCodes?: ProofStatusReasonCode[];
+  decisionTraceHash?: string;
+  verifiedAt?: string;
+}
+
+export type BidCommitState = "PENDING" | "COMMITTED" | "REJECTED";
+export type BidRevealState = "WAITING_FOR_WINDOW" | "READY" | "REVEALED" | "REJECTED";
+export type ProofState =
+  | "NOT_SUBMITTED"
+  | "QUEUED"
+  | "VERIFYING"
+  | "PASSED"
+  | "FAILED"
+  | "NEEDS_REVIEW"
+  | "OVERRIDDEN";
+export type AwardState = "NOT_DECIDED" | "SHORTLISTED" | "AWARDED" | "NOT_SELECTED";
+
+export interface BidStatusDeadlines {
+  commitDeadline: string;
+  revealDeadline: string;
+}
+
+export interface BidStatusProofSummary {
+  proofId: string;
+  result?: ProofResult;
+  reasonCodes?: ProofStatusReasonCode[];
+  verifiedAt?: string;
+  decisionTraceHash?: string;
+}
+
+export interface BidStatusAuditRefs {
+  bidAuditId?: string;
+  proofAuditId?: string;
+  decisionTraceHash?: string;
+}
+
+export interface BidStatusResponse {
+  bidId: string;
+  taskId: string;
+  agentId: string;
+  latestPhase: BidPhase;
+  commitState: BidCommitState;
+  revealState: BidRevealState;
+  proofState: ProofState;
+  awardState: AwardState;
+  deadlines: BidStatusDeadlines;
+  proof?: BidStatusProofSummary;
+  failureReasonCodes?: BidStatusReasonCode[];
+  auditRefs?: BidStatusAuditRefs;
+  refresh: RefreshPolicy;
+}
+
+export type ProofVerificationState =
+  | "QUEUED"
+  | "VERIFYING"
+  | "PASSED"
+  | "FAILED"
+  | "NEEDS_REVIEW"
+  | "OVERRIDDEN";
+
+export interface ProofStatusResponse {
+  proofId: string;
+  taskId: string;
+  bidId?: string;
+  agentId: string;
+  verificationState: ProofVerificationState;
+  requiredDifficulty?: number;
+  achievedDifficulty?: number;
+  reasonCodes?: ProofStatusReasonCode[];
+  needsManualReview?: boolean;
+  decisionTraceHash?: string;
+  verifiedAt?: string;
+  refresh: RefreshPolicy;
 }
