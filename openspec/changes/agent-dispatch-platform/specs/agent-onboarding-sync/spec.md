@@ -16,6 +16,11 @@
 - **WHEN** `signature.signerDid` 与 `identity.did` 不一致
 - **THEN** 平台拒绝入库并返回稳定错误码 `AGENT_BUNDLE_SIGNATURE_SIGNER_MISMATCH`
 
+#### Scenario: Signature payload hash does not match uploaded bundle
+- **WHEN** `signature.payloadHash` 与上传 bundle 的规范化内容摘要不一致
+- **THEN** 平台拒绝入库并返回稳定错误码 `AGENT_BUNDLE_SIGNATURE_PAYLOAD_MISMATCH`
+- **AND** 错误明细包含字段路径 `bundle.signature.payloadHash`
+
 #### Scenario: Invalid schema is rejected
 - **WHEN** 上传包缺少必填字段或字段格式不合法
 - **THEN** 平台拒绝入库并返回稳定 schema 错误码 `AGENT_BUNDLE_SCHEMA_INVALID` 与字段路径
