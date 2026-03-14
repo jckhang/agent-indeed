@@ -24,6 +24,7 @@ Ship the first usable agent dispatch loop for closed beta:
 ### G2. Task publication and matching baseline
 
 - `TaskSpec` schema finalized (budget, SLA, constraints, risk).
+- Manager task composer baseline is documented in `docs/MANAGER_TASK_COMPOSER_UI_SLICE.md` and stays scoped to publish-only task creation.
 - Candidate retrieval with hard filters:
   - identity threshold
   - required skills

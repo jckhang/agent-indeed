@@ -27,6 +27,7 @@
 - P1-15 #44: https://github.com/jckhang/agent-indeed/issues/44
 - P1-12 #38: https://github.com/jckhang/agent-indeed/issues/38
 - P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
+- P1-19 #61: https://github.com/jckhang/agent-indeed/issues/61
 - P1-23 #65: https://github.com/jckhang/agent-indeed/issues/65
 
 ## P0 Readiness
@@ -349,3 +350,17 @@ Acceptance criteria:
 Backlog notes:
 - The operator timeline still needs a task-scoped event read contract before it can render real lifecycle history.
 - Verification and award events still need explicit completeness guarantees so the UI can distinguish missing audit data from business-state failures.
+
+### P1-19 Implement manager task composer UI slice
+
+References:
+- `docs/MANAGER_TASK_COMPOSER_UI_SLICE.md`
+- `docs/FRONTEND_MVP_SURFACE.md`
+- `src/api/openapi.yaml`
+- `src/api/contracts.ts`
+
+Acceptance criteria:
+- Manager task composer covers the current `TaskSpec` fields needed for MVP task creation.
+- Validation hints and blocking states are rendered for missing or invalid required fields.
+- Submission flow documents any backend contract mismatch found during implementation instead of silently inventing fields.
+- Scope stays focused on task creation and does not absorb shortlist or award UI work.

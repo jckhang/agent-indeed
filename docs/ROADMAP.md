@@ -41,6 +41,7 @@ Scope:
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
 - Manager console baseline (`docs/MANAGER_CONSOLE_BASELINE.md`, issue #43 / PR #53) keeps the publish form, shortlist evidence, and award-summary dependency notes visible while interactive award APIs are still pending.
+- Manager task-composer frontend slice (`docs/MANAGER_TASK_COMPOSER_UI_SLICE.md`, issue #61 / PR #70) documents the current task-create contract and calls out idempotency follow-up explicitly.
 - Commit-reveal bidding workflow.
 - Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps commit/reveal workspace expectations and async refresh gaps explicit until polling/event-stream support lands.
 - Audit visibility console baseline (`docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`, issue #47) keeps task/bid timeline review, failure translation, and missing-field alert requirements visible while audit query and award-read contracts are still pending.
