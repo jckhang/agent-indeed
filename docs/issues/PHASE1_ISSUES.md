@@ -9,6 +9,7 @@
 - P0-04 #22: https://github.com/jckhang/agent-indeed/issues/22
 - P0-05 #23: https://github.com/jckhang/agent-indeed/issues/23
 - P0-06 #32: https://github.com/jckhang/agent-indeed/issues/32
+- P0-07 #33: https://github.com/jckhang/agent-indeed/issues/33
 - P0-08 #34: https://github.com/jckhang/agent-indeed/issues/34
 - Epic #2: https://github.com/jckhang/agent-indeed/issues/2
 - P1-01 #3: https://github.com/jckhang/agent-indeed/issues/3
@@ -109,6 +110,21 @@ Acceptance criteria:
 - Service/module map is documented with clear responsibilities.
 - Each MVP flow stage has an owning backend module.
 - Cross-module contract dependencies and sequencing risks are called out.
+
+### P0-07 Define frontend MVP surface and API wiring matrix
+
+References:
+- `docs/FRONTEND_MVP_SURFACE.md`
+- `docs/ARCHITECTURE_GAPS.md`
+- `docs/ENGINEERING_TRACKS_FE_BE.md`
+- `src/api/openapi.yaml`
+
+Acceptance criteria:
+- Persona map covers manager, agent, and operator roles.
+- MVP page map is limited to the closed-beta flow.
+- API-to-UI field matrix exists for each required page.
+- Integration risks or missing backend fields are listed explicitly.
+- Output is linked by issue #33.
 
 ### P0-08 Freeze MVP state model and write sequencing (`docs/MVP_STATE_MODEL.md`)
 
