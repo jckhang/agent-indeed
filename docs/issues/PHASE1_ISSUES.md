@@ -5,6 +5,7 @@
 - P0-00 #14 (closed): https://github.com/jckhang/agent-indeed/issues/14
 - P0-01 #15: https://github.com/jckhang/agent-indeed/issues/15
 - P0-02 #16: https://github.com/jckhang/agent-indeed/issues/16
+- P0-06 #32: https://github.com/jckhang/agent-indeed/issues/32
 - P0-03 #21: https://github.com/jckhang/agent-indeed/issues/21
 - P0-04 #22: https://github.com/jckhang/agent-indeed/issues/22
 - P0-05 #23: https://github.com/jckhang/agent-indeed/issues/23
@@ -92,6 +93,20 @@ Acceptance criteria:
 - Role gaps, priority, and target hiring window are defined.
 - Each core role includes mission, must-have skills, and 30/60/90 expectations.
 - Interview loop and evaluation rubric are documented for HR execution.
+
+### P0-06 Define backend service boundaries and ownership map (`docs/BACKEND_SERVICE_BOUNDARIES.md`)
+
+References:
+- `docs/BACKEND_SERVICE_BOUNDARIES.md`
+- `docs/ARCHITECTURE_GAPS.md`
+- `docs/ENGINEERING_TRACKS_FE_BE.md`
+- `src/api/openapi.yaml`
+
+Acceptance criteria:
+- Service/module map is documented with clear responsibilities.
+- Each MVP flow stage (`upload -> match -> bid -> verify -> award`) has an owning module.
+- Cross-module contract dependencies and sequencing risks are explicitly called out.
+- Output is linked by issue tracking documentation.
 
 ## P1 Epic
 
