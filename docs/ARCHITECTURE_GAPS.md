@@ -22,7 +22,7 @@ Identify the smallest set of missing decisions that block delivery of the Phase 
 | P0 | Data and state transition model is incomplete | Commit-reveal and PoMW decisions can become inconsistent | Task/bid/proof/audit state machine + write model |
 | P1 | Error-code catalog and retry policy baseline is now documented, but endpoint adoption is incomplete | Integrations can still drift if new endpoints skip the shared error contract | Keep `docs/ERROR_CODE_RETRY_POLICY.md` synchronized with OpenAPI/contracts per change |
 | P1 | Observability baseline is missing | Incidents cannot be diagnosed quickly in beta | Event schema + trace/log/metric baseline per flow stage |
-| P1 | Security and compliance baseline is missing | High-risk tasks lack policy guardrails | AuthN/AuthZ model + sensitive data handling checklist |
+| P1 | Security and compliance baseline is now documented, but enforcement work is still pending | High-risk tasks still need API, secret, and redaction controls before beta | Keep `docs/SECURITY_COMPLIANCE_BASELINE.md` synchronized with auth, audit, and operator implementation changes |
 
 ## Frontend-Specific Gaps
 
