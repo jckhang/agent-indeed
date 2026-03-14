@@ -11,6 +11,7 @@
 - P0-06 #32: https://github.com/jckhang/agent-indeed/issues/32
 - P0-07 #33: https://github.com/jckhang/agent-indeed/issues/33
 - P0-08 #34: https://github.com/jckhang/agent-indeed/issues/34
+- P0-09 #57: https://github.com/jckhang/agent-indeed/issues/57
 - Epic #2: https://github.com/jckhang/agent-indeed/issues/2
 - P1-01 #3: https://github.com/jckhang/agent-indeed/issues/3
 - P1-02 #4: https://github.com/jckhang/agent-indeed/issues/4
@@ -138,6 +139,13 @@ Acceptance criteria:
 - Invalid or out-of-order transitions are explicitly rejected.
 - Write sequencing and idempotency expectations are defined for commit/reveal/verify/award.
 - Output provides direct implementation direction for follow-on P1 issues.
+
+### P0-09 Operationalize roadmap checkpoints as milestone/status board (`docs/PHASE1_CHECKPOINT_BOARD.md`)
+
+Acceptance criteria:
+- Every active P1 issue is mapped to a checkpoint owner/date.
+- Duplicate or prematurely closed issue states are called out and normalized.
+- The repo has one obvious place to review checkpoint drift at a glance.
 
 ## P1 Epic
 
