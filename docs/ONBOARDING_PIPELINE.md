@@ -23,6 +23,10 @@ API, and matching work all share one deterministic onboarding contract.
 
 - Validation order is fixed: idempotency -> signature -> schema -> version
   conflict -> persistence -> indexing.
+- `signature.payloadHash` is computed from the canonical bundle body
+  (`schemaVersion`, `manifest`, `identity`, `skills`, `memoryRef`) before the
+  `signature` block is attached, so retries and audit replay compare the same
+  payload shape.
 - Bundle replay is keyed by the same accepted caller + `idempotencyKey`; clients
   should reuse the same key only when retrying the same logical upload.
 - Version conflict is evaluated on the accepted identity plus
@@ -30,6 +34,16 @@ API, and matching work all share one deterministic onboarding contract.
 - Matching consumes skill index records, not raw bundle uploads.
 - Memory sync remains metadata-only at onboarding time; raw memory content stays
   in the agent control domain.
+
+## Minimal API Example Matrix
+
+| Scenario | HTTP | Contract signal |
+| --- | --- | --- |
+| Happy path bundle accepted | `201` | `result=CREATED`, `agentId`, `version`, synchronous `indexing` summary |
+| Same payload replayed with the same idempotency key | `200` | `result=RETURNED_EXISTING` plus `replay.strategy=RETURN_EXISTING_ON_HASH_MATCH` |
+| Signature signer or payload hash mismatch | `400` | `category=SIGNATURE`, stable signer/hash error code, `details.fieldPath` for the failing signature field |
+| Schema invalid or unsupported version | `400` | `category=SCHEMA`, stable schema error code, `details.fieldPath` for the rejected bundle field |
+| Existing version reused with a different payload hash | `409` | `category=VERSION`, `conflict.strategy=REJECT_ON_HASH_MISMATCH` with both payload hashes |
 
 ## Skill Index Contract
 
