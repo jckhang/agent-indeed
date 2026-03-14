@@ -1376,6 +1376,7 @@ components:
             payloadHash:
               type: string
               pattern: '^sha256:[a-f0-9]{64}$'
+              description: SHA-256 of the canonical unsigned bundle payload, computed over the `bundle` object with `signature` omitted before hashing.
             signature:
               type: string
               minLength: 32
