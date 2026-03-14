@@ -201,6 +201,7 @@ export type ApiErrorCategory =
   | AgentBundleErrorCategory
   | "VALIDATION"
   | "IDEMPOTENCY"
+  | "MATCHING"
   | "WINDOW"
   | "PRECONDITION"
   | "POLICY"
@@ -211,6 +212,11 @@ export type TaskCreateErrorCode =
   | "TASK_SPEC_CONSTRAINTS_MISSING"
   | "TASK_SPEC_POLICY_INVALID"
   | "TASK_CREATE_IDEMPOTENCY_CONFLICT";
+
+export type CandidateMatchErrorCode =
+  | "TASK_MATCH_TASK_NOT_FOUND"
+  | "TASK_MATCH_NOT_READY"
+  | "TASK_MATCH_LIMIT_INVALID";
 
 export type BidCommitErrorCode =
   | "BID_COMMIT_PAYLOAD_INVALID"
@@ -239,6 +245,7 @@ export type AwardAuditErrorCode =
 export type ApiErrorCode =
   | AgentBundleErrorCode
   | TaskCreateErrorCode
+  | CandidateMatchErrorCode
   | BidCommitErrorCode
   | BidRevealErrorCode
   | ProofVerifyErrorCode
@@ -289,6 +296,56 @@ export interface TaskSpec {
     commitDeadline: string;
     revealDeadline: string;
   };
+}
+
+export type CandidateEligibilityGate =
+  | "IDENTITY_TIER"
+  | "REQUIRED_SKILL"
+  | "COMPLIANCE";
+
+export interface CandidateEligibilityCheck {
+  gate: CandidateEligibilityGate;
+  status: "PASSED" | "FAILED" | "NOT_REQUESTED";
+  detail?: string;
+}
+
+export type CandidateRankingFactorType =
+  | "SUCCESS_RATE"
+  | "LATENCY"
+  | "BUDGET_FIT"
+  | "HISTORICAL_SIMILARITY";
+
+export interface CandidateRankingFactor {
+  factor: CandidateRankingFactorType;
+  weight: number;
+  rawScore: number;
+  weightedScore: number;
+  rationale?: string;
+}
+
+export interface CandidateRankingBreakdown {
+  totalScore: number;
+  factors: CandidateRankingFactor[];
+}
+
+export interface CandidateMatch {
+  agentId: string;
+  rank?: number;
+  eligible: boolean;
+  matchingTraceId: string;
+  identityTier: IdentityTier;
+  matchedSkills: string[];
+  missingRequiredSkills?: string[];
+  complianceStatus: "PASSED" | "FAILED" | "NOT_REQUESTED";
+  eligibilityChecks: CandidateEligibilityCheck[];
+  scoreBreakdown?: CandidateRankingBreakdown;
+}
+
+export interface CandidateMatchListResponse {
+  taskId: string;
+  status: "MATCHED" | "NO_ELIGIBLE_CANDIDATES";
+  generatedAt: string;
+  candidates: CandidateMatch[];
 }
 
 export interface ProofPack {
