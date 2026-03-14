@@ -5,6 +5,7 @@
 - P0-00 #14 (closed): https://github.com/jckhang/agent-indeed/issues/14
 - P0-01 #15: https://github.com/jckhang/agent-indeed/issues/15
 - P0-02 #16: https://github.com/jckhang/agent-indeed/issues/16
+- P0-07 #33: https://github.com/jckhang/agent-indeed/issues/33
 - P0-03 #21: https://github.com/jckhang/agent-indeed/issues/21
 - P0-04 #22: https://github.com/jckhang/agent-indeed/issues/22
 - P0-05 #23: https://github.com/jckhang/agent-indeed/issues/23
@@ -92,6 +93,19 @@ Acceptance criteria:
 - Role gaps, priority, and target hiring window are defined.
 - Each core role includes mission, must-have skills, and 30/60/90 expectations.
 - Interview loop and evaluation rubric are documented for HR execution.
+
+### P0-07 Define frontend MVP surface and API wiring matrix (`docs/FRONTEND_MVP_SURFACE.md`)
+
+References:
+- `docs/FRONTEND_MVP_SURFACE.md`
+- `docs/ENGINEERING_TRACKS_FE_BE.md`
+- `src/api/openapi.yaml`
+
+Acceptance criteria:
+- Persona map covers manager, agent, and operator roles.
+- Closed-beta page map and navigation flow are explicitly defined.
+- API-to-UI field matrix is listed for required MVP pages.
+- Integration risks and missing backend fields are explicitly called out.
 
 ## P1 Epic
 
