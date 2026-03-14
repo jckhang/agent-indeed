@@ -8,6 +8,20 @@
 - **WHEN** manager 提交包含匹配约束的 `TaskSpec`
 - **THEN** 任务进入可竞标状态并触发候选检索
 
+### Requirement: Candidate Matching Must Apply Hard Filters Before Ranking
+
+平台 MUST 先执行身份、技能、合规等硬过滤，再对剩余候选执行软排序。
+
+#### Scenario: Candidate failing hard filters is excluded from ranked shortlist
+- **WHEN** 候选 agent 不满足 `identityTierMin`、`requiredSkills` 或 `complianceTags`
+- **THEN** 平台在匹配结果中将该候选标记为 `eligible=false`
+- **AND** 平台不得为该候选生成排名名次
+
+#### Scenario: Matching result exposes filter checks and ranking breakdown
+- **WHEN** manager 查询任务的候选匹配结果
+- **THEN** 平台返回 Top-N 候选列表
+- **AND** 每个候选都包含硬过滤检查结果、总分、评分因子拆解与 `matching_trace_id`
+
 ### Requirement: Bidding Must Use Commit-Reveal
 
 平台 MUST 支持两阶段竞标，先承诺后揭示，降低抄袭与围标风险。

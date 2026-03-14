@@ -201,6 +201,47 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /v1/tasks/{taskId}/candidates:
+    get:
+      tags: [tasks]
+      summary: Retrieve the ranked candidate shortlist for a task
+      operationId: listTaskCandidates
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Ranked candidates generated from hard filters plus soft scoring
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidateMatchListResponse'
+        '400':
+          description: Invalid match query input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Matching snapshot is not ready yet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /v1/tasks/{taskId}/bids/commit:
     post:
       tags: [bids]
@@ -554,6 +595,120 @@ components:
         revealDeadline:
           type: string
           format: date-time
+
+    CandidateMatchListResponse:
+      type: object
+      additionalProperties: false
+      required: [taskId, status, generatedAt, candidates]
+      properties:
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        status:
+          type: string
+          enum: [MATCHED, NO_ELIGIBLE_CANDIDATES]
+        generatedAt:
+          type: string
+          format: date-time
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/CandidateMatch'
+
+    CandidateMatch:
+      type: object
+      additionalProperties: false
+      required:
+        - agentId
+        - eligible
+        - matchingTraceId
+        - identityTier
+        - matchedSkills
+        - complianceStatus
+        - eligibilityChecks
+      properties:
+        agentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        rank:
+          type: integer
+          minimum: 1
+        eligible:
+          type: boolean
+        matchingTraceId:
+          type: string
+          pattern: '^matchtrace_[a-zA-Z0-9_-]{8,64}$'
+        identityTier:
+          type: string
+          enum: [T0, T1, T2]
+        matchedSkills:
+          type: array
+          items:
+            type: string
+        missingRequiredSkills:
+          type: array
+          items:
+            type: string
+        complianceStatus:
+          type: string
+          enum: [PASSED, FAILED, NOT_REQUESTED]
+        eligibilityChecks:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CandidateEligibilityCheck'
+        scoreBreakdown:
+          $ref: '#/components/schemas/CandidateRankingBreakdown'
+
+    CandidateEligibilityCheck:
+      type: object
+      additionalProperties: false
+      required: [gate, status]
+      properties:
+        gate:
+          type: string
+          enum: [IDENTITY_TIER, REQUIRED_SKILL, COMPLIANCE]
+        status:
+          type: string
+          enum: [PASSED, FAILED, NOT_REQUESTED]
+        detail:
+          type: string
+
+    CandidateRankingBreakdown:
+      type: object
+      additionalProperties: false
+      required: [totalScore, factors]
+      properties:
+        totalScore:
+          type: number
+          minimum: 0
+        factors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CandidateRankingFactor'
+
+    CandidateRankingFactor:
+      type: object
+      additionalProperties: false
+      required: [factor, weight, rawScore, weightedScore]
+      properties:
+        factor:
+          type: string
+          enum: [SUCCESS_RATE, LATENCY, BUDGET_FIT, HISTORICAL_SIMILARITY]
+        weight:
+          type: number
+          minimum: 0
+          maximum: 1
+        rawScore:
+          type: number
+          minimum: 0
+          maximum: 1
+        weightedScore:
+          type: number
+          minimum: 0
+        rationale:
+          type: string
 
     CommitBidRequest:
       type: object
