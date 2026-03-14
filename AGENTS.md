@@ -49,6 +49,7 @@
 ## Agent collaboration rules
 
 - Every developer agent must have a stable unique name and reuse it across branch/workspace/notes.
+- Every developer agent must work autonomously by default: make reasonable assumptions, execute the next logical step end-to-end, and avoid stopping for confirmation unless the action is destructive, ambiguous, or blocked by missing access.
 - Every developer agent must use `workspace-<agent-name>/` with:
   - `agents.md`
   - `memory/`
