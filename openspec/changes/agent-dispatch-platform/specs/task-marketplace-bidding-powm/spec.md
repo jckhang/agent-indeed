@@ -48,6 +48,30 @@
 - **WHEN** 平台完成中标决策
 - **THEN** 审计日志包含候选评分摘要、PoMW 结果、决策时间戳和签名
 
+### Requirement: Manager Shortlist Reads Must Expose Ranking Gaps
+
+平台 MUST 提供 manager shortlist read model，显式暴露评分拆解、缺失数据状态和审计引用。
+
+#### Scenario: Candidate shortlist returns reviewable ranking context
+- **WHEN** manager 查询任务候选 shortlist
+- **THEN** 每个候选都返回 `rankingScore`、可选 `scoreBreakdown`、`missingDataStates` 和 `shortlistAuditId`
+
+#### Scenario: Missing verification data blocks award readiness without hiding candidate
+- **WHEN** 候选缺少 proof 结果或审计引用不完整
+- **THEN** shortlist 响应保留该候选，但将 `eligibilityStatus` 标记为 `NEEDS_REVIEW` 或 `INELIGIBLE` 并给出稳定缺失数据原因
+
+### Requirement: Award Read Model Must Support Manager Handoff
+
+平台 MUST 提供 award read/write contract，支持 manager 审核说明、状态提示和交接信息。
+
+#### Scenario: Award write requires shortlist and proof confirmation refs
+- **WHEN** manager 提交 award 决策
+- **THEN** 请求必须包含 shortlist/proof 审计确认字段与幂等键，便于后续审计和重放判定
+
+#### Scenario: Award detail read exposes current handoff state
+- **WHEN** manager 读取任务的 award detail
+- **THEN** 响应返回 `statusMessage`、proof 摘要、`decisionTraceHash`、`auditEventId` 与 handoff 状态，足以驱动 UI 复核和交接
+
 ### Requirement: Retry and Idempotency Signals Must Be Explicit
 
 平台 MUST 在失败响应中明确 `retryable` 信号，并为写操作提供可判定的幂等行为。

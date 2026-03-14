@@ -1,6 +1,6 @@
 # Agent Indeed Roadmap
 
-Last updated: 2026-03-13
+Last updated: 2026-03-14
 
 ## Product North Star
 
@@ -40,6 +40,7 @@ Goal: deliver MVP control-plane APIs and event trail to run closed beta tasks en
 Scope:
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
+- Manager shortlist and award read models with audit-linked review status.
 - Commit-reveal bidding workflow.
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.
@@ -77,7 +78,7 @@ Scope:
 - M1 (2026-03-20): finalize contracts + upload pipeline design.
 - M2 (2026-03-27): task/matching + bidding API baseline.
 - M3 (2026-04-03): PoMW policy + verifier baseline.
-- M4 (2026-04-10): audit/reputation hook + E2E test pack + security/compliance readiness review.
+- M4 (2026-04-10): audit/reputation hook + manager award-read contracts + E2E test pack + security/compliance readiness review.
 
 Checkpoint status board:
 - Review `docs/PHASE1_CHECKPOINT_BOARD.md` for the one-screen issue/PR map, target owners, and drift callouts.

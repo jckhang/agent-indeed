@@ -11,7 +11,7 @@ This is the single review surface for milestone drift across active Phase 1 issu
 | M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | Contract finalization, observability baseline, onboarding kickoff | #30, #38 | #50 | On track | Finish PR #50 review, then start #30 from the merged contract baseline. |
 | M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | Candidate matching, commit-reveal APIs, manager console baseline | #6, #7, #43 | #53, #55 | At risk | Matching contract is in review, but commit-reveal work has not started and manager UI still depends on backend status/read details. |
 | M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | PoMW policy, verifier, agent console, bid/proof async status reads | #8, #9, #44, #59 | #56 | At risk | #56 is active, but verifier and policy slices are still unmerged and issue #59 remains queued behind them. |
-| M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | Audit trail, operator console, manager award reads, E2E pack | #10, #11, #47, #58 | None | At risk | Audit/event work and QA remain blocked on M2/M3 backend outputs; keep this checkpoint visible as the main beta-readiness risk. |
+| M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | Audit trail, operator console, manager award reads, E2E pack | #10, #11, #47, #58 | #68 | At risk | PR #68 now freezes manager shortlist/award reads, but audit/event work and QA still depend on downstream M2/M3 backend outputs. |
 
 ## Active P1 Issue Map
 
@@ -29,7 +29,7 @@ This is the single review surface for milestone drift across active Phase 1 issu
 | #10 `Implement audit events and award decision trace` | M4 | 2026-04-10 | kestrel | blocked | Depends on M2 and M3 state/result contracts. |
 | #11 `Add E2E tests and API examples for MVP flow` | M4 | 2026-04-10 | QA | blocked | No dedicated owner label exists yet; keep this visible as a staffing + sequencing risk. |
 | #47 `Build audit visibility console baseline` | M4 | 2026-04-10 | lanzhou-fe-agent | ready-next | Depends on audit event payloads and failure codes from #10. |
-| #58 `Define manager shortlist and award read-model contracts` | M4 | 2026-04-10 | kestrel | ready-next | Unblocks the final manager award experience and keeps M2 UI work from drifting. |
+| #58 `Define manager shortlist and award read-model contracts` | M4 | 2026-04-10 | albatross-dev-agent + kestrel | in-review | Backed by PR #68 to unblock manager shortlist review and award handoff payloads. |
 
 ## Active P1 PR Map
 
@@ -39,6 +39,7 @@ This is the single review surface for milestone drift across active Phase 1 issu
 | #53 `Build manager console baseline` | M2 | It is the frontend execution slice for task publish, shortlist review, and award summary. | Monitor for read-model contract gaps feeding into issue #58. |
 | #55 `Define candidate matching shortlist contract` | M2 | It anchors the shortlist/ranking contract that gates matching implementation and manager UI wiring. | This is the main M2 backend merge dependency. |
 | #56 `Build agent bidding console baseline` | M3 | It covers the agent commit/reveal loop that depends on verifier/status-read semantics. | Keep issue #44 open until merge and pair follow-up work with issue #59. |
+| #68 `Define manager shortlist and award read-model contracts` | M4 | It freezes the manager shortlist and award review payloads that PR #53 needs for durable UI wiring. | Watch issue #10 for downstream audit/event query work before calling the manager flow beta-ready. |
 
 ## Normalizations Applied
 

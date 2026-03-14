@@ -28,6 +28,10 @@ Ship the first usable agent dispatch loop for closed beta:
   - identity threshold
   - required skills
   - compliance flags
+- Manager shortlist read model exposes:
+  - score breakdown
+  - missing-data states
+  - shortlist audit identifiers
 - Soft ranking baseline:
   - success rate
   - latency
@@ -49,6 +53,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - `POMW_VERIFIED`
   - `TASK_AWARDED`
 - Award decision includes score summary + proof result trace.
+- Award review/read contract includes manager-facing status messaging and handoff readiness details.
 
 ## Out of Scope (Phase 1)
 

@@ -24,6 +24,7 @@
 - P1-09 #11: https://github.com/jckhang/agent-indeed/issues/11
 - P1-11 #37: https://github.com/jckhang/agent-indeed/issues/37
 - P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
+- P1-17 #58: https://github.com/jckhang/agent-indeed/issues/58
 
 ## P0 Readiness
 
@@ -220,6 +221,19 @@ Acceptance criteria:
 - Required lifecycle events emitted.
 - `TASK_AWARDED` stores candidate score and proof summary.
 - Event stream is queryable by task id and bid id.
+
+### P1-17 Define manager shortlist and award read-model contracts
+
+References:
+- `docs/FRONTEND_MVP_SURFACE.md`
+- `src/api/openapi.yaml`
+- `src/api/contracts.ts`
+- `openspec/changes/agent-dispatch-platform/specs/task-marketplace-bidding-powm/spec.md`
+
+Acceptance criteria:
+- Candidate shortlist payload exposes score breakdown, missing-data states, and shortlist audit identifiers.
+- Award read/write payloads expose manager review status, proof summary, decision trace, and handoff readiness.
+- Frontend baseline blockers from PR #53 are resolved in the contract draft or explicitly deferred with named follow-up.
 
 ### P1-09 Add E2E test suite and API examples for MVP flow
 
