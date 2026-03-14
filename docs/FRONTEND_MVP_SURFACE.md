@@ -74,6 +74,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | `/agent/tasks/{taskId}/bid-workspace` (commit stage) | `POST /v1/tasks/{taskId}/bids/commit` | `idempotencyKey`, `commit.bidId`, `commit.taskId`, `commit.agentId`, `commit.bidHash`, `commit.committedAt` | `bidId`, `taskId`, `agentId`, `phase`, `status`, `result`, `window.*` | Ready for the commit stage of the unified workspace; stable reason codes and server-authored window snapshot already exist |
 | `/agent/tasks/{taskId}/bid-workspace` (reveal stage) | `POST /v1/tasks/{taskId}/bids/reveal` | `idempotencyKey`, `reveal.bidId`, `reveal.taskId`, `reveal.agentId`, `reveal.nonce`, `reveal.price.*`, `reveal.executionPlan.*`, `reveal.proof.*` | `bidId`, `phase`, `status`, `result`, `rankingScore`, `decisionTraceHash`, `proofSubmission.*`, `window.*` | Ready for the reveal stage with typed failure paths; proof read endpoint is still needed to recover after refresh |
 | `/agent/tasks/{taskId}/verification` | `GET /v1/tasks/{taskId}/proofs/{proofId}` (proposed read endpoint) | `taskId`, `proofId` | `status`, `result` (`PASS`, `FAIL`, `MANUAL_REVIEW`), `requiredDifficulty`, `achievedDifficulty`, `reasonCodes`, `verifiedAt`, `lastUpdatedAt`, `refreshPolicy` | Missing on `main`; the bid workspace can hand off here after reveal, but queued/verifying reads still depend on issue `#59` / PR `#66` |
+| `/agent/tasks/{taskId}/status` | `GET /v1/tasks/{taskId}/bids/{bidId}` | `taskId`, `bidId` | `commitState`, `revealState`, `proofState`, `awardState`, `failureReasonCodes`, `proof.*`, `refresh.*` | Proposed in PR `#66`; intended shared status projection for agent timeline and retry UX |
 
 ### Operator pages
 
@@ -99,6 +100,7 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 | Candidate snapshot may still be pending when task first opens | Manager can land on an empty or confusing shortlist state | Surface `TASK_MATCH_NOT_READY` as a retryable loading state and poll using the API delay hint |
 | Missing award write/read endpoints | Closed loop cannot finish in UI | Add award APIs with `decisionTraceHash` and `auditEventId` |
 | Missing merged list/read endpoints for bids/proofs | UI cannot refresh queued/verifying state on `main` without guessing hidden fields | Merge PR `#66` or equivalent read endpoints for bid/proof status by `taskId`, `bidId`, `proofId` |
+| Proof queue and audit event list endpoints are still missing | Operator queue and full timeline screens cannot refresh without custom backend work | Add list/read endpoints beyond the bid/proof detail projections |
 | Generic `ErrorResponse` for commit/reveal/verify failures | User-facing reason code mapping is unstable | Publish stable error code catalog with category + retryability |
 | No idempotency support beyond bundle upload | Retry-safe UX cannot be guaranteed for task publish/award | Add idempotency key contract to task and award writes |
 | No award summary read contract | Manager and operator still need a winner-focused read model beyond the event stream | Add award read surface with `decisionTraceHash`, proof summary, and blocker fields |
@@ -106,8 +108,9 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 
 ## Recommended Contract Follow-Ups
 
-1. Add frontend-critical read APIs before Manager F1 and Agent F2 implementation starts.
+1. Build agent verification UX on top of `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` instead of inferring async state from write responses.
 2. Standardize error shape (`code`, `category`, `message`, `retryable`, `details`, `auditId`) across all write endpoints.
 3. Add task-scoped bid/proof read endpoints that reuse the existing `window` snapshot shape so the unified bid workspace can recover state after refresh.
 4. Freeze state enums for task, bid, proof, and award in `openapi.yaml` and `contracts.ts` to reduce UI branching drift.
 5. Carry refresh metadata (`manualRefreshAllowed`, `pollAfterSeconds`, `lastUpdatedAt`) in the bid/proof read model so the verification timeline stays testable and honest.
+6. Add operator queue and audit event list APIs so the new polling contract can scale beyond single bid/proof detail pages.

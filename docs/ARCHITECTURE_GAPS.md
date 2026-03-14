@@ -32,6 +32,8 @@ Identify the smallest set of missing decisions that block delivery of the Phase 
 - Agent-side bidding baseline is now documented in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, while the focused commit/reveal and verification follow-through are captured in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` and `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`; merged async status-read contracts are still missing.
 - Operator audit timeline baseline is now documented in `docs/OPERATOR_AUDIT_TIMELINE_BASELINE.md`, but task-scoped event reads and completeness guarantees are still missing.
 - MVP polling semantics are proposed in PR `#66`, but `main` still lacks a merged contract for sync/async updates.
+- Bid/proof detail polling contract is now defined, but proof queue and audit event list refresh surfaces are still missing.
+- No UX-level error taxonomy for invalid commit/reveal/proof failure branches.
 - Commit/reveal/proof error codes are documented, but route-level UX mapping still needs to stay synchronized with backend responses.
 
 ## Backend-Specific Gaps
