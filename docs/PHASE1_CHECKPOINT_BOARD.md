@@ -10,7 +10,7 @@ This is the single review surface for milestone drift across the active executio
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | Contract finalization, observability baseline, onboarding kickoff | #30 | #90 | On track | PR #90 is the remaining M1 delivery in review; keep the kickoff examples aligned with the merged observability baseline. |
 | M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | Candidate matching, commit-reveal APIs, manager console baseline | #6 | #55 | At risk | Matching contract work is still in review; downstream manager and agent UX must keep honoring the current shortlist contract until it merges. |
-| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | Verifier contract, agent workspace, bid/proof async status reads | #9, #59, #63 | #66, #73, #76, #83 | At risk | PRs #73 and #76 keep the Lanzhou frontend slices moving, but durable verification/status semantics still depend on the open verifier and status-read contract work. |
+| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | Verifier contract, agent workspace, bid/proof async status reads | #9, #59, #63, #64 | #66, #73, #76, #83 | At risk | PRs #73 and #76 keep the Lanzhou frontend slices moving, but durable verification/status semantics still depend on the open verifier and status-read contract work. |
 | M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | Audit trail, manager award reads, shortlist review, security readiness, QA smoke pass | #10, #11, #58, #62, #72 | #68, #77, #78, #84 | At risk | Manager award reads, auditability, and QA coverage are still blocked on open backend contracts, while security and shortlist follow-through remain in review. |
 
 ## Active P1 Issue Map
@@ -22,6 +22,7 @@ This is the single review surface for milestone drift across the active executio
 | #9 `Implement ProofPack verifier and result codes` | M3 | 2026-04-03 | kestrel | blocked | Blocked on the final verifier contract shape and should stay aligned with PR #83. |
 | #59 `Define bid/proof status reads and async refresh contract` | M3 | 2026-04-03 | kestrel | in-review | Backed by PR #66; this is the contract gate for refresh-safe verification UX. |
 | #63 `Implement agent bid commit/reveal workspace UI` | M3 | 2026-04-03 | lanzhou-fe-agent | in-review | PR #76 carries the focused bid workspace slice while keeping async refresh assumptions tied to issue #59. |
+| #64 `Implement bid/proof verification timeline UX` | M3 | 2026-04-03 | lanzhou-fe-agent | in-review | PR #73 tracks the queued/verifying/terminal timeline slice while keeping live refresh explicitly gated on PR #66. |
 | #10 `Implement audit events and award decision trace` | M4 | 2026-04-10 | kestrel | blocked | Depends on the M3 verification/result contract outputs plus final manager award reads. |
 | #11 `Add E2E tests and API examples for MVP flow` | M4 | 2026-04-10 | QA | blocked | QA coverage stays gated on the open manager/agent read contracts and shortlist-to-award flow stability. |
 | #58 `Define manager shortlist and award read-model contracts` | M4 | 2026-04-10 | kestrel | in-review | Backed by PR #68 and still the main contract dependency for manager shortlist/award follow-through. |
@@ -47,4 +48,4 @@ This is the single review surface for milestone drift across the active executio
 
 - Removed merged PRs (`#50`, `#53`, `#56`, `#81`) from the active checkpoint tables so only currently open PRs appear here.
 - Removed closed issues (`#7`, `#8`, `#38`, `#43`, `#44`, `#47`, `#61`, `#71`) from the active issue map to match current GitHub state.
-- Kept the active Lanzhou frontend slices (`#62` / PR #78, `#63` / PR #76, PR #73) visible alongside their open backend contract dependencies.
+- Kept the active Lanzhou frontend slices (`#62` / PR #78, `#63` / PR #76, `#64` / PR #73) visible alongside their open backend contract dependencies.

@@ -76,10 +76,11 @@ Exit criteria:
 Deliverables:
 - Unified bid workspace with commit-stage deadline feedback.
 - Reveal stage with `ProofPack` entry/upload guidance and required-section validation.
-- Verification handoff that stays explicit about missing refresh-safe read contracts.
+- Verification timeline with queued/verifying/pass/fail/manual-review states.
+- Refresh fallback bounded by the current status-read contract (manual today, polling once the read model lands).
 
 Exit criteria:
-- Agent can complete commit/reveal from one workflow and reach verification follow-through without losing contract clarity.
+- Agent can complete commit/reveal from one workflow and understand whether verification is pending, in progress, or terminal without relying on hidden backend fields.
 
 ### F3. Audit Visibility Baseline (Week 4)
 

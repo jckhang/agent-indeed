@@ -54,7 +54,12 @@
    - 所有状态变更写入事件日志：`TASK_CREATED`, `BID_COMMITTED`, `BID_REVEALED`, `POMW_VERIFIED`, `TASK_AWARDED`。
    - 事件记录调用方身份、时间戳、摘要哈希。
 
-7. 建立 MVP 生命周期可观测性基线
+7. 前端验证状态可见性必须显式建模
+   - agent 侧验证时间线至少区分 queued、verifying、passed、failed、needs_review 五类状态。
+   - 在 bid/proof read contract 合入前，前端不得把 queued/verifying 当作已可查询事实，只能作为受限 pending UX 呈现。
+   - MVP 的刷新策略以显式轮询 contract 为目标；若 read endpoint 尚未合入，必须展示依赖说明而不是伪造实时刷新。
+
+8. 建立 MVP 生命周期可观测性基线
    - 为 `upload -> match -> bid -> verify -> award` 每个阶段定义必选事件、trace 属性、结构化日志字段与指标族。
    - 统一相关性主键：`trace_id`, `request_id`, `task_id`, `bid_id`, `proof_id`, `audit_id`, `job_id`。
    - 对关键失败族建立最小告警面：上载校验失败、候选检索退化、commit/reveal 完整性异常、PoMW 校验超时、award/audit 缺失。
