@@ -211,6 +211,10 @@ Acceptance criteria:
 - Policy output: required proof strength and verifier parameters.
 - Policy decision is persisted with trace id.
 
+Implementation notes:
+- Add a dedicated PoMW policy resolve contract before proof verification.
+- Carry `policyTraceId` from policy decision into proof verification and downstream audit.
+
 ### P1-07 Implement ProofPack verifier + result codes
 
 Acceptance criteria:

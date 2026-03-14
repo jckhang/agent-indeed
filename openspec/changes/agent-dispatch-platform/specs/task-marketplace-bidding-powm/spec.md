@@ -44,6 +44,12 @@
 - **WHEN** 候选身份为 T2 且任务风险等级高
 - **THEN** 平台要求高强度 PoMW（样本执行 + 更高挑战或质押要求）
 
+#### Scenario: Policy decision returns auditable verifier parameters
+- **WHEN** 平台根据任务 `risk.level`、`risk.valueScore`、候选 `identityTier` 与 `trustScore` 解析 PoMW 策略
+- **THEN** 平台返回 `requiredProofStrength`、挑战配置、最低样本质量阈值等 verifier 参数
+- **AND** 平台为该决策持久化唯一 `policy_trace_id`
+- **AND** 后续 proof 校验结果必须引用同一个 `policy_trace_id`
+
 #### Scenario: Proof verification failure returns stable code
 - **WHEN** 提交的 `ProofPack` 未满足任务要求的 PoMW 强度
 - **THEN** 平台返回稳定验证错误码（`PROOF_VERIFY_FAILED` 或 `PROOF_VERIFY_NEEDS_REVIEW`）并附带可审计标识
