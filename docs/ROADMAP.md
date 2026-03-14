@@ -43,6 +43,7 @@ Scope:
 - Commit-reveal bidding workflow.
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.
+- Lifecycle observability baseline for `upload -> match -> bid -> verify -> award`.
 
 Exit criteria:
 - Core APIs available and documented in `src/api/openapi.yaml`.
@@ -78,6 +79,7 @@ Scope:
 - M2 (2026-03-27): task/matching + bidding API baseline.
 - M3 (2026-04-03): PoMW policy + verifier baseline.
 - M4 (2026-04-10): audit/reputation hook + E2E test pack + security/compliance readiness review.
+- M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md` to be implemented by downstream telemetry work.
 
 Checkpoint status board:
 - Review `docs/PHASE1_CHECKPOINT_BOARD.md` for the one-screen issue/PR map, target owners, and drift callouts.
