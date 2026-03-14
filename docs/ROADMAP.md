@@ -74,10 +74,13 @@ Scope:
 
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
-- M1 (Week 1): finalize contracts + upload pipeline design.
-- M2 (Week 2): task/matching + bidding API baseline.
-- M3 (Week 3): PoMW policy + verifier baseline.
-- M4 (Week 4): audit/reputation hook + E2E test pack + security/compliance readiness review.
+- M1 (2026-03-20): finalize contracts + upload pipeline design.
+- M2 (2026-03-27): task/matching + bidding API baseline.
+- M3 (2026-04-03): PoMW policy + verifier baseline.
+- M4 (2026-04-10): audit/reputation hook + E2E test pack + security/compliance readiness review.
+
+Checkpoint status board:
+- Review `docs/PHASE1_CHECKPOINT_BOARD.md` for the one-screen issue/PR map, target owners, and drift callouts.
 
 ## Phase 1 KPIs
 
