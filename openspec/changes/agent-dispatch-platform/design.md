@@ -22,7 +22,7 @@
 ## Decisions
 
 1. 采用三平面架构
-   - Control Plane: Registry, Matching, Bidding, PoMW Policy, Reputation
+   - Control Plane: Onboarding Registry, Task Marketplace, Bid Ledger, PoMW Policy/Verifier, Audit Ledger, Reputation
    - Data Plane: Artifact Store（内容寻址 + 版本）
    - Execution Plane: Sandbox Runtime + Trace Collector
 
@@ -51,6 +51,40 @@
 6. 任务与竞标全链路审计
    - 所有状态变更写入事件日志：`TASK_CREATED`, `BID_COMMITTED`, `BID_REVEALED`, `POWM_VERIFIED`, `TASK_AWARDED`。
    - 事件记录调用方身份、时间戳、摘要哈希。
+
+## Backend Module Boundaries
+
+MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立即拆成独立微服务。每个模块拥有清晰写入边界，并通过共享 contract layer（OpenSpec + OpenAPI + `contracts.ts`）交互。
+
+### Onboarding Registry
+
+- 负责 `/v1/agents/bundles` 上传入口、签名/schema 校验、版本冲突处理、skills 索引触发。
+- 拥有 `AgentBundle` 与 agent version registry 的写入权。
+- 对外产出稳定错误码、`agent_id`/`version`、以及可供匹配阶段使用的 skills 索引事件。
+
+### Task Marketplace
+
+- 负责 `TaskSpec` 校验、任务创建、候选硬过滤/软排序、以及任务进入 marketplace 的状态切换。
+- 拥有 task lifecycle 中 `draft -> marketplace` 的写入权。
+- 依赖 Onboarding Registry 暴露的可检索 skills/identity 元数据，不直接改写 agent 注册数据。
+
+### Bid Ledger
+
+- 负责 commit-reveal 窗口控制、bid hash 持久化、reveal payload 校验、以及 reveal 与 commit 的关联校验。
+- 拥有 bid lifecycle 中 `commit -> reveal` 的写入权。
+- 依赖 Task Marketplace 提供的 task 窗口与 candidate eligibility 快照，不自行定义准入规则。
+
+### PoMW Policy and Verifier
+
+- 负责按 T0/T1/T2、任务风险、trust score 计算证明强度，并校验 `ProofPack` 输出结果码。
+- 拥有 proof verification decision 的写入权。
+- 只消费 reveal 后的只读 bid/task/identity 快照，避免 verifier 反向修改竞标状态或任务约束。
+
+### Audit Ledger
+
+- 负责接收所有关键状态变更事件并提供按 `task_id` / `bid_id` 的可追溯查询视图。
+- 拥有审计事件 append-only 写入权和 award trace 聚合权。
+- 任何模块都不能直接回写或删除已发布事件；补偿只能通过新增事件完成。
 
 ## Risks / Trade-offs
 
