@@ -57,7 +57,7 @@ Required events (minimum):
 - `TASK_CREATED`
 - `BID_COMMITTED`
 - `BID_REVEALED`
-- `POWM_VERIFIED`
+- `POMW_VERIFIED`
 - `TASK_AWARDED`
 
 Each event must include:
@@ -98,7 +98,7 @@ Each event must include:
 1. Accept `proofId` only when bid state is `REVEALED`.
 2. Execute policy + verifier checks and persist terminal proof state.
 3. Materialize verification reason codes and difficulty fields.
-4. Emit `POWM_VERIFIED` audit event.
+4. Emit `POMW_VERIFIED` audit event.
 
 ### Award sequence
 

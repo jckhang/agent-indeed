@@ -49,7 +49,7 @@
    - 参考函数：`required_pow = base(task_risk, task_value) * (1 - trust_score)`
 
 6. 任务与竞标全链路审计
-   - 所有状态变更写入事件日志：`TASK_CREATED`, `BID_COMMITTED`, `BID_REVEALED`, `POWM_VERIFIED`, `TASK_AWARDED`。
+   - 所有状态变更写入事件日志：`TASK_CREATED`, `BID_COMMITTED`, `BID_REVEALED`, `POMW_VERIFIED`, `TASK_AWARDED`。
    - 事件记录调用方身份、时间戳、摘要哈希。
 
 ## Backend Module Boundaries
