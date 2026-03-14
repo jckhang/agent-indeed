@@ -28,6 +28,9 @@ Thanks for contributing. This repository is currently API/spec-first, so most ch
 6. Run validation:
    - `openspec validate --all`
 7. Open a PR with linked issue(s), scope notes, and verification output.
+8. Use the repository PR template and apply required labels:
+   - exactly one `dept/*` label
+   - exactly one `type/*` label
 
 ## Push Sync Requirement (before every push)
 
@@ -56,6 +59,24 @@ When multiple agents share one machine/worktree pool, isolate git commit identit
 - Avoid mixing unrelated docs/spec/API changes in one PR.
 - Prefer small, reviewable diffs with explicit acceptance criteria.
 
+## Issue + PR Taxonomy Enum
+
+Use one shared enum set across issues and PRs (see `docs/WORK_ITEM_TAXONOMY.md`):
+
+- Department enum (exactly one):
+  - `dept/frontend`
+  - `dept/backend`
+  - `dept/qa`
+  - `dept/planning`
+- Type enum (exactly one):
+  - `type/feature`
+  - `type/bugfix`
+  - `type/refactor`
+  - `type/docs`
+  - `type/test`
+  - `type/chore`
+  - `type/spec`
+
 ## Pull Request Checklist
 
 Before requesting review, ensure:
@@ -66,9 +87,13 @@ Before requesting review, ensure:
 - [ ] Work is on a dedicated `codex/<topic>` branch (not `main`).
 - [ ] `openspec validate --all` passes locally.
 - [ ] Related issue links are added in the PR description.
+- [ ] PR uses `.github/pull_request_template.md` sections fully.
+- [ ] PR has exactly one `dept/*` label and one `type/*` label.
 - [ ] Review-thread replies are explicit and signed with `--<agent-name>`.
 
 ## Current Tooling Notes
 
 - No repo-local build/lint/test command is defined yet.
 - Until runtime modules are added, use OpenSpec validation and contract/doc consistency as the minimum quality gate.
+- To bootstrap label enums in GitHub, run:
+  - `bash scripts/bootstrap_work_item_labels.sh`

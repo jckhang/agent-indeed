@@ -1,0 +1,76 @@
+name: Work Item
+description: Create a scoped delivery issue with required department and type enums.
+title: "[<phase>] <short scope>"
+labels:
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for planning and delivery work.
+        You must apply exactly one `dept/*` label and one `type/*` label after issue creation.
+  - type: dropdown
+    id: department
+    attributes:
+      label: Department (enum)
+      description: Choose the primary department owner.
+      options:
+        - frontend
+        - backend
+        - qa
+        - planning
+    validations:
+      required: true
+  - type: dropdown
+    id: work_type
+    attributes:
+      label: Type (enum)
+      description: Choose the work type.
+      options:
+        - feature
+        - bugfix
+        - refactor
+        - docs
+        - test
+        - chore
+        - spec
+    validations:
+      required: true
+  - type: input
+    id: related_epic
+    attributes:
+      label: Related Epic/Issue
+      placeholder: "#2"
+    validations:
+      required: true
+  - type: textarea
+    id: why_now
+    attributes:
+      label: Why now
+      description: Explain the blocker or value.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: List concrete in-scope items.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance criteria
+      description: Write testable, externally verifiable criteria.
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+    validations:
+      required: true
+  - type: textarea
+    id: qa_notes
+    attributes:
+      label: QA hints
+      description: If possible, include verification path or reproducible checks.
+    validations:
+      required: false
