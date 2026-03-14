@@ -45,6 +45,7 @@ Deliverables:
 - PoMW policy engine (T0/T1/T2 baseline).
 - Proof verification result codes and reason mapping.
 - Audit events and award decision trace queryability.
+- Observability rollout anchored to `docs/OBSERVABILITY_BASELINE.md` (events, traces, logs, metrics, alerts).
 
 Exit criteria:
 - `publish -> commit -> reveal -> verify -> award` is auditable by task/bid id.
@@ -85,6 +86,7 @@ Exit criteria:
 
 Deliverables:
 - Task/bid audit event timeline view.
+- Operator-facing rendering aligned to `docs/OBSERVABILITY_BASELINE.md` correlation IDs and failure reasons.
 - Failure reason rendering for proof/commit/reveal rejection.
 
 Exit criteria:

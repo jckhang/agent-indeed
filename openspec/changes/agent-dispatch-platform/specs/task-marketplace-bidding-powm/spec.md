@@ -55,3 +55,15 @@
 #### Scenario: Transport retry on bid commit preserves outcome
 - **WHEN** 客户端因网络超时重试同一 `bid_id` 的 commit 请求
 - **THEN** 平台返回与首次提交一致的最终状态（成功或重复），不产生额外状态分叉
+
+### Requirement: Lifecycle Observability Must Support Diagnosis
+
+平台 MUST 为 `publish -> match -> bid -> verify -> award` 各阶段提供统一的事件、trace、日志和指标基线，以支持 beta 期间的故障诊断与审计查询。
+
+#### Scenario: Every state-changing step can be correlated by workflow identifiers
+- **WHEN** 任一阶段产生状态变化或拒绝结果
+- **THEN** 平台记录可按 `task_id` / `bid_id` / `audit_id` / `trace_id` 关联的诊断信号
+
+#### Scenario: Alert-worthy failures are surfaced explicitly
+- **WHEN** commit/reveal/verify/award 阶段出现高风险失败模式或处理积压
+- **THEN** 平台暴露可用于告警的指标与失败事件，而不是仅依赖人工翻查原始日志

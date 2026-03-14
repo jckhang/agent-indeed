@@ -57,3 +57,15 @@
 #### Scenario: Skill metadata indexed on upload
 - **WHEN** bundle 含有 skills 元数据（skill_id, version, io schema）
 - **THEN** 平台将其纳入检索索引，供后续任务匹配使用
+
+### Requirement: Upload Diagnostics Must Be Correlated
+
+平台 MUST 为 agent 上传阶段提供最小可观测性信号，以支持调试重试、签名失败和索引延迟问题。
+
+#### Scenario: Upload failure carries audit and trace correlation
+- **WHEN** 上传请求因 schema、签名或版本冲突被拒绝
+- **THEN** 响应和日志包含可查询的 `audit_id`，并可关联到同一 `trace_id` 的诊断记录
+
+#### Scenario: Accepted upload emits lifecycle events
+- **WHEN** 上传请求通过校验并进入索引阶段
+- **THEN** 平台依次记录接收、校验、索引完成等生命周期事件，供按 `agent_id` 查询

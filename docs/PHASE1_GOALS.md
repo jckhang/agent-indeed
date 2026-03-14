@@ -49,6 +49,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - `POMW_VERIFIED`
   - `TASK_AWARDED`
 - Award decision includes score summary + proof result trace.
+- Observability contract is documented in `docs/OBSERVABILITY_BASELINE.md`, covering events, traces, logs, metrics, correlation IDs, retention, and alert-worthy failures for each MVP stage.
 
 ## Out of Scope (Phase 1)
 
