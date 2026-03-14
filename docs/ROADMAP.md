@@ -40,10 +40,12 @@ Goal: deliver MVP control-plane APIs and event trail to run closed beta tasks en
 Scope:
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
+- Manager console baseline (`docs/MANAGER_CONSOLE_BASELINE.md`, issue #43 / PR #53) keeps the publish form, shortlist evidence, and award-summary dependency notes visible while interactive award APIs are still pending.
 - Commit-reveal bidding workflow.
 - Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps commit/reveal workspace expectations and async refresh gaps explicit until polling/event-stream support lands.
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.
+- Lifecycle observability baseline for `upload -> match -> bid -> verify -> award`.
 
 Exit criteria:
 - Core APIs available and documented in `src/api/openapi.yaml`.
@@ -79,6 +81,7 @@ Scope:
 - M2 (2026-03-27): task/matching + bidding API baseline.
 - M3 (2026-04-03): PoMW policy + verifier baseline.
 - M4 (2026-04-10): audit/reputation hook + E2E test pack + security/compliance readiness review.
+- M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md` to be implemented by downstream telemetry work.
 
 Checkpoint status board:
 - Review `docs/PHASE1_CHECKPOINT_BOARD.md` for the one-screen issue/PR map, target owners, and drift callouts.

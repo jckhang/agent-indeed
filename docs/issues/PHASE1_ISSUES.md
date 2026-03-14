@@ -22,8 +22,10 @@
 - P1-07 #9: https://github.com/jckhang/agent-indeed/issues/9
 - P1-08 #10: https://github.com/jckhang/agent-indeed/issues/10
 - P1-09 #11: https://github.com/jckhang/agent-indeed/issues/11
+- P1-14 #43: https://github.com/jckhang/agent-indeed/issues/43
 - P1-11 #37: https://github.com/jckhang/agent-indeed/issues/37
 - P1-15 #44: https://github.com/jckhang/agent-indeed/issues/44
+- P1-12 #38: https://github.com/jckhang/agent-indeed/issues/38
 - P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
 
 ## P0 Readiness
@@ -242,6 +244,22 @@ Acceptance criteria:
 - Retryability and idempotency rules are explicit for upload, publish, commit, reveal, verify, and award operations.
 - The catalog is reflected consistently across OpenSpec scenarios and API drafts.
 
+### P1-12 Define observability baseline for MVP lifecycle
+
+References:
+- `docs/OBSERVABILITY_BASELINE.md`
+- `docs/ARCHITECTURE_GAPS.md`
+- `docs/PHASE1_GOALS.md`
+- `docs/ROADMAP.md`
+- `openspec/changes/agent-dispatch-platform/design.md`
+- `openspec/changes/agent-dispatch-platform/specs/task-marketplace-bidding-powm/spec.md`
+
+Acceptance criteria:
+- Required events, trace attributes, logs, and metrics are defined for each MVP flow stage.
+- Correlation identifiers and retention expectations are documented for debugging and audit use.
+- Alert-worthy failure modes are called out for onboarding, bidding, verification, and award flows.
+- The baseline is linked from Phase 1 planning artifacts and OpenSpec scope so downstream implementation can stay aligned.
+
 ### P1-13 Define security and compliance baseline for closed beta
 
 References:
@@ -261,13 +279,6 @@ Acceptance criteria:
 
 References:
 - `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`
-- `docs/ENGINEERING_TRACKS_FE_BE.md`
-- `docs/MVP_STATE_MODEL.md`
-- `docs/ERROR_CODE_RETRY_POLICY.md`
-- `src/api/openapi.yaml`
-- `src/api/contracts.ts`
-
-Acceptance criteria:
 - Agent can complete commit and reveal flows from UI with deadline/status feedback.
 - ProofPack entry or upload inputs reflect current API contract and validation hints.
 - Verification outcome and failure reasons are rendered in a timeline/status view.
@@ -276,3 +287,22 @@ Acceptance criteria:
 Backlog notes:
 - Bid status refresh still needs a task-scoped bid read model before the UI can survive browser refreshes or cross-device resume.
 - Proof verification status still needs a proof read endpoint and polling/event guidance before the timeline can promise live updates.
+### P1-14 Build manager console baseline for task publish and award
+
+References:
+- `docs/MANAGER_CONSOLE_BASELINE.md`
+- `docs/ENGINEERING_TRACKS_FE_BE.md`
+- `docs/MVP_STATE_MODEL.md`
+- `docs/ERROR_CODE_RETRY_POLICY.md`
+- `src/api/openapi.yaml`
+- `src/api/contracts.ts`
+
+Acceptance criteria:
+- Manager can create an MVP task from UI using the current `TaskSpec` contract.
+- Candidate/ranking output is rendered with score breakdown and missing-field handling.
+- Award decision summary is visible with clear state/status messaging and backend dependency callouts.
+- Any API contract gaps found during UI planning are fed back into the backlog with explicit notes.
+
+Backlog notes:
+- Manager candidate review still needs a task-scoped ranking read model from matching work before the UI can move beyond placeholders.
+- Award summary and award command contracts are still pending and must align with audit/award trace work before an interactive CTA can ship.

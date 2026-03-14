@@ -13,6 +13,7 @@
 - 新增两个能力规格：
   - agent 上传与生产资料同步能力
   - 任务市场匹配、竞标与 PoMW 验证能力
+- 补充 MVP 生命周期可观测性基线，覆盖事件、trace、日志、指标、告警与保留期约束。
 - 明确身份分层（T0/T1/T2）下的 PoMW 强度策略。
 - 定义从任务发布到中标执行的关键状态流转与审计要求。
 
@@ -28,5 +29,6 @@
 ## Impact
 
 - 新增 OpenSpec 规范文件，作为后续服务拆分与 API 设计依据。
+- 新增 `docs/OBSERVABILITY_BASELINE.md`，作为后续后端埋点、运维告警与审计可视化的统一契约。
 - 将影响后续模块：Registry、Matching、Bidding、PoMW Verifier、Audit/Reputation、Settlement。
 - 该变更当前不直接引入运行时代码，但会约束后续实现与测试。
