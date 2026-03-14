@@ -100,6 +100,27 @@ export interface ProofVerifyRequestContext {
   auditReason?: string;
 }
 
+export interface CreateTaskRequest {
+  task: TaskSpec;
+}
+
+export interface CreateTaskHttpRequest {
+  headers: TaskWriteContextHeaders;
+  body: CreateTaskRequest;
+}
+
+export interface VerifyProofPackHttpRequest {
+  headers: ProofVerifyRequestContext;
+  body: VerifyProofPackRequest;
+}
+
+export interface CreateTaskResponse {
+  taskId: string;
+  status: "OPEN_FOR_MATCHING" | "OPEN_FOR_BIDDING";
+  commitDeadline?: string;
+  revealDeadline?: string;
+}
+
 export interface UploadAgentBundleCreatedResponse {
   agentId: string;
   version: string;
