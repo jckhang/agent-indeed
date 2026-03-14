@@ -347,3 +347,15 @@ export interface Bid {
     proof?: ProofPack;
   };
 }
+
+export type BidStatus = "COMMITTED" | "REVEALED" | "REJECTED" | "SCORED";
+
+export interface BidResponse {
+  bidId: string;
+  taskId: string;
+  agentId: string;
+  phase: "COMMIT" | "REVEAL";
+  status: BidStatus;
+  rankingScore?: number;
+  decisionTraceHash?: string;
+}
