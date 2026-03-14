@@ -28,6 +28,7 @@ Identify the smallest set of missing decisions that block delivery of the Phase 
 
 - Manager-side publish/award baseline is documented in `docs/MANAGER_CONSOLE_BASELINE.md`, but candidate-read and award contracts are still missing.
 - Manager task authoring is now documented in `docs/MANAGER_TASK_COMPOSER_UI_SLICE.md`, but shortlist and award visibility still need dedicated read-model follow-through.
+- Manager shortlist/award-readiness guidance now exists in `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`, but the shortlist and award contracts are still pending backend merge work.
 - Agent-side bidding baseline is now documented in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, but bid/proof read contracts are still missing.
 - Operator audit timeline baseline is now documented in `docs/OPERATOR_AUDIT_TIMELINE_BASELINE.md`, but task-scoped event reads and completeness guarantees are still missing.
 - No contract for sync/async updates (polling, event stream, or both).

@@ -23,6 +23,7 @@
 - P1-08 #10: https://github.com/jckhang/agent-indeed/issues/10
 - P1-09 #11: https://github.com/jckhang/agent-indeed/issues/11
 - P1-14 #43: https://github.com/jckhang/agent-indeed/issues/43
+- P1-20 #62: https://github.com/jckhang/agent-indeed/issues/62
 - P1-11 #37: https://github.com/jckhang/agent-indeed/issues/37
 - P1-15 #44: https://github.com/jckhang/agent-indeed/issues/44
 - P1-12 #38: https://github.com/jckhang/agent-indeed/issues/38
@@ -332,6 +333,25 @@ Acceptance criteria:
 Backlog notes:
 - Manager candidate review still needs a task-scoped ranking read model from matching work before the UI can move beyond placeholders.
 - Award summary and award command contracts are still pending and must align with audit/award trace work before an interactive CTA can ship.
+
+### P1-20 Implement shortlist review and award-readiness UI slice
+
+References:
+- `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`
+- `docs/MANAGER_CONSOLE_BASELINE.md`
+- `docs/FRONTEND_MVP_SURFACE.md`
+- `docs/MVP_STATE_MODEL.md`
+- issue `#58` / PR `#68`
+
+Acceptance criteria:
+- Candidate shortlist UI renders ranking breakdown, missing-field fallback, and loading/empty/error states.
+- Award-readiness panel shows current task/bid status, blocking reasons, and dependency callouts without assuming unavailable backend fields.
+- Any missing shortlist/award read contract is linked back to issue `#58` or a named follow-up instead of being hidden in the UI.
+- Scope excludes task-composer implementation details.
+
+Backlog notes:
+- The shortlisted-candidate experience still depends on the contract proposal in PR `#68`; until it merges, the UI must preserve partial-data states and dependency copy.
+- Award-readiness visibility must stay separate from the eventual award command execution path so manager UX does not imply unsupported write behavior.
 
 ### P1-16 Build audit visibility console baseline
 
