@@ -91,3 +91,16 @@
 #### Scenario: Downstream implementation work is mapped to telemetry obligations
 - **WHEN** 团队推进匹配、竞标、校验或审计等后续 issue / PR
 - **THEN** 平台维护一份可审阅的 handoff 清单，明确每个活跃工作项必须补齐的事件、指标、trace 字段，以及仍阻塞观测接入的 `job_id` / async read / `audit_id` 等合同缺口
+
+### Requirement: Sensitive Marketplace And Proof Data Must Respect Role And Phase Boundaries
+
+平台 MUST 对竞标、proof 与审计读写面实施显式 actor scope 与脱敏边界，避免在闭测期泄露商业或敏感验证数据。
+
+#### Scenario: Unrevealed bid content is redacted before reveal gate opens
+- **WHEN** manager 或 operator 在 reveal deadline 之前查看 shortlist / bid 读模型
+- **THEN** 平台只返回允许披露的状态摘要，不暴露价格、执行计划原文或 proof 引用
+
+#### Scenario: Manual proof override requires privileged actor and rationale
+- **WHEN** operator 使用人工 override 处理 proof 校验结果
+- **THEN** 请求必须携带特权 actor 身份与 review reason
+- **AND** 审计事件记录 actor、reason、ticket/reference 与时间戳

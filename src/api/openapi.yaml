@@ -21,6 +21,9 @@ paths:
       tags: [agents]
       summary: Upload a signed agent bundle
       operationId: uploadAgentBundle
+      security:
+        - AgentBearer: []
+      x-required-scopes: [agent.bundle.write]
       description: |
         Runs the deterministic onboarding pipeline in this order:
         idempotency lookup, signature verification, schema validation,
@@ -210,6 +213,11 @@ paths:
       tags: [tasks]
       summary: Publish a task into marketplace
       operationId: createTask
+      security:
+        - ManagerSession: []
+      x-required-scopes: [task.write]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
       requestBody:
         required: true
         content:
@@ -235,6 +243,9 @@ paths:
       tags: [bids]
       summary: Commit bid hash in the commit phase
       operationId: commitBid
+      security:
+        - AgentBearer: []
+      x-required-scopes: [bid.commit]
       parameters:
         - $ref: '#/components/parameters/TaskIdParam'
       requestBody:
@@ -304,6 +315,13 @@ paths:
       tags: [bids]
       summary: Reveal bid details and PoMW artifacts
       operationId: revealBid
+      security:
+        - AgentBearer: []
+      x-required-scopes: [bid.reveal]
+      description: |
+        Reveal is limited to the authenticated shortlisted agent.
+        Manager/operator read models must keep unrevealed commercial fields
+        and proof references redacted until the reveal gate opens.
       parameters:
         - $ref: '#/components/parameters/TaskIdParam'
       requestBody:
@@ -379,13 +397,24 @@ paths:
       tags: [proofs]
       summary: Verify proof pack against task PoMW policy
       operationId: verifyProofPack
+      security:
+        - VerifierService: []
+        - OperatorSession: []
+      x-security-scope-options:
+        - scheme: VerifierService
+          requiredScopes: [proof.verify]
+        - scheme: OperatorSession
+          requiredScopes: [proof.verify.override]
       description: |
         Verifies a proof pack against a previously persisted PoMW policy
         snapshot. Clients MUST supply the exact `policyTraceId` returned by
         `POST /v1/tasks/{taskId}/proof-policy` so audit and award flows can
-        replay the same decision basis.
+        replay the same decision basis. Automated verification uses a verifier
+        service credential. Manual override paths require an operator session
+        plus an audit reason.
       parameters:
         - $ref: '#/components/parameters/TaskIdParam'
+        - $ref: '#/components/parameters/AuditReasonHeader'
       requestBody:
         required: true
         content:
@@ -531,6 +560,27 @@ paths:
                     retryable: false
 
 components:
+  securitySchemes:
+    AgentBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Agent-scoped write credential bound to `identity.did`.
+    ManagerSession:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Manager session token; combine with `X-Workspace-Id` for workspace-scoped writes.
+    OperatorSession:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Privileged operator session for manual review or override paths.
+    VerifierService:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Service credential for automated proof verification against persisted policy traces.
   parameters:
     TaskIdParam:
       name: taskId
@@ -539,6 +589,24 @@ components:
       schema:
         type: string
         pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+    WorkspaceIdHeader:
+      name: X-Workspace-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 128
+      description: Workspace scope required for manager task publication.
+    AuditReasonHeader:
+      name: X-Audit-Reason
+      in: header
+      required: false
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 512
+      description: Required when an operator triggers a manual proof verification override.
 
   schemas:
     UploadAgentBundleRequest:

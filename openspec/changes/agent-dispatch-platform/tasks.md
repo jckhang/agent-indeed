@@ -31,3 +31,4 @@
 - [ ] 4.2 定义 `ProofPack` 结构与验证结果状态码。
 - [ ] 4.3 规范审计事件模型并预留信誉回写接口。
 - [x] 4.4 定义 MVP 生命周期可观测性基线（事件/trace/log/metric/retention/alerts）。
+- [x] 4.5 输出闭测安全就绪清单，明确 auth/authz、secret handling、redaction 与 M4 go/no-go 门槛。

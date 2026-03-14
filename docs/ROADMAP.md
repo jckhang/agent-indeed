@@ -84,7 +84,7 @@ Scope:
 - M2 (2026-03-27): task/matching + bidding API baseline.
 - M3 (2026-04-03): PoMW policy + verifier baseline.
 - M4 (2026-04-10): audit/reputation hook + E2E test pack + security/compliance readiness review.
-- M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md` plus `docs/MVP_TELEMETRY_HANDOFF.md` so downstream telemetry work lands with owners, contract gaps, and alert checks made explicit.
+- M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, and `docs/CLOSED_BETA_SECURITY_READINESS.md` so telemetry owners plus auth, secret-handling, and redaction follow-ons stay reviewable.
 
 Checkpoint status board:
 - Review `docs/PHASE1_CHECKPOINT_BOARD.md` for the one-screen issue/PR map, target owners, and drift callouts.
