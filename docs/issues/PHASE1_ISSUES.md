@@ -310,6 +310,10 @@ Acceptance criteria:
 
 References:
 - `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`
+- `docs/ENGINEERING_TRACKS_FE_BE.md`
+- `docs/ARCHITECTURE_GAPS.md`
+- `src/api/openapi.yaml`
+- `openspec/changes/agent-dispatch-platform/specs/task-marketplace-bidding-powm/spec.md`
 
 Acceptance criteria:
 - Agent can complete commit and reveal flows from UI with deadline/status feedback.
