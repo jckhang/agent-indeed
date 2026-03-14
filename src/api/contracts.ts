@@ -324,26 +324,132 @@ export interface ProofPack {
   };
 }
 
-export interface Bid {
+export type BidWindowPhase = "COMMIT_OPEN" | "REVEAL_OPEN" | "CLOSED";
+
+export interface BidWindowSnapshot {
+  currentPhase: BidWindowPhase;
+  commitDeadline: string;
+  revealDeadline: string;
+  serverTime: string;
+  nextAction:
+    | "WAIT_FOR_REVEAL_WINDOW"
+    | "SUBMIT_REVEAL"
+    | "TRACK_PROOF_VERIFICATION"
+    | "NO_FURTHER_ACTION";
+}
+
+export interface BidCommitCommand {
   bidId: string;
   taskId: string;
   agentId: string;
-  phase: "COMMIT" | "REVEAL";
-  commit?: {
-    bidHash: string;
-    committedAt: string;
+  bidHash: string;
+  committedAt: string;
+}
+
+export interface BidRevealCommand {
+  bidId: string;
+  taskId: string;
+  agentId: string;
+  nonce: string;
+  price: {
+    currency: string;
+    amount: number;
   };
-  reveal?: {
-    nonce: string;
-    price: {
-      currency: string;
-      amount: number;
-    };
-    executionPlan: {
-      summary: string;
-      etaSeconds: number;
-      requiredTools?: string[];
-    };
-    proof?: ProofPack;
+  executionPlan: {
+    summary: string;
+    etaSeconds: number;
+    requiredTools?: string[];
+  };
+  proof: ProofPack;
+}
+
+export type Bid = BidCommitCommand | BidRevealCommand;
+
+export interface CommitBidRequest {
+  idempotencyKey: string;
+  commit: BidCommitCommand;
+}
+
+export interface RevealBidRequest {
+  idempotencyKey: string;
+  reveal: BidRevealCommand;
+}
+
+export interface BidProofSubmission {
+  proofId: string;
+  verificationStatus: "PENDING_VERIFY" | "PASS" | "FAIL" | "MANUAL_REVIEW";
+}
+
+export interface CommitBidAcceptedResponse {
+  bidId: string;
+  taskId: string;
+  agentId: string;
+  phase: "COMMIT";
+  status: "COMMITTED";
+  result: "COMMITTED" | "RETURNED_EXISTING";
+  commit: BidCommitCommand;
+  window: BidWindowSnapshot;
+}
+
+export interface RevealBidAcceptedResponse {
+  bidId: string;
+  taskId: string;
+  agentId: string;
+  phase: "REVEAL";
+  status: "REVEALED" | "SCORED";
+  result: "REVEALED" | "SCORED";
+  rankingScore?: number;
+  decisionTraceHash?: string;
+  revealAcceptedAt: string;
+  proofSubmission: BidProofSubmission;
+  window: BidWindowSnapshot;
+}
+
+export interface CommitBidErrorResponse extends ApiErrorResponse {
+  code: BidCommitErrorCode;
+  details?: {
+    bidId?: string;
+    taskId?: string;
+    currentPhase?: BidWindowPhase;
+    commitDeadline?: string;
+    revealDeadline?: string;
+    serverTime?: string;
+    existingCommitAuditId?: string;
+  };
+}
+
+export interface RevealBidErrorResponse extends ApiErrorResponse {
+  code: BidRevealErrorCode;
+  details?: {
+    bidId?: string;
+    taskId?: string;
+    currentPhase?: BidWindowPhase;
+    commitRecordedAt?: string;
+    revealDeadline?: string;
+    expectedBidHash?: string;
+  };
+}
+
+export interface VerifyProofPackRequest {
+  proof: ProofPack;
+}
+
+export interface ProofVerificationResponse {
+  proofId: string;
+  result: "PASS" | "FAIL" | "MANUAL_REVIEW";
+  requiredDifficulty: number;
+  achievedDifficulty: number;
+  reasonCodes?: string[];
+  verifiedAt?: string;
+}
+
+export interface ProofVerifyErrorResponse extends ApiErrorResponse {
+  code: ProofVerifyErrorCode;
+  details?: {
+    proofId?: string;
+    taskId?: string;
+    policyTraceId?: string;
+    requiredDifficulty?: number;
+    achievedDifficulty?: number;
   };
 }

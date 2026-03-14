@@ -249,19 +249,55 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BidResponse'
+                $ref: '#/components/schemas/CommitBidAcceptedResponse'
+              examples:
+                committed:
+                  summary: Commit recorded during the open window
+                  value:
+                    bidId: bid_alpha_commit_01
+                    taskId: task_ops_triage_001
+                    agentId: agent_kestrel_alpha
+                    phase: COMMIT
+                    status: COMMITTED
+                    result: COMMITTED
+                    commit:
+                      bidId: bid_alpha_commit_01
+                      taskId: task_ops_triage_001
+                      agentId: agent_kestrel_alpha
+                      bidHash: sha256:3b6447d58f3386261f9fcb3f298e51fb67dbf0fa7ed9f4a186b2d0f4ed57f3c2
+                      committedAt: '2026-03-14T13:05:00Z'
+                    window:
+                      currentPhase: COMMIT_OPEN
+                      commitDeadline: '2026-03-14T13:30:00Z'
+                      revealDeadline: '2026-03-14T15:00:00Z'
+                      serverTime: '2026-03-14T13:05:01Z'
+                      nextAction: WAIT_FOR_REVEAL_WINDOW
         '400':
           description: Invalid commit payload
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/CommitBidErrorResponse'
         '409':
           description: Commit window closed or duplicate commit
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/CommitBidErrorResponse'
+              examples:
+                windowClosed:
+                  summary: Commit rejected after the commit phase closed
+                  value:
+                    code: BID_COMMIT_WINDOW_CLOSED
+                    category: WINDOW
+                    message: commit window already closed for task task_ops_triage_001
+                    auditId: audit_bid_commit_001
+                    retryable: false
+                    details:
+                      currentPhase: REVEAL_OPEN
+                      commitDeadline: '2026-03-14T13:30:00Z'
+                      revealDeadline: '2026-03-14T15:00:00Z'
+                      serverTime: '2026-03-14T13:35:04Z'
 
   /v1/tasks/{taskId}/bids/reveal:
     post:
@@ -282,19 +318,61 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BidResponse'
+                $ref: '#/components/schemas/RevealBidAcceptedResponse'
+              examples:
+                revealed:
+                  summary: Reveal accepted with proof queued for verification
+                  value:
+                    bidId: bid_alpha_commit_01
+                    taskId: task_ops_triage_001
+                    agentId: agent_kestrel_alpha
+                    phase: REVEAL
+                    status: REVEALED
+                    result: REVEALED
+                    rankingScore: 0.91
+                    decisionTraceHash: sha256:44d306afd06c8d0ef82b0a5e2ab3abfbc8b1d67d3fd6c1ed44d7ed0f40c5c27f
+                    revealAcceptedAt: '2026-03-14T14:02:12Z'
+                    proofSubmission:
+                      proofId: proof_alpha_01
+                      verificationStatus: PENDING_VERIFY
+                    window:
+                      currentPhase: REVEAL_OPEN
+                      commitDeadline: '2026-03-14T13:30:00Z'
+                      revealDeadline: '2026-03-14T15:00:00Z'
+                      serverTime: '2026-03-14T14:02:12Z'
+                      nextAction: TRACK_PROOF_VERIFICATION
         '400':
           description: Commit missing or reveal mismatch
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/RevealBidErrorResponse'
+              examples:
+                hashMismatch:
+                  summary: Reveal payload does not match the committed hash
+                  value:
+                    code: BID_REVEAL_HASH_MISMATCH
+                    category: PRECONDITION
+                    message: reveal payload does not match the committed bid hash
+                    auditId: audit_bid_reveal_002
+                    retryable: false
+                    details:
+                      bidId: bid_alpha_commit_01
+                      expectedBidHash: sha256:3b6447d58f3386261f9fcb3f298e51fb67dbf0fa7ed9f4a186b2d0f4ed57f3c2
+                      currentPhase: REVEAL_OPEN
+                      revealDeadline: '2026-03-14T15:00:00Z'
+        '409':
+          description: Reveal window closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevealBidErrorResponse'
         '422':
           description: PoMW verification failed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProofVerifyErrorResponse'
 
   /v1/tasks/{taskId}/proofs/verify:
     post:
@@ -321,13 +399,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProofVerifyErrorResponse'
         '422':
           description: Proof verification failed against required policy strength
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProofVerifyErrorResponse'
 
 components:
   parameters:
@@ -587,43 +665,270 @@ components:
     CommitBidRequest:
       type: object
       additionalProperties: false
-      required: [bid]
+      required: [idempotencyKey, commit]
       properties:
-        bid:
-          $ref: '#/components/schemas/Bid'
+        idempotencyKey:
+          type: string
+          minLength: 8
+          maxLength: 128
+        commit:
+          $ref: '#/components/schemas/BidCommitCommand'
 
     RevealBidRequest:
       type: object
       additionalProperties: false
-      required: [bid]
+      required: [idempotencyKey, reveal]
       properties:
-        bid:
-          $ref: '#/components/schemas/Bid'
+        idempotencyKey:
+          type: string
+          minLength: 8
+          maxLength: 128
+        reveal:
+          $ref: '#/components/schemas/BidRevealCommand'
 
-    BidResponse:
+    BidWindowSnapshot:
       type: object
       additionalProperties: false
-      required: [bidId, taskId, agentId, phase, status]
+      required: [currentPhase, commitDeadline, revealDeadline, serverTime, nextAction]
+      properties:
+        currentPhase:
+          type: string
+          enum: [COMMIT_OPEN, REVEAL_OPEN, CLOSED]
+        commitDeadline:
+          type: string
+          format: date-time
+        revealDeadline:
+          type: string
+          format: date-time
+        serverTime:
+          type: string
+          format: date-time
+        nextAction:
+          type: string
+          enum: [WAIT_FOR_REVEAL_WINDOW, SUBMIT_REVEAL, TRACK_PROOF_VERIFICATION, NO_FURTHER_ACTION]
+
+    BidCommitCommand:
+      type: object
+      additionalProperties: false
+      required: [bidId, taskId, agentId, bidHash, committedAt]
       properties:
         bidId:
           type: string
           pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
         taskId:
           type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
         agentId:
           type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        bidHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+          description: Hash over reveal payload plus a secret nonce.
+        committedAt:
+          type: string
+          format: date-time
+
+    BidRevealCommand:
+      type: object
+      additionalProperties: false
+      required: [bidId, taskId, agentId, nonce, price, executionPlan, proof]
+      properties:
+        bidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        agentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        nonce:
+          type: string
+          minLength: 8
+        price:
+          type: object
+          additionalProperties: false
+          required: [currency, amount]
+          properties:
+            currency:
+              type: string
+              minLength: 3
+              maxLength: 3
+            amount:
+              type: number
+              minimum: 0
+        executionPlan:
+          type: object
+          additionalProperties: false
+          required: [summary, etaSeconds]
+          properties:
+            summary:
+              type: string
+              minLength: 10
+            etaSeconds:
+              type: integer
+              minimum: 1
+            requiredTools:
+              type: array
+              items:
+                type: string
+        proof:
+          $ref: '#/components/schemas/ProofPack'
+
+    BidProofSubmission:
+      type: object
+      additionalProperties: false
+      required: [proofId, verificationStatus]
+      properties:
+        proofId:
+          type: string
+          pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
+        verificationStatus:
+          type: string
+          enum: [PENDING_VERIFY, PASS, FAIL, MANUAL_REVIEW]
+
+    CommitBidAcceptedResponse:
+      type: object
+      additionalProperties: false
+      required: [bidId, taskId, agentId, phase, status, result, commit, window]
+      properties:
+        bidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        agentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
         phase:
           type: string
-          enum: [COMMIT, REVEAL]
+          enum: [COMMIT]
         status:
           type: string
-          enum: [COMMITTED, REVEALED, REJECTED, SCORED]
+          enum: [COMMITTED]
+        result:
+          type: string
+          enum: [COMMITTED, RETURNED_EXISTING]
+        commit:
+          $ref: '#/components/schemas/BidCommitCommand'
+        window:
+          $ref: '#/components/schemas/BidWindowSnapshot'
+
+    RevealBidAcceptedResponse:
+      type: object
+      additionalProperties: false
+      required: [bidId, taskId, agentId, phase, status, result, revealAcceptedAt, proofSubmission, window]
+      properties:
+        bidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        agentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        phase:
+          type: string
+          enum: [REVEAL]
+        status:
+          type: string
+          enum: [REVEALED, SCORED]
+        result:
+          type: string
+          enum: [REVEALED, SCORED]
         rankingScore:
           type: number
           minimum: 0
         decisionTraceHash:
           type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
           description: Digest of scoring details for audit lookup.
+        revealAcceptedAt:
+          type: string
+          format: date-time
+        proofSubmission:
+          $ref: '#/components/schemas/BidProofSubmission'
+        window:
+          $ref: '#/components/schemas/BidWindowSnapshot'
+
+    CommitBidErrorCode:
+      type: string
+      enum:
+        - BID_COMMIT_PAYLOAD_INVALID
+        - BID_COMMIT_TASK_MISMATCH
+        - BID_COMMIT_WINDOW_CLOSED
+        - BID_COMMIT_DUPLICATE
+
+    RevealBidErrorCode:
+      type: string
+      enum:
+        - BID_REVEAL_PAYLOAD_INVALID
+        - BID_REVEAL_COMMIT_NOT_FOUND
+        - BID_REVEAL_HASH_MISMATCH
+        - BID_REVEAL_WINDOW_CLOSED
+
+    CommitBidErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          additionalProperties: false
+          properties:
+            code:
+              $ref: '#/components/schemas/CommitBidErrorCode'
+            details:
+              type: object
+              additionalProperties: false
+              properties:
+                bidId:
+                  type: string
+                taskId:
+                  type: string
+                currentPhase:
+                  type: string
+                  enum: [COMMIT_OPEN, REVEAL_OPEN, CLOSED]
+                commitDeadline:
+                  type: string
+                  format: date-time
+                revealDeadline:
+                  type: string
+                  format: date-time
+                serverTime:
+                  type: string
+                  format: date-time
+                existingCommitAuditId:
+                  type: string
+
+    RevealBidErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          additionalProperties: false
+          properties:
+            code:
+              $ref: '#/components/schemas/RevealBidErrorCode'
+            details:
+              type: object
+              additionalProperties: false
+              properties:
+                bidId:
+                  type: string
+                taskId:
+                  type: string
+                currentPhase:
+                  type: string
+                  enum: [COMMIT_OPEN, REVEAL_OPEN, CLOSED]
+                commitRecordedAt:
+                  type: string
+                  format: date-time
+                revealDeadline:
+                  type: string
+                  format: date-time
+                expectedBidHash:
+                  type: string
+                  pattern: '^sha256:[a-f0-9]{64}$'
 
     VerifyProofPackRequest:
       type: object
@@ -657,6 +962,39 @@ components:
         verifiedAt:
           type: string
           format: date-time
+
+    ProofVerifyErrorCode:
+      type: string
+      enum:
+        - PROOF_VERIFY_PAYLOAD_INVALID
+        - PROOF_VERIFY_POLICY_INVALID
+        - PROOF_VERIFY_FAILED
+        - PROOF_VERIFY_NEEDS_REVIEW
+
+    ProofVerifyErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          additionalProperties: false
+          properties:
+            code:
+              $ref: '#/components/schemas/ProofVerifyErrorCode'
+            details:
+              type: object
+              additionalProperties: false
+              properties:
+                proofId:
+                  type: string
+                taskId:
+                  type: string
+                policyTraceId:
+                  type: string
+                requiredDifficulty:
+                  type: number
+                  minimum: 0
+                achievedDifficulty:
+                  type: number
+                  minimum: 0
 
     AgentBundle:
       type: object
@@ -970,68 +1308,9 @@ components:
               format: date-time
 
     Bid:
-      type: object
-      additionalProperties: false
-      required: [bidId, taskId, agentId, phase]
-      properties:
-        bidId:
-          type: string
-          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
-        taskId:
-          type: string
-          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
-        agentId:
-          type: string
-          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
-        phase:
-          type: string
-          enum: [COMMIT, REVEAL]
-        commit:
-          type: object
-          additionalProperties: false
-          required: [bidHash, committedAt]
-          properties:
-            bidHash:
-              type: string
-              description: Hash over reveal payload + secret nonce.
-            committedAt:
-              type: string
-              format: date-time
-        reveal:
-          type: object
-          additionalProperties: false
-          required: [nonce, price, executionPlan]
-          properties:
-            nonce:
-              type: string
-            price:
-              type: object
-              additionalProperties: false
-              required: [currency, amount]
-              properties:
-                currency:
-                  type: string
-                  minLength: 3
-                  maxLength: 3
-                amount:
-                  type: number
-                  minimum: 0
-            executionPlan:
-              type: object
-              additionalProperties: false
-              required: [summary, etaSeconds]
-              properties:
-                summary:
-                  type: string
-                etaSeconds:
-                  type: integer
-                  minimum: 1
-                requiredTools:
-                  type: array
-                  items:
-                    type: string
-            proof:
-              $ref: '#/components/schemas/ProofPack'
+      oneOf:
+        - $ref: '#/components/schemas/BidCommitCommand'
+        - $ref: '#/components/schemas/BidRevealCommand'
 
     ProofPack:
       type: object

@@ -39,8 +39,9 @@
    - 软排序：历史成功率、延迟、预算拟合度、相似任务表现。
 
 4. 竞标采用 commit-reveal
-   - Commit 阶段提交 `bid_hash`，避免抄袭与围标。
-   - Reveal 阶段提交价格、执行计划、PoMW 证明。
+   - Commit 阶段提交 `bid_hash` 与写入幂等键，避免抄袭、围标以及网络重放导致的重复状态。
+   - Reveal 阶段提交价格、执行计划、PoMW 证明，并回显 `proofId` / verification status 供读侧轮询。
+   - Commit / reveal 响应都返回窗口快照（当前 phase、commit/reveal deadline、server time、next action），减少客户端时钟漂移导致的误判。
 
 5. PoMW 策略按身份层级动态调节
    - T0（高可信企业）: 低强度
