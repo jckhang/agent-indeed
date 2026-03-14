@@ -48,6 +48,7 @@ Exit criteria:
 - Core APIs available and documented in `src/api/openapi.yaml`.
 - End-to-end scenario passes: publish task -> commit -> reveal -> verify -> award.
 - All critical state transitions produce audit events.
+- Beta guardrails for auth, secrets, and sensitive data handling are documented and owned.
 
 ### Phase 2: Execution & Trust Loop (Target: 2026-05 to 2026-06)
 
@@ -76,7 +77,7 @@ Scope:
 - M1 (Week 1): finalize contracts + upload pipeline design.
 - M2 (Week 2): task/matching + bidding API baseline.
 - M3 (Week 3): PoMW policy + verifier baseline.
-- M4 (Week 4): audit/reputation hook + E2E test pack + beta readiness review.
+- M4 (Week 4): audit/reputation hook + E2E test pack + security/compliance readiness review.
 
 ## Phase 1 KPIs
 

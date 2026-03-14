@@ -65,3 +65,4 @@ Ship the first usable agent dispatch loop for closed beta:
 - GitHub issues for Phase 1 epics/tasks are created and linked to this plan.
 - P0 baseline issues that block collaboration quality are closed or explicitly waived.
 - FE/BE execution ownership and MVP hiring-critical roles are assigned or explicitly risk-accepted.
+- Closed-beta auth, auditability, and sensitive-data guardrails are documented or explicitly risk-accepted.

@@ -20,6 +20,7 @@
 - P1-08 #10: https://github.com/jckhang/agent-indeed/issues/10
 - P1-09 #11: https://github.com/jckhang/agent-indeed/issues/11
 - P1-11 #37: https://github.com/jckhang/agent-indeed/issues/37
+- P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
 
 ## P0 Readiness
 
@@ -201,3 +202,18 @@ Acceptance criteria:
 - Stable error codes are listed per MVP flow stage with trigger conditions and client handling guidance.
 - Retryability and idempotency rules are explicit for upload, publish, commit, reveal, verify, and award operations.
 - The catalog is reflected consistently across OpenSpec scenarios and API drafts.
+
+### P1-13 Define security and compliance baseline for closed beta
+
+References:
+- `docs/SECURITY_COMPLIANCE_BASELINE.md`
+- `docs/ARCHITECTURE_GAPS.md`
+- `docs/ROADMAP.md`
+- `docs/PHASE1_GOALS.md`
+- `src/api/openapi.yaml`
+
+Acceptance criteria:
+- AuthN/AuthZ model is documented for manager, agent, and internal verifier/audit roles.
+- Sensitive fields and handling requirements are listed for onboarding, bidding, proof, and audit data.
+- Closed-beta guardrails and minimum compliance checklist are explicit and testable.
+- The baseline identifies follow-on implementation issues needed before beta readiness.
