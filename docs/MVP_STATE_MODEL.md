@@ -65,16 +65,20 @@ Each event must include:
 
 ## 2) Invalid Transition Rejection Rules
 
+Exact stable error codes for these branches are owned by P1-11's error-code catalog/API work.
+This state-model baseline freezes the rejection conditions and HTTP class expectations, and later
+contract work must map these rows onto the authoritative catalog instead of inventing new codes here.
+
 | Operation | Rejection condition | Expected result |
 | --- | --- | --- |
-| Commit | Task not in `OPEN_FOR_BIDDING` or commit window closed | `409 BID_COMMIT_WINDOW_CLOSED` |
-| Commit | Duplicate commit on same `taskId + agentId` with different payload hash | `409 BID_COMMIT_PAYLOAD_CONFLICT` |
-| Reveal | No prior valid commit | `400 BID_REVEAL_COMMIT_MISSING` |
-| Reveal | Reveal window closed | `409 BID_REVEAL_WINDOW_CLOSED` |
-| Reveal | Reveal hash does not match committed hash | `400 BID_REVEAL_HASH_MISMATCH` |
-| Verify | Bid not in `REVEALED` | `409 PROOF_VERIFY_BID_NOT_REVEALED` |
-| Award | Any candidate lacks completed verification (`PASS` or accepted manual decision) | `409 AWARD_VERIFY_INCOMPLETE` |
-| Award | Task already awarded | idempotent replay or `409 TASK_ALREADY_AWARDED` |
+| Commit | Task not in `OPEN_FOR_BIDDING` or commit window closed | `409` conflict response; exact code comes from the shared error catalog |
+| Commit | Duplicate commit on same `taskId + agentId` with different payload hash | `409` conflict/idempotency response; exact code comes from the shared error catalog |
+| Reveal | No prior valid commit | `400` invalid reveal precondition response; exact code comes from the shared error catalog |
+| Reveal | Reveal window closed | `409` conflict response; exact code comes from the shared error catalog |
+| Reveal | Reveal hash does not match committed hash | `400` invalid reveal payload response; exact code comes from the shared error catalog |
+| Verify | Bid not in `REVEALED` | `409` invalid verification state response; exact code comes from the shared error catalog |
+| Award | Any candidate lacks completed verification (`PASS` or accepted manual decision) | `409` award precondition response; exact code comes from the shared error catalog |
+| Award | Task already awarded | idempotent replay or `409` conflict response from the shared error catalog |
 
 ## 3) Write Sequencing (Deterministic Order)
 
@@ -114,7 +118,7 @@ Each event must include:
 
 - Commit/reveal/verify/award must accept client idempotency keys.
 - Same key + same payload: return original result (no duplicate side effects).
-- Same key + different payload: reject with `409 IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD`.
+- Same key + different payload: reject with the shared `409` idempotency-conflict code once P1-11 finalizes the catalog.
 
 ### Data constraints
 
@@ -131,7 +135,7 @@ Use stable lock order to avoid deadlocks:
 ## 5) Direct Follow-on for P1 Issues
 
 - #5 (`TaskSpec`): must carry windows needed for deterministic commit/reveal gates.
-- #7 (commit/reveal APIs): must implement rejection codes and idempotent replay behavior above.
+- #7 (commit/reveal APIs): must implement rejection behavior above using the authoritative P1-11 error-code catalog.
 - #8 (PoMW policy engine): must output verifier parameters consumed by `PENDING_VERIFY -> terminal` transitions.
 - #9 (Proof verifier): must return stable reason codes aligned to `PASS/FAIL/MANUAL_REVIEW`.
 - #10 (audit + award trace): must persist ordered lifecycle events and decision trace hash.
