@@ -44,13 +44,18 @@ Every lifecycle event must emit:
 - `event_name`
 - `occurred_at`
 - `trace_id`
-- `actor_type` (`manager`, `agent`, `system`)
+- `actor_type` (`manager`, `agent`, `operator`, `audit`, `system`)
 - `actor_id` or redacted equivalent
 - `task_id` when a task exists
 - `bid_id` when a bid exists
 - `result` (`accepted`, `rejected`, `started`, `completed`, `failed`)
 - `reason_code` for rejection/failure branches
 - `audit_id` when the event feeds operator review or customer-facing error contracts
+
+Operator and audit guidance:
+- Use `operator` for manual review, exception handling, replay, or award override actions taken by a human operator.
+- Use `audit` for actions initiated by an audit/compliance role or a dedicated audit workflow that is distinct from normal operations.
+- Keep the same `task_id`, `bid_id`, `trace_id`, and `audit_id` on operator/audit follow-up events so manual decisions remain first-class in the lifecycle timeline.
 
 ### Required trace attributes
 
@@ -208,6 +213,8 @@ Required events:
 - `TASK_AWARD_EVALUATED`
 - `TASK_AWARDED`
 - `TASK_AWARD_REJECTED`
+- `TASK_AWARD_MANUAL_REVIEW_REQUESTED`
+- `TASK_AWARD_OVERRIDE_RECORDED`
 - `REPUTATION_WRITEBACK_QUEUED`
 
 Required trace/log attributes:
@@ -215,6 +222,8 @@ Required trace/log attributes:
 - `award.score_summary`
 - `award.decision_source`
 - `award.signature_status`
+- `actor_type`
+- `actor_id`
 - `audit_id`
 - `reputation.writeback_status`
 
@@ -228,6 +237,7 @@ Alert-worthy failures:
 - award event emitted without score summary or proof result trace
 - multiple awards recorded for the same task
 - reputation writeback queue stalls after award completion
+- operator/audit override events missing the acting role identity or correlation IDs
 - operator-visible audit timeline missing critical lifecycle events
 
 ## Retention Expectations

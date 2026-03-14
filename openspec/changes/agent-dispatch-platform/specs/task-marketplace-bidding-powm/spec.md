@@ -66,4 +66,4 @@
 
 #### Scenario: Award review can locate proof and ranking evidence
 - **WHEN** 操作方回放一次中标决策
-- **THEN** 相关事件和日志包含 `audit_id`、评分摘要、PoMW 结果码与阶段化时间戳，足以解释中标或拒绝原因
+- **THEN** 相关事件和日志包含 `audit_id`、评分摘要、PoMW 结果码、阶段化时间戳以及触发回放/覆写的 `actor_type`，足以解释中标或拒绝原因
