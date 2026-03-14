@@ -70,12 +70,12 @@ Operator path:
 
 | Page | API endpoint | Required request fields | Required response fields | UI behavior |
 | --- | --- | --- | --- | --- |
-| `TaskCreatePage` | `POST /v1/tasks` | `task.title`, `task.budget`, `task.sla`, `task.constraints`, `task.risk`, `task.powmPolicy`, `task.biddingWindow` | `taskId`, `status`, `commitDeadline`, `revealDeadline` | Synchronous submit with inline schema validation |
+| `TaskCreatePage` | `POST /v1/tasks` | `task.title`, `task.description`, `task.budget`, `task.sla`, `task.constraints`, `task.risk`, `task.powmPolicy`, `task.biddingWindow` | `taskId`, `status`, `commitDeadline`, `revealDeadline` | Synchronous submit with inline schema validation |
 | `TaskPublishResultPage` | `POST /v1/tasks` result reuse | none (from previous response) | `taskId`, `status`, deadlines | Read-only confirmation + copy task id |
 | `CandidateDecisionPage` | (depends on candidate retrieval API from P1-04) | `taskId` | candidate list, ranking score breakdown, verification summary | Table + score explanation panel |
 | `AwardResultPage` | (depends on award API/event query from P1-08) | `taskId`, selected winner id | winner id, score summary, `decisionTraceHash` | Final confirmation and trace visibility |
-| `BidCommitPage` | `POST /v1/tasks/{taskId}/bids/commit` | `taskId`, `bid.bidId`, `bid.agentId`, `bid.commit.bidHash` | `bidId`, `phase`, `status` | Deadline countdown + commit confirmation |
-| `BidRevealPage` | `POST /v1/tasks/{taskId}/bids/reveal` | `taskId`, `bidId`, `agentId`, `bid.reveal`, `bid.reveal.proof` | `bidId`, `phase`, `status`, optional `rankingScore` | Hash match errors shown inline |
+| `BidCommitPage` | `POST /v1/tasks/{taskId}/bids/commit` | `taskId`, `bid.bidId`, `bid.taskId`, `bid.agentId`, `bid.phase`, `bid.commit.bidHash`, `bid.commit.committedAt` | `bidId`, `phase`, `status` | Deadline countdown + commit confirmation |
+| `BidRevealPage` | `POST /v1/tasks/{taskId}/bids/reveal` | `taskId`, `bid.bidId`, `bid.taskId`, `bid.agentId`, `bid.phase`, `bid.reveal`, `bid.reveal.proof` | `bidId`, `phase`, `status`, optional `rankingScore` | Hash match errors shown inline |
 | `BidStatusTimelinePage` | reveal/verify response aggregation | `taskId`, `bidId` | bid status + proof verify result (`PASS/FAIL/MANUAL_REVIEW`) | Polling refresh (no event stream yet) |
 | `TaskAuditTimelinePage` | (depends on audit query API from P1-08) | `taskId` | ordered lifecycle events, actor, timestamp, trace hash | Timeline visualization |
 | `FailureInspectionPage` | (depends on audit/proof query API from P1-07/P1-08) | filters (`reasonCode`, `taskId`, `agentId`) | reason code, failed stage, payload refs | Search + filtered failure panel |
