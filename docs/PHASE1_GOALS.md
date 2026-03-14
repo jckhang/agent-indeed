@@ -49,6 +49,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - `POMW_VERIFIED`
   - `TASK_AWARDED`
 - Award decision includes score summary + proof result trace.
+- Lifecycle observability contract is documented in `docs/OBSERVABILITY_BASELINE.md`.
 
 ## Out of Scope (Phase 1)
 

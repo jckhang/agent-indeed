@@ -55,3 +55,15 @@
 #### Scenario: Transport retry on bid commit preserves outcome
 - **WHEN** 客户端因网络超时重试同一 `bid_id` 的 commit 请求
 - **THEN** 平台返回与首次提交一致的最终状态（成功或重复），不产生额外状态分叉
+
+### Requirement: MVP Lifecycle Telemetry Must Support Cross-Stage Diagnosis
+
+平台 MUST 为 `upload -> match -> bid -> verify -> award` 的每个阶段定义最小事件、trace、日志、指标与相关性标识要求，以支持闭测期故障定位与审计回放。
+
+#### Scenario: Critical lifecycle failure is traced across sync and async hops
+- **WHEN** 任一阶段发生失败、重试或超时
+- **THEN** 操作方可使用共享的 `trace_id`、业务标识（如 `task_id`/`bid_id`）以及稳定 `reason_code` 将 API、异步任务、审计事件和错误日志串联起来
+
+#### Scenario: Award review can locate proof and ranking evidence
+- **WHEN** 操作方回放一次中标决策
+- **THEN** 相关事件和日志包含 `audit_id`、评分摘要、PoMW 结果码、阶段化时间戳以及触发回放/覆写的 `actor_type`，足以解释中标或拒绝原因

@@ -23,6 +23,7 @@
 - P1-08 #10: https://github.com/jckhang/agent-indeed/issues/10
 - P1-09 #11: https://github.com/jckhang/agent-indeed/issues/11
 - P1-11 #37: https://github.com/jckhang/agent-indeed/issues/37
+- P1-12 #38: https://github.com/jckhang/agent-indeed/issues/38
 - P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
 
 ## P0 Readiness
@@ -240,6 +241,22 @@ Acceptance criteria:
 - Stable error codes are listed per MVP flow stage with trigger conditions and client handling guidance.
 - Retryability and idempotency rules are explicit for upload, publish, commit, reveal, verify, and award operations.
 - The catalog is reflected consistently across OpenSpec scenarios and API drafts.
+
+### P1-12 Define observability baseline for MVP lifecycle
+
+References:
+- `docs/OBSERVABILITY_BASELINE.md`
+- `docs/ARCHITECTURE_GAPS.md`
+- `docs/PHASE1_GOALS.md`
+- `docs/ROADMAP.md`
+- `openspec/changes/agent-dispatch-platform/design.md`
+- `openspec/changes/agent-dispatch-platform/specs/task-marketplace-bidding-powm/spec.md`
+
+Acceptance criteria:
+- Required events, trace attributes, logs, and metrics are defined for each MVP flow stage.
+- Correlation identifiers and retention expectations are documented for debugging and audit use.
+- Alert-worthy failure modes are called out for onboarding, bidding, verification, and award flows.
+- The baseline is linked from Phase 1 planning artifacts and OpenSpec scope so downstream implementation can stay aligned.
 
 ### P1-13 Define security and compliance baseline for closed beta
 
