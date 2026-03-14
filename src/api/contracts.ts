@@ -236,6 +236,7 @@ export type AwardAuditErrorCode =
   | "TASK_AWARD_PRECONDITION_FAILED"
   | "TASK_AWARD_PROOF_NOT_VERIFIED"
   | "TASK_AWARD_CANDIDATE_NOT_ELIGIBLE"
+  | "TASK_AWARD_IDEMPOTENCY_CONFLICT"
   | "AUDIT_QUERY_NOT_FOUND";
 
 export type ApiErrorCode =
@@ -293,6 +294,17 @@ export interface TaskSpec {
   };
 }
 
+export interface CreateTaskRequest {
+  task: TaskSpec;
+}
+
+export interface CreateTaskResponse {
+  taskId: string;
+  status: "OPEN_FOR_MATCHING" | "OPEN_FOR_BIDDING";
+  commitDeadline?: string;
+  revealDeadline?: string;
+}
+
 export interface ProofPack {
   proofId: string;
   taskId: string;
@@ -345,5 +357,142 @@ export interface Bid {
       requiredTools?: string[];
     };
     proof?: ProofPack;
+  };
+}
+
+export interface CommitBidRequest {
+  bid: Bid;
+}
+
+export interface RevealBidRequest {
+  bid: Bid;
+}
+
+export interface BidResponse {
+  bidId: string;
+  taskId: string;
+  agentId: string;
+  phase: "COMMIT" | "REVEAL";
+  status: "COMMITTED" | "REVEALED" | "REJECTED" | "SCORED";
+  rankingScore?: number;
+  decisionTraceHash?: string;
+}
+
+export interface VerifyProofPackRequest {
+  proof: ProofPack;
+}
+
+export type ProofVerificationResult = "PASS" | "FAIL" | "MANUAL_REVIEW";
+
+export interface ProofVerificationResponse {
+  proofId: string;
+  result: ProofVerificationResult;
+  requiredDifficulty: number;
+  achievedDifficulty: number;
+  reasonCodes?: string[];
+  verifiedAt?: string;
+}
+
+export type CandidateEligibilityStatus = "ELIGIBLE" | "NEEDS_REVIEW" | "INELIGIBLE";
+export type CandidateMissingDataStatus = "BLOCKING" | "WARNING";
+export type CandidateMissingDataCode =
+  | "NO_ACTIVE_BID"
+  | "PROOF_PENDING"
+  | "PROOF_MANUAL_REVIEW"
+  | "PROFILE_STALE"
+  | "AUDIT_GAP";
+export type ProofReadinessStatus = "READY" | "PENDING" | "FAILED" | "NEEDS_REVIEW";
+
+export interface CandidateScoreBreakdownItem {
+  metric: string;
+  value: number;
+  weight: number;
+  contribution: number;
+  rationale?: string;
+}
+
+export interface CandidateMissingDataState {
+  code: CandidateMissingDataCode;
+  status: CandidateMissingDataStatus;
+  message: string;
+  auditId?: string;
+}
+
+export interface CandidateProofReadiness {
+  status: ProofReadinessStatus;
+  proofId?: string;
+  result?: ProofVerificationResult;
+  reasonCodes?: string[];
+  auditId?: string;
+}
+
+export interface CandidateShortlistEntry {
+  agentId: string;
+  bidId?: string;
+  identityTier: IdentityTier;
+  hardFilterPassed: boolean;
+  eligibilityStatus: CandidateEligibilityStatus;
+  rankingScore: number;
+  scoreBreakdown?: CandidateScoreBreakdownItem[];
+  missingDataStates: CandidateMissingDataState[];
+  proofReadiness: CandidateProofReadiness;
+  shortlistAuditId: string;
+  decisionTraceHash: string;
+}
+
+export interface CandidateShortlistResponse {
+  taskId: string;
+  generatedAt: string;
+  topK: number;
+  candidates: CandidateShortlistEntry[];
+}
+
+export type AwardStatus = "PENDING_REVIEW" | "READY_TO_AWARD" | "AWARDED" | "BLOCKED";
+export type AwardHandoffStatus = "PENDING" | "READY" | "SENT";
+
+export interface AwardProofSummary {
+  proofId: string;
+  result: ProofVerificationResult;
+  reasonCodes?: string[];
+  requiredDifficulty?: number;
+  achievedDifficulty?: number;
+  verifiedAt?: string;
+  auditId: string;
+}
+
+export interface AwardHandoffSummary {
+  status: AwardHandoffStatus;
+  handoffChannel?: "API" | "WEBHOOK" | "MANUAL_EXPORT";
+  destinationRef?: string;
+  checklist?: string[];
+}
+
+export interface AwardDecisionDetail {
+  taskId: string;
+  status: AwardStatus;
+  statusMessage: string;
+  shortlistedBidId?: string;
+  awardedBidId?: string;
+  awardedAgentId?: string;
+  awardReason?: string;
+  managerDecisionNote?: string;
+  shortlistAuditId?: string;
+  proofAuditId?: string;
+  proofSummary?: AwardProofSummary;
+  decisionTraceHash?: string;
+  auditEventId?: string;
+  handoff: AwardHandoffSummary;
+  reviewedAt?: string;
+  awardedAt?: string;
+}
+
+export interface CreateTaskAwardRequest {
+  idempotencyKey: string;
+  award: {
+    bidId: string;
+    awardReason: string;
+    managerDecisionNote?: string;
+    shortlistAuditId: string;
+    proofAuditId: string;
   };
 }

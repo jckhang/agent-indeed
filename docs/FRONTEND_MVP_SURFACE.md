@@ -61,8 +61,8 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | Page | API endpoint | Required request fields from UI | Response fields required by UI | Contract status |
 | --- | --- | --- | --- | --- |
 | `/manager/tasks/new` | `POST /v1/tasks` | `idempotencyKey`, `task.title`, `task.description`, `task.budget.*`, `task.sla.*`, `task.constraints.*`, `task.risk.*`, `task.powmPolicy.*`, `task.biddingWindow.*` | `taskId`, `status`, `commitDeadline`, `revealDeadline` | Ready for core publish path; FE must include idempotency key and handle structured validation details when contract sync lands |
-| `/manager/tasks/{taskId}/candidates` | `GET /v1/tasks/{taskId}/candidates` (proposed) | `taskId`, `topK`, `includeScoreBreakdown` | `agentId`, `identityTier`, `hardFilterPassed`, `rankingScore`, `scoreBreakdown`, `proofReadiness`, `decisionTraceHash` | Missing in current API |
-| `/manager/tasks/{taskId}/award` | `POST /v1/tasks/{taskId}/award` + `GET /v1/tasks/{taskId}/award` (proposed) | `taskId`, `bidId`, `awardReason`, `idempotencyKey` | `taskId`, `awardedBidId`, `awardedAt`, `proofSummary`, `decisionTraceHash`, `auditEventId` | Missing in current API |
+| `/manager/tasks/{taskId}/candidates` | `GET /v1/tasks/{taskId}/candidates` | `taskId`, `topK`, `includeScoreBreakdown` | `agentId`, `bidId`, `identityTier`, `hardFilterPassed`, `eligibilityStatus`, `rankingScore`, `scoreBreakdown`, `missingDataStates`, `proofReadiness`, `shortlistAuditId`, `decisionTraceHash` | Ready in the current draft API + TS contract for shortlist review; FE can render audit-linked ranking gaps directly |
+| `/manager/tasks/{taskId}/award` | `POST /v1/tasks/{taskId}/award` + `GET /v1/tasks/{taskId}/award` | write: `taskId`, `bidId`, `awardReason`, `managerDecisionNote`, `shortlistAuditId`, `proofAuditId`, `idempotencyKey`; read: `taskId` | `taskId`, `status`, `statusMessage`, `awardedBidId`, `awardedAgentId`, `proofSummary`, `decisionTraceHash`, `auditEventId`, `handoff.*` | Ready in the current draft API + TS contract; remaining follow-up is downstream audit/event list work from issue #10 |
 
 ### Agent pages
 
@@ -94,8 +94,7 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 
 | Risk | Impact on frontend delivery | Minimal backend addition to unblock |
 | --- | --- | --- |
-| Missing candidate retrieval endpoint | Manager cannot inspect ranking before award | Add `GET /v1/tasks/{taskId}/candidates` with score breakdown |
-| Missing award write/read endpoints | Closed loop cannot finish in UI | Add award APIs with `decisionTraceHash` and `auditEventId` |
+| Award handoff remains contract-only | UI can review handoff readiness, but downstream dispatch/export transport is still backend follow-up work | Keep handoff summary in the read model and track transport/event execution under issue #10 |
 | Missing list/read endpoints for bids/proofs | UI cannot refresh status without ad-hoc polling hacks | Add read endpoints for bid/proof status by `taskId`, `bidId`, `proofId` |
 | Generic `ErrorResponse` for commit/reveal/verify failures | User-facing reason code mapping is unstable | Publish stable error code catalog with category + retryability |
 | No idempotency support beyond bundle upload | Retry-safe UX cannot be guaranteed for task publish/award | Add idempotency key contract to task and award writes |
@@ -103,6 +102,6 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 
 ## Recommended Contract Follow-Ups
 
-1. Add frontend-critical read APIs before Manager F1 and Agent F2 implementation starts.
+1. Keep manager shortlist and award payloads frozen while frontend wiring for PR #53 moves from planning to implementation.
 2. Standardize error shape (`code`, `category`, `message`, `retryable`, `details`, `auditId`) across all write endpoints.
-3. Freeze state enums for task, bid, proof, and award in `openapi.yaml` and `contracts.ts` to reduce UI branching drift.
+3. Add operator-side audit/event list endpoints so manager handoff links can deep-link into the immutable timeline.
