@@ -21,12 +21,67 @@ paths:
       tags: [agents]
       summary: Upload a signed agent bundle
       operationId: uploadAgentBundle
+      description: |
+        Runs the deterministic onboarding pipeline in this order:
+        idempotency lookup, signature verification, schema validation,
+        version-conflict policy, bundle persistence, and skill indexing.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/UploadAgentBundleRequest'
+            examples:
+              validBundle:
+                summary: Valid signed bundle
+                value:
+                  idempotencyKey: idem_agentbundle_001
+                  bundle:
+                    manifest:
+                      name: support_triage_agent
+                      version: 1.2.0
+                      runtime: OPENCLAW
+                      entrypoint: ./bin/triage
+                      image: oci://registry.example.com/agents/support-triage:1.2.0
+                      checksum: sha256:1111111111111111111111111111111111111111111111111111111111111111
+                    identity:
+                      did: did:key:z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8Kestrel
+                      publicKey: z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8KestrelPubKey
+                      credentialLevel: T1
+                      issuer: did:web:registry.agent-indeed.dev
+                      trustScore: 0.84
+                    skills:
+                      - skillId: skill_support.triage
+                        version: 1.4.0
+                        tags: [support, routing]
+                        inputSchema:
+                          type: object
+                          required: [ticketId, transcript]
+                        outputSchema:
+                          type: object
+                          required: [category, urgency]
+                      - skillId: skill_support.priority_score
+                        version: 1.1.0
+                        tags: [support, scoring]
+                        inputSchema:
+                          type: object
+                          required: [transcript]
+                        outputSchema:
+                          type: object
+                          required: [priority]
+                    memoryRef:
+                      mode: INDEX_ONLY
+                      summaryHash: sha256:2222222222222222222222222222222222222222222222222222222222222222
+                      vectorIndexUri: s3://agent-memory/support-triage/index.bin
+                      accessPolicy:
+                        scope: MATCHING_ONLY
+                        ttlSeconds: 3600
+                    signature:
+                      algorithm: ED25519
+                      payloadHash: sha256:3333333333333333333333333333333333333333333333333333333333333333
+                      signature: base64:MEUCIQDdExampleSignatureForBundleUploadFlow1234567890==
+                      signerDid: did:key:z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8Kestrel
+                      signedAt: '2026-03-14T01:30:00Z'
       responses:
         '200':
           description: Idempotent replay matched an existing bundle version
@@ -34,18 +89,86 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UploadAgentBundleReplayResponse'
+              examples:
+                hashMatchedReplay:
+                  summary: Replay matched an existing bundle version
+                  value:
+                    agentId: agent_supporttriage001
+                    version: 1.2.0
+                    status: EXISTING
+                    result: RETURNED_EXISTING
+                    indexing:
+                      status: INDEXED
+                      indexedSkillCount: 2
+                      memoryMode: INDEX_ONLY
+                      skills:
+                        - skillId: skill_support.triage
+                          version: 1.4.0
+                          sourceAgentId: agent_supporttriage001
+                          sourceVersion: 1.2.0
+                          tags: [support, routing]
+                        - skillId: skill_support.priority_score
+                          version: 1.1.0
+                          sourceAgentId: agent_supporttriage001
+                          sourceVersion: 1.2.0
+                          tags: [support, scoring]
+                    replay:
+                      strategy: RETURN_EXISTING_ON_HASH_MATCH
+                      existingAgentId: agent_supporttriage001
+                      existingVersion: 1.2.0
+                      existingPayloadHash: sha256:3333333333333333333333333333333333333333333333333333333333333333
+                      incomingPayloadHash: sha256:3333333333333333333333333333333333333333333333333333333333333333
+                    indexedAt: '2026-03-14T01:30:02Z'
         '201':
           description: Agent bundle accepted and versioned
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UploadAgentBundleResponse'
+                $ref: '#/components/schemas/UploadAgentBundleCreatedResponse'
+              examples:
+                created:
+                  summary: New bundle accepted and indexed
+                  value:
+                    agentId: agent_supporttriage001
+                    version: 1.2.0
+                    status: ACCEPTED
+                    result: CREATED
+                    indexing:
+                      status: INDEXED
+                      indexedSkillCount: 2
+                      memoryMode: INDEX_ONLY
+                      skills:
+                        - skillId: skill_support.triage
+                          version: 1.4.0
+                          sourceAgentId: agent_supporttriage001
+                          sourceVersion: 1.2.0
+                          tags: [support, routing]
+                        - skillId: skill_support.priority_score
+                          version: 1.1.0
+                          sourceAgentId: agent_supporttriage001
+                          sourceVersion: 1.2.0
+                          tags: [support, scoring]
+                    indexedAt: '2026-03-14T01:30:02Z'
         '400':
           description: Invalid schema or signature payload
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UploadAgentBundleValidationErrorResponse'
+              examples:
+                signerMismatch:
+                  summary: Signature signer DID does not match bundle identity
+                  value:
+                    code: AGENT_BUNDLE_SIGNATURE_SIGNER_MISMATCH
+                    category: SIGNATURE
+                    message: signature.signerDid must match bundle.identity.did
+                    auditId: audit_bundle_upload_signer_mismatch
+                    retryable: false
+                    details:
+                      fieldPath: bundle.signature.signerDid
+                      rule: signer_matches_identity
+                      expected: did:key:z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8Kestrel
+                      actual: did:key:z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8WrongSigner
         '409':
           description: Duplicate bundle version
           content:
@@ -200,10 +323,10 @@ components:
         bundle:
           $ref: '#/components/schemas/AgentBundle'
 
-    UploadAgentBundleResponse:
+    UploadAgentBundleCreatedResponse:
       type: object
       additionalProperties: false
-      required: [agentId, version, status, result]
+      required: [agentId, version, status, result, indexing]
       properties:
         agentId:
           type: string
@@ -217,6 +340,8 @@ components:
         result:
           type: string
           enum: [CREATED]
+        indexing:
+          $ref: '#/components/schemas/UploadAgentBundleIndexingSummary'
         indexedAt:
           type: string
           format: date-time
@@ -224,7 +349,7 @@ components:
     UploadAgentBundleReplayResponse:
       type: object
       additionalProperties: false
-      required: [agentId, version, status, result, replay]
+      required: [agentId, version, status, result, indexing, replay]
       properties:
         agentId:
           type: string
@@ -238,11 +363,53 @@ components:
         result:
           type: string
           enum: [RETURNED_EXISTING]
+        indexing:
+          $ref: '#/components/schemas/UploadAgentBundleIndexingSummary'
         replay:
           $ref: '#/components/schemas/AgentBundleVersionReplay'
         indexedAt:
           type: string
           format: date-time
+
+    UploadAgentBundleIndexingSummary:
+      type: object
+      additionalProperties: false
+      required: [status, indexedSkillCount, memoryMode, skills]
+      properties:
+        status:
+          type: string
+          enum: [INDEXED]
+        indexedSkillCount:
+          type: integer
+          minimum: 0
+        memoryMode:
+          type: string
+          enum: [INDEX_ONLY, ENCRYPTED_REF, FULL]
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentSkillIndexRecord'
+
+    AgentSkillIndexRecord:
+      type: object
+      additionalProperties: false
+      required: [skillId, version, sourceAgentId, sourceVersion]
+      properties:
+        skillId:
+          type: string
+        version:
+          type: string
+          pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+        sourceAgentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        sourceVersion:
+          type: string
+          pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+        tags:
+          type: array
+          items:
+            type: string
 
     UploadAgentBundleValidationErrorResponse:
       type: object
