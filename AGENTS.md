@@ -20,10 +20,24 @@
   4. Re-run required validation commands
   5. Push branch (`git push --force-with-lease` when history was rewritten by rebase)
 
+## PR and issue format policy
+
+- All PRs must use `.github/pull_request_template.md`.
+- Every PR must include:
+  - Exactly one department label: `dept/frontend`, `dept/backend`, `dept/qa`, or `dept/planning`
+  - Exactly one type label: `type/feature`, `type/bugfix`, `type/refactor`, `type/docs`, `type/test`, `type/chore`, or `type/spec`
+- Every issue should use the same enum set for ownership and work classification.
+- Source of truth for enums and examples: `docs/WORK_ITEM_TAXONOMY.md`.
+- PR descriptions must be self-complete for review:
+  - acceptance criteria mapping
+  - reproducible QA steps and expected results
+  - validation output and risk/rollback note
+
 ## Known commands
 
 - Validate OpenSpec changes for active work with `openspec validate --changes`.
 - Run full OpenSpec validation with `openspec validate --all` when needed.
+- Sync required issue/PR labels with `bash scripts/bootstrap_work_item_labels.sh`.
 
 ## Repo layout
 
