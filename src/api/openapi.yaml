@@ -379,6 +379,11 @@ paths:
       tags: [proofs]
       summary: Verify proof pack against task PoMW policy
       operationId: verifyProofPack
+      description: |
+        Verifies a proof pack against a previously persisted PoMW policy
+        snapshot. Clients MUST supply the exact `policyTraceId` returned by
+        `POST /v1/tasks/{taskId}/proof-policy` so audit and award flows can
+        replay the same decision basis.
       parameters:
         - $ref: '#/components/parameters/TaskIdParam'
       requestBody:
@@ -394,18 +399,78 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProofVerificationResponse'
+              examples:
+                passAgainstResolvedPolicy:
+                  summary: Proof verification reuses the persisted policy trace
+                  value:
+                    proofId: proof_ops_triage_001
+                    result: PASS
+                    policyTraceId: policytrace_ops_triage_001
+                    requiredPolicy:
+                      policyTraceId: policytrace_ops_triage_001
+                      requiredProofStrength: MEDIUM
+                      challengeProfile: SAMPLE_EXECUTION
+                      verifierParams:
+                        minSampleCount: 2
+                        minQualityScore: 0.82
+                        maxRuntimeMs: 180000
+                      inputSnapshot:
+                        taskRiskLevel: MEDIUM
+                        taskValueScore: 0.72
+                        identityTier: T1
+                        trustScore: 0.84
+                      rationale:
+                        - task risk requires more than T0 baseline
+                        - trust score allows sample execution without stake
+                      persistedAt: '2026-03-14T05:20:00Z'
+                    requiredDifficulty: 0.82
+                    achievedDifficulty: 0.91
+                    verifiedAt: '2026-03-14T05:24:00Z'
         '400':
-          description: Invalid proof payload or policy mapping input
+          description: Invalid proof payload or policy trace reference
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProofVerifyErrorResponse'
+              examples:
+                invalidPayload:
+                  summary: Request omits required proof fields
+                  value:
+                    code: PROOF_VERIFY_PAYLOAD_INVALID
+                    category: VALIDATION
+                    message: proof.sampleWork.outputDigest is required
+                    auditId: audit_proof_verify_payload_invalid
+                    retryable: false
+        '404':
+          description: Referenced policy snapshot was not found for this task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProofVerifyErrorResponse'
+              examples:
+                missingPolicyTrace:
+                  summary: Verification cannot proceed without a persisted policy decision
+                  value:
+                    code: PROOF_POLICY_TRACE_NOT_FOUND
+                    category: POLICY
+                    message: policyTraceId policytrace_missing_001 was not found for task task_ops_triage_001
+                    auditId: audit_proof_policy_trace_not_found
+                    retryable: false
         '422':
           description: Proof verification failed against required policy strength
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProofVerifyErrorResponse'
+              examples:
+                policyThresholdFailed:
+                  summary: Proof does not satisfy the resolved difficulty threshold
+                  value:
+                    code: PROOF_VERIFY_FAILED
+                    category: POLICY
+                    message: proof difficulty 0.51 is below required threshold 0.82
+                    auditId: audit_proof_verify_failed
+                    retryable: false
 
   /v1/tasks/{taskId}/proof-policy:
     post:
@@ -991,12 +1056,12 @@ components:
     VerifyProofPackRequest:
       type: object
       additionalProperties: false
-      required: [proof]
+      required: [policyTraceId, proof]
       properties:
         policyTraceId:
           type: string
           pattern: '^policytrace_[a-zA-Z0-9_-]{8,64}$'
-          description: Persisted PoMW policy snapshot reference used for verification and audit.
+          description: Exact persisted PoMW policy snapshot reference used for verification and audit replay.
         proof:
           $ref: '#/components/schemas/ProofPack'
 
@@ -1592,6 +1657,7 @@ components:
         - BID_REVEAL_HASH_MISMATCH
         - BID_REVEAL_WINDOW_CLOSED
         - PROOF_POLICY_INPUT_INVALID
+        - PROOF_POLICY_TRACE_NOT_FOUND
         - PROOF_VERIFY_PAYLOAD_INVALID
         - PROOF_VERIFY_POLICY_INVALID
         - PROOF_VERIFY_FAILED

@@ -50,6 +50,12 @@
 - **AND** 平台为该决策持久化唯一 `policy_trace_id`
 - **AND** 后续 proof 校验结果必须引用同一个 `policy_trace_id`
 
+#### Scenario: Proof verification rejects unknown policy snapshot references
+- **WHEN** agent 提交 proof 校验请求但未提供已持久化的 `policy_trace_id`
+- **OR** 提供的 `policy_trace_id` 不属于当前 task 的策略快照
+- **THEN** 平台拒绝校验请求并返回稳定错误
+- **AND** 平台不得在 verify 阶段隐式重新解析 PoMW 策略
+
 #### Scenario: Proof verification failure returns stable code
 - **WHEN** 提交的 `ProofPack` 未满足任务要求的 PoMW 强度
 - **THEN** 平台返回稳定验证错误码（`PROOF_VERIFY_FAILED` 或 `PROOF_VERIFY_NEEDS_REVIEW`）并附带可审计标识

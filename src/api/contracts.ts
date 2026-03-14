@@ -228,6 +228,7 @@ export type BidRevealErrorCode =
 
 export type ProofVerifyErrorCode =
   | "PROOF_POLICY_INPUT_INVALID"
+  | "PROOF_POLICY_TRACE_NOT_FOUND"
   | "PROOF_VERIFY_PAYLOAD_INVALID"
   | "PROOF_VERIFY_POLICY_INVALID"
   | "PROOF_VERIFY_FAILED"
