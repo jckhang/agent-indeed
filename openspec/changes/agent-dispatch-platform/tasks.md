@@ -15,7 +15,7 @@
 
 - [ ] 2.1 定义 `AgentBundle` schema（manifest/identity/skills/memoryRef）。
 - [ ] 2.2 设计上传校验流水线（签名、schema、能力索引、版本冲突处理）。
-- [ ] 2.3 定义上传失败错误码与可重试策略。
+- [x] 2.3 定义上传失败错误码与可重试策略（见 `docs/ERROR_CODE_RETRY_POLICY.md`）。
 
 ## 3. 任务匹配与竞标流程设计
 

@@ -19,5 +19,6 @@ Agent dispatch platform prototype.
 - MVP roadmap: `docs/ROADMAP.md`
 - Organization and member profiles: `docs/ORGANIZATION.md`
 - Architecture gap assessment: `docs/ARCHITECTURE_GAPS.md`
+- Error-code + retry baseline: `docs/ERROR_CODE_RETRY_POLICY.md`
 - Frontend/backend delivery tracks: `docs/ENGINEERING_TRACKS_FE_BE.md`
 - HR hiring plan: `docs/HR_HIRING_PLAN.md`

@@ -164,6 +164,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProofVerificationResponse'
+        '400':
+          description: Invalid proof payload or policy mapping input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Proof verification failed against required policy strength
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   parameters:
@@ -904,15 +916,67 @@ components:
             stakeAsset:
               type: string
 
+    ErrorCode:
+      type: string
+      enum:
+        - AGENT_BUNDLE_SCHEMA_INVALID
+        - AGENT_BUNDLE_SCHEMA_UNSUPPORTED_VERSION
+        - AGENT_BUNDLE_SIGNATURE_INVALID
+        - AGENT_BUNDLE_SIGNATURE_SIGNER_MISMATCH
+        - AGENT_BUNDLE_SIGNATURE_PAYLOAD_MISMATCH
+        - AGENT_BUNDLE_VERSION_CONFLICT
+        - TASK_SPEC_CONSTRAINTS_MISSING
+        - TASK_SPEC_POLICY_INVALID
+        - TASK_CREATE_IDEMPOTENCY_CONFLICT
+        - BID_COMMIT_PAYLOAD_INVALID
+        - BID_COMMIT_TASK_MISMATCH
+        - BID_COMMIT_WINDOW_CLOSED
+        - BID_COMMIT_DUPLICATE
+        - BID_REVEAL_PAYLOAD_INVALID
+        - BID_REVEAL_COMMIT_NOT_FOUND
+        - BID_REVEAL_HASH_MISMATCH
+        - BID_REVEAL_WINDOW_CLOSED
+        - PROOF_VERIFY_PAYLOAD_INVALID
+        - PROOF_VERIFY_POLICY_INVALID
+        - PROOF_VERIFY_FAILED
+        - PROOF_VERIFY_NEEDS_REVIEW
+        - TASK_AWARD_PRECONDITION_FAILED
+        - TASK_AWARD_PROOF_NOT_VERIFIED
+        - TASK_AWARD_CANDIDATE_NOT_ELIGIBLE
+        - AUDIT_QUERY_NOT_FOUND
+
+    ErrorCategory:
+      type: string
+      enum:
+        - SCHEMA
+        - SIGNATURE
+        - VERSION
+        - VALIDATION
+        - IDEMPOTENCY
+        - WINDOW
+        - PRECONDITION
+        - POLICY
+        - VERIFICATION
+        - AUDIT
+
     ErrorResponse:
       type: object
       additionalProperties: false
-      required: [code, message]
+      required: [code, category, message, auditId, retryable]
       properties:
         code:
-          type: string
+          $ref: '#/components/schemas/ErrorCode'
+        category:
+          $ref: '#/components/schemas/ErrorCategory'
         message:
           type: string
+        auditId:
+          type: string
+        retryable:
+          type: boolean
+        retryAfterSeconds:
+          type: integer
+          minimum: 0
         details:
           type: object
           additionalProperties: true
