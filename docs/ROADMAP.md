@@ -40,13 +40,13 @@ Goal: deliver MVP control-plane APIs and event trail to run closed beta tasks en
 Scope:
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
-- Manager console baseline (`docs/MANAGER_CONSOLE_BASELINE.md`, issue #43 / PR #53) keeps the publish form, shortlist evidence, and award-summary dependency notes visible while interactive award APIs are still pending.
-- Manager task-composer frontend slice (`docs/MANAGER_TASK_COMPOSER_UI_SLICE.md`, issue #61 / PR #70) documents the current task-create contract and calls out idempotency follow-up explicitly.
-- Manager shortlist review slice (`docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`, issue #62) keeps shortlist fallback states and award blockers reviewable while shortlist/award contracts remain in flight.
+- Manager console baseline (`docs/MANAGER_CONSOLE_BASELINE.md`, merged from issue #43 / PR #53) keeps the publish form, shortlist evidence, and award-summary dependency notes visible while downstream award-read follow-ons continue in PR #68.
+- Manager task-composer frontend slice (`docs/MANAGER_TASK_COMPOSER_UI_SLICE.md`, merged from issue #61 / PR #70) now serves as the task-create baseline.
+- Manager shortlist review slice (`docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`, merged from issue #62 / PR #78) keeps shortlist fallback states and award blockers reviewable while award-read contracts remain in follow-on review.
 - Commit-reveal bidding workflow.
-- Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps the broader commit/reveal + verification journey visible.
-- Dedicated bid workspace slice (`docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, issue #63 / PR #76) narrows the next frontend delivery item to one commit/reveal workflow while leaving async refresh on the backend follow-up track (#59).
-- Audit visibility console baseline (`docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`, issue #47) keeps task/bid timeline review, failure translation, and missing-field alert requirements visible while audit query and award-read contracts are still pending.
+- Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, merged from issue #44 / PR #56) keeps the broader commit/reveal + verification journey visible.
+- Dedicated bid workspace slice (`docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, merged from issue #63 / PR #76) narrows the focused commit/reveal workflow while async refresh remains on the open backend follow-up track (#59 / PR #66).
+- Audit visibility console baseline (`docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`, issue #47) keeps task and bid timeline review plus missing-field alert requirements visible as a historical baseline while audit/event contracts remain follow-on work.
 - PoMW verification baseline with identity-tier policy.
 - Agent verification timeline/read-refresh baseline tied to the bid/proof status-read contract.
 - Auditable award events and minimal reputation writeback hook.
@@ -87,7 +87,7 @@ Scope:
 - M2 (2026-03-27): task/matching + bidding API baseline.
 - M3 (2026-04-03): PoMW policy + verifier baseline + bid/proof status-read visibility for agent UX.
 - M4 (2026-04-10): audit/reputation hook + E2E test pack + security/compliance readiness review.
-- M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, and `docs/CLOSED_BETA_SECURITY_READINESS.md` so telemetry owners plus auth, secret-handling, and redaction follow-ons stay reviewable.
+- M4 readiness now depends on open follow-on PRs #68, #82, #84, #92, #95, and #96, the still-open verifier/status work (#59 / PRs #66 and #83), the audit/E2E issues #10 and #11, and the next QA smoke pass in issue #87; telemetry handoff #71 / PR #81 and the security-readiness PR #77 are already merged.
 
 Checkpoint status board:
 - Review `docs/PHASE1_CHECKPOINT_BOARD.md` for the one-screen issue/PR map, target owners, and drift callouts.
