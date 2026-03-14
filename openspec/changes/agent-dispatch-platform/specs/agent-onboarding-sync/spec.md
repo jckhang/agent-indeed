@@ -5,16 +5,24 @@
 平台 MUST 支持上传标准化 `AgentBundle`，并在入库前完成完整性与身份可验证检查。
 
 #### Scenario: Valid signed bundle is accepted
-- **WHEN** agent owner 提交包含 `manifest`, `identity`, `skills`, `memoryRef` 的 bundle，且签名有效
+- **WHEN** agent owner 提交包含 `schemaVersion`, `manifest`, `identity`, `skills`, `memoryRef` 的 bundle，且签名有效
 - **THEN** 平台接受上传并返回 `agent_id` 与 `version`
 
 #### Scenario: Invalid signature is rejected
 - **WHEN** 上传包签名校验失败
-- **THEN** 平台拒绝入库并返回可审计错误码（`AGENT_BUNDLE_SIGNATURE_INVALID` 或同类签名错误码）
+- **THEN** 平台拒绝入库并返回可审计错误码 `AGENT_BUNDLE_SIGNATURE_INVALID`
+
+#### Scenario: Signature signer does not match declared identity
+- **WHEN** `signature.signerDid` 与 `identity.did` 不一致
+- **THEN** 平台拒绝入库并返回稳定错误码 `AGENT_BUNDLE_SIGNATURE_SIGNER_MISMATCH`
 
 #### Scenario: Invalid schema is rejected
-- **WHEN** 上传包缺少必填字段、字段格式不合法，或 schema 版本不受支持
-- **THEN** 平台拒绝入库并返回稳定 schema 错误码（`AGENT_BUNDLE_SCHEMA_INVALID` / `AGENT_BUNDLE_SCHEMA_UNSUPPORTED_VERSION`）与字段路径
+- **WHEN** 上传包缺少必填字段或字段格式不合法
+- **THEN** 平台拒绝入库并返回稳定 schema 错误码 `AGENT_BUNDLE_SCHEMA_INVALID` 与字段路径
+
+#### Scenario: Unsupported bundle schema version is rejected
+- **WHEN** `schemaVersion` 不在平台支持列表内
+- **THEN** 平台拒绝入库并返回稳定错误码 `AGENT_BUNDLE_SCHEMA_UNSUPPORTED_VERSION` 与字段路径 `bundle.schemaVersion`
 
 ### Requirement: Bundle Version Conflict Must Follow Deterministic Strategy
 
@@ -23,10 +31,11 @@
 #### Scenario: Replayed upload with identical payload hash
 - **WHEN** 同一 `agent_id` 与 `manifest.version` 已存在，且 `payload_hash` 一致
 - **THEN** 平台返回已存在版本信息，并标记冲突策略 `RETURN_EXISTING_ON_HASH_MATCH`
+- **AND** 响应中回显已有版本的 `agent_id`, `version`, `existing_payload_hash`, `incoming_payload_hash`
 
 #### Scenario: Duplicate version with different payload hash
 - **WHEN** 同一 `agent_id` 与 `manifest.version` 已存在，但 `payload_hash` 不一致
-- **THEN** 平台拒绝上传并返回 `AGENT_BUNDLE_VERSION_CONFLICT` 与策略 `REJECT_ON_HASH_MISMATCH`
+- **THEN** 平台拒绝上传并返回版本冲突错误码 `AGENT_BUNDLE_VERSION_CONFLICT` 与策略 `REJECT_ON_HASH_MISMATCH`
 
 #### Scenario: Upload replay with identical idempotency key is deterministic
 - **WHEN** 客户端因网络抖动重试同一个 `idempotencyKey` 且 payload hash 不变
