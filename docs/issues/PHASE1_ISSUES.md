@@ -111,7 +111,7 @@ Acceptance criteria:
 - Each MVP flow stage has an owning backend module.
 - Cross-module contract dependencies and sequencing risks are called out.
 
-### P0-07 Define frontend MVP surface and API wiring matrix
+### P0-07 Define frontend MVP surface and API wiring matrix (`docs/FRONTEND_MVP_SURFACE.md`)
 
 References:
 - `docs/FRONTEND_MVP_SURFACE.md`
