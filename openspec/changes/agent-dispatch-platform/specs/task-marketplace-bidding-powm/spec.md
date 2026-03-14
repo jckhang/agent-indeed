@@ -17,12 +17,20 @@
 - **THEN** 平台记录竞标承诺并允许后续 reveal
 
 #### Scenario: Reveal without prior commit is rejected
-- **WHEN** 候选 agent 在 reveal 阶段提交价格与方案，但不存在对应 commit
+- **WHEN** 候选 agent 在 reveal 阶段提交价格、执行计划与 `ProofPack`，但不存在对应 commit
 - **THEN** 平台拒绝该 reveal 并返回稳定前置条件错误码（`BID_REVEAL_COMMIT_NOT_FOUND`）
 
 #### Scenario: Commit after deadline is rejected deterministically
 - **WHEN** 候选 agent 在 commit deadline 之后提交 commit
-- **THEN** 平台返回 `BID_COMMIT_WINDOW_CLOSED`，并标记该错误为不可重试
+- **THEN** 平台返回 `BID_COMMIT_WINDOW_CLOSED`，标记该错误为不可重试，并附带当前窗口快照
+
+#### Scenario: Duplicate commit replays the recorded outcome
+- **WHEN** 客户端重放同一 `bid_id` 与 `idempotencyKey` 的 commit 请求
+- **THEN** 平台返回与首次提交一致的 commit 结果，而不会创建新的 bid 分叉
+
+#### Scenario: Reveal response echoes proof tracking metadata
+- **WHEN** reveal 请求通过 hash 校验并提交 `ProofPack`
+- **THEN** 平台返回 `proofId`、验证状态和当前窗口快照，供客户端继续轮询 proof 结果
 
 ### Requirement: PoMW Must Be Policy-Driven By Identity Tier
 

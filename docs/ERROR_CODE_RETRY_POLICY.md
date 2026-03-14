@@ -34,10 +34,10 @@ All MVP error responses should follow this shape:
 | Commit bid | `BID_COMMIT_PAYLOAD_INVALID` | `VALIDATION` | Missing required `Bid` commit fields | Fix request and retry |
 | Commit bid | `BID_COMMIT_TASK_MISMATCH` | `VALIDATION` | Path `taskId` and `bid.taskId` mismatch | Correct request identifiers and retry |
 | Commit bid | `BID_COMMIT_WINDOW_CLOSED` | `WINDOW` | Commit after commit deadline | Do not retry; workflow state has advanced |
-| Commit bid | `BID_COMMIT_DUPLICATE` | `IDEMPOTENCY` | Duplicate commit for same bid | Treat as already-submitted unless payload differs |
+| Commit bid | `BID_COMMIT_DUPLICATE` | `IDEMPOTENCY` | Duplicate commit for same bid/idempotency key | Treat as already-submitted unless payload differs; reuse returned window snapshot |
 | Reveal bid | `BID_REVEAL_PAYLOAD_INVALID` | `VALIDATION` | Missing nonce/price/execution plan/proof fields | Fix request and retry |
 | Reveal bid | `BID_REVEAL_COMMIT_NOT_FOUND` | `PRECONDITION` | No valid commit exists for reveal | Do not retry until commit exists |
-| Reveal bid | `BID_REVEAL_HASH_MISMATCH` | `PRECONDITION` | Reveal content does not match committed hash | Correct reveal payload; no blind retry |
+| Reveal bid | `BID_REVEAL_HASH_MISMATCH` | `PRECONDITION` | Reveal content does not match committed hash | Correct reveal payload using `expectedBidHash`; no blind retry |
 | Reveal bid | `BID_REVEAL_WINDOW_CLOSED` | `WINDOW` | Reveal after reveal deadline | Do not retry; submit is permanently rejected |
 | Verify proof | `PROOF_VERIFY_PAYLOAD_INVALID` | `VALIDATION` | Invalid or incomplete `ProofPack` | Fix proof payload and retry |
 | Verify proof | `PROOF_VERIFY_POLICY_INVALID` | `POLICY` | Policy input incompatible with task/identity tier | Correct policy inputs and retry |
