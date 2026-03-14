@@ -1,5 +1,6 @@
 export type IdentityTier = "T0" | "T1" | "T2";
 
+export type AgentBundleSchemaVersion = "1.0";
 export type AgentRuntime = "OPENCLAW" | "CUSTOM_CONTAINER" | "WASM";
 export type AgentMemoryMode = "INDEX_ONLY" | "ENCRYPTED_REF" | "FULL";
 export type AgentMemoryScope = "DISCOVERY_ONLY" | "MATCHING_ONLY" | "TASK_RUNTIME";
@@ -78,6 +79,7 @@ export interface AgentBundleSignature {
 }
 
 export interface AgentBundle {
+  schemaVersion: AgentBundleSchemaVersion;
   manifest: AgentManifest;
   identity: AgentIdentity;
   skills: AgentSkillMetadata[];

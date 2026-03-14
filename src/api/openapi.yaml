@@ -37,6 +37,7 @@ paths:
                 value:
                   idempotencyKey: idem_agentbundle_001
                   bundle:
+                    schemaVersion: '1.0'
                     manifest:
                       name: support_triage_agent
                       version: 1.2.0
@@ -169,12 +170,40 @@ paths:
                       rule: signer_matches_identity
                       expected: did:key:z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8Kestrel
                       actual: did:key:z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8WrongSigner
+                unsupportedSchemaVersion:
+                  summary: Unsupported bundle schema version
+                  value:
+                    code: AGENT_BUNDLE_SCHEMA_UNSUPPORTED_VERSION
+                    category: SCHEMA
+                    message: bundle.schemaVersion 2.0 is not supported
+                    auditId: audit_bundle_upload_unsupported_schema
+                    retryable: false
+                    details:
+                      fieldPath: bundle.schemaVersion
+                      rule: supported_schema_version
+                      expected: '1.0'
+                      actual: '2.0'
         '409':
           description: Duplicate bundle version
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UploadAgentBundleVersionConflictResponse'
+              examples:
+                hashMismatchConflict:
+                  summary: Same agent and version but different payload
+                  value:
+                    code: AGENT_BUNDLE_VERSION_CONFLICT
+                    category: VERSION
+                    message: agent_supporttriage001@1.2.0 already exists with a different payload hash
+                    auditId: audit_bundle_upload_version_conflict
+                    retryable: false
+                    conflict:
+                      strategy: REJECT_ON_HASH_MISMATCH
+                      existingAgentId: agent_supporttriage001
+                      existingVersion: 1.2.0
+                      existingPayloadHash: sha256:3333333333333333333333333333333333333333333333333333333333333333
+                      incomingPayloadHash: sha256:4444444444444444444444444444444444444444444444444444444444444444
 
   /v1/tasks:
     post:
@@ -632,8 +661,12 @@ components:
     AgentBundle:
       type: object
       additionalProperties: false
-      required: [manifest, identity, skills, memoryRef, signature]
+      required: [schemaVersion, manifest, identity, skills, memoryRef, signature]
       properties:
+        schemaVersion:
+          type: string
+          enum: ['1.0']
+          description: Contract version used to route schema compatibility checks.
         manifest:
           type: object
           additionalProperties: false
