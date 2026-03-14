@@ -45,6 +45,73 @@ API, and matching work all share one deterministic onboarding contract.
 | Schema invalid or unsupported version | `400` | `category=SCHEMA`, stable schema error code, `details.fieldPath` for the rejected bundle field |
 | Existing version reused with a different payload hash | `409` | `category=VERSION`, `conflict.strategy=REJECT_ON_HASH_MISMATCH` with both payload hashes |
 
+Canonical payload-hash steps:
+
+1. Start from the submitted `bundle`.
+2. Remove the entire `signature` object.
+3. Serialize the remaining object with stable key ordering and preserved array
+   order.
+4. Compute SHA-256 and prefix the digest with `sha256:`.
+
+Happy path request:
+
+```json
+{
+  "idempotencyKey": "idem_agentbundle_001",
+  "bundle": {
+    "schemaVersion": "1.0",
+    "manifest": {
+      "name": "support_triage_agent",
+      "version": "1.2.0",
+      "runtime": "OPENCLAW",
+      "entrypoint": "./bin/triage"
+    },
+    "identity": {
+      "did": "did:key:z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8Kestrel",
+      "publicKey": "z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8KestrelPubKey",
+      "credentialLevel": "T1"
+    },
+    "skills": [
+      {
+        "skillId": "skill_support.triage",
+        "version": "1.4.0",
+        "inputSchema": { "type": "object" },
+        "outputSchema": { "type": "object" }
+      }
+    ],
+    "memoryRef": {
+      "mode": "INDEX_ONLY",
+      "summaryHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "vectorIndexUri": "s3://agent-memory/support-triage/index.bin"
+    },
+    "signature": {
+      "algorithm": "ED25519",
+      "payloadHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "signature": "base64:MEUCIQDdExampleSignatureForBundleUploadFlow1234567890==",
+      "signerDid": "did:key:z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8Kestrel"
+    }
+  }
+}
+```
+
+Schema-invalid response:
+
+```json
+{
+  "code": "AGENT_BUNDLE_SCHEMA_INVALID",
+  "category": "SCHEMA",
+  "message": "bundle.skills[0].outputSchema is required",
+  "auditId": "audit_bundle_upload_schema_invalid",
+  "retryable": false,
+  "details": {
+    "fieldPath": "bundle.skills[0].outputSchema",
+    "rule": "required",
+    "expected": "present",
+    "actual": "missing"
+  }
+}
+```
+
 ## Skill Index Contract
 
 Each accepted upload creates one index record per skill:
