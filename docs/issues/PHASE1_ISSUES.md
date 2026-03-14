@@ -27,6 +27,7 @@
 - P1-15 #44: https://github.com/jckhang/agent-indeed/issues/44
 - P1-12 #38: https://github.com/jckhang/agent-indeed/issues/38
 - P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
+- P1-23 #65: https://github.com/jckhang/agent-indeed/issues/65
 
 ## P0 Readiness
 
@@ -328,3 +329,23 @@ Acceptance criteria:
 Backlog notes:
 - Task-scoped audit event reads still need a normalized event stream contract before the UI can move beyond documented placeholders.
 - Award trace and shortlist-read dependencies must stay aligned with issue `#10` and issue `#58` so audit review does not infer missing backend evidence.
+
+### P1-23 Implement operator audit timeline and failure-state UI
+
+References:
+- `docs/OPERATOR_AUDIT_TIMELINE_BASELINE.md`
+- `docs/FRONTEND_MVP_SURFACE.md`
+- `docs/ERROR_CODE_RETRY_POLICY.md`
+- `docs/MVP_STATE_MODEL.md`
+- `src/api/openapi.yaml`
+- `src/api/contracts.ts`
+
+Acceptance criteria:
+- Operator timeline renders task and bid audit events in chronological order with clear event names and timestamps.
+- Proof, commit, reveal, and award failures are translated into operator-friendly states instead of raw backend codes only.
+- Missing audit/event fields that block stakeholder review are highlighted explicitly in the UI.
+- Scope stays focused on operator audit visibility and does not expand into general admin-console work.
+
+Backlog notes:
+- The operator timeline still needs a task-scoped event read contract before it can render real lifecycle history.
+- Verification and award events still need explicit completeness guarantees so the UI can distinguish missing audit data from business-state failures.
