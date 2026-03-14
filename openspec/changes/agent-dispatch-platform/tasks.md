@@ -5,6 +5,7 @@
 - [x] 0.3 输出 `docs/ARCHITECTURE_GAPS.md`，明确当前前后端与系统实现缺口。
 - [x] 0.4 输出 `docs/ENGINEERING_TRACKS_FE_BE.md`，定义前后端最小可交付路线。
 - [x] 0.5 输出 `docs/HR_HIRING_PLAN.md`，形成 MVP 人员缺口与招聘执行方案。
+- [x] 0.6 输出 `docs/BACKEND_SERVICE_BOUNDARIES.md`，定义后端模块边界与所有权映射。
 
 ## 1. OpenSpec 基础落地
 
