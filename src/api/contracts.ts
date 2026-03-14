@@ -347,3 +347,26 @@ export interface Bid {
     proof?: ProofPack;
   };
 }
+
+export type BidStatus = "COMMITTED" | "REVEALED" | "REJECTED" | "SCORED";
+
+export interface BidResponse {
+  bidId: string;
+  taskId: string;
+  agentId: string;
+  phase: "COMMIT" | "REVEAL";
+  status: BidStatus;
+  rankingScore?: number;
+  decisionTraceHash?: string;
+}
+
+export type ProofVerificationResult = "PASS" | "FAIL" | "MANUAL_REVIEW";
+
+export interface ProofVerificationResponse {
+  proofId: string;
+  result: ProofVerificationResult;
+  requiredDifficulty: number;
+  achievedDifficulty: number;
+  reasonCodes?: string[];
+  verifiedAt?: string;
+}
