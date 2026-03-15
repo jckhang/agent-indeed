@@ -54,6 +54,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 3. `/operator/tasks/{taskId}/audit`
    - Inspect timeline from task creation to award.
    - Baseline behavior and dependency notes live in `docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`.
+   - Translate lifecycle failures into operator-friendly states and flag incomplete audit records.
 
 ## API-to-UI Wiring Matrix
 
@@ -80,7 +81,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | --- | --- | --- | --- | --- |
 | `/operator/proofs/queue` | `GET /v1/proofs` (proposed) | `result`, `updatedSince`, `cursor` | `proofId`, `taskId`, `agentId`, `result`, `reasonCodes`, `verifiedAt`, `needsManualReview` | Missing in current API |
 | `/operator/proofs/{proofId}/review` | `POST /v1/tasks/{taskId}/proofs/verify` + `PATCH /v1/proofs/{proofId}/decision` (proposed override) | verify payload `proof.*`; override payload `decision`, `reason`, `operatorId` | `proofId`, `result`, `reasonCodes`, `verifiedAt`, `decisionTraceHash`; error `code`, `category`, `retryable`, `details.policyTraceId` | Partial: verify now has typed proof failure codes, manual override still missing |
-| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` (proposed) | `taskId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `entityId`, `summary`, `traceHash`, `occurredAt` | Missing in current API |
+| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` (proposed) | `taskId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `entityId`, `summary`, `traceHash`, `occurredAt`, completeness flags or equivalent missing-field signal | Missing in current API |
 
 ## State-Driven UI Requirements
 
@@ -100,6 +101,7 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 | Missing list/read endpoints for bids/proofs after write success | UI cannot refresh long-running verification without ad-hoc polling hacks | Add read endpoints for bid/proof status by `taskId`, `bidId`, `proofId` |
 | No idempotency support beyond bundle upload | Retry-safe UX cannot be guaranteed for task publish/award | Add idempotency key contract to task and award writes |
 | No audit event query contract | Operator and manager cannot verify decisions without logs | Add task/bid event stream endpoint with pagination |
+| No audit-field completeness contract | Operator cannot distinguish incomplete records from clean lifecycle history | Add required-vs-optional event fields or explicit completeness markers |
 
 ## Recommended Contract Follow-Ups
 

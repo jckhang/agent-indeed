@@ -27,7 +27,8 @@ Identify the smallest set of missing decisions that block delivery of the Phase 
 ## Frontend-Specific Gaps
 
 - Manager-side baseline is now documented in `docs/MANAGER_CONSOLE_BASELINE.md`, but candidate-read and award contracts are still missing.
-- No agent-side workflow definition for bid commit/reveal and proof status feedback.
+- Agent-side bidding baseline is now documented in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, but bid/proof read contracts are still missing.
+- Operator audit timeline baseline is now documented in `docs/OPERATOR_AUDIT_TIMELINE_BASELINE.md`, but task-scoped event reads and completeness guarantees are still missing.
 - No contract for sync/async updates (polling, event stream, or both).
 - Commit/reveal/proof error codes are documented, but route-level UX mapping still needs to stay synchronized with backend responses.
 
