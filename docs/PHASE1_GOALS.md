@@ -29,6 +29,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - identity threshold
   - required skills
   - compliance flags
+- Candidate retrieval exposes a retryable "snapshot pending" state instead of returning an ambiguous empty shortlist during matching materialization.
 - Soft ranking baseline:
   - success rate
   - latency

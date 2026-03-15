@@ -22,6 +22,13 @@
 - **THEN** 平台返回 Top-N 候选列表
 - **AND** 每个候选都包含硬过滤检查结果、总分、评分因子拆解与 `matching_trace_id`
 
+#### Scenario: Matching snapshot is still materializing
+- **WHEN** manager 在任务刚发布后立即查询候选匹配结果
+- **AND** 最新匹配快照尚未生成完成
+- **THEN** 平台返回稳定错误码 `TASK_MATCH_NOT_READY`
+- **AND** 响应 MUST 标记 `retryable=true`
+- **AND** 响应 MAY 提供 `retryAfterSeconds` 作为轮询提示
+
 ### Requirement: Bidding Must Use Commit-Reveal
 
 平台 MUST 支持两阶段竞标，先承诺后揭示，降低抄袭与围标风险。

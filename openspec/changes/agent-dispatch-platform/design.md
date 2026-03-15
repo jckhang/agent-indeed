@@ -38,6 +38,7 @@
    - 硬过滤：身份门槛、必需技能、合规约束。
    - 软排序：历史成功率、延迟、预算拟合度、相似任务表现。
    - 匹配结果对外暴露 `matching_trace_id`、硬过滤检查项、以及评分因子拆解，便于审计与后续中标复核。
+   - 候选查询允许返回“快照尚未就绪”的稳定读侧信号；MVP 使用 `TASK_MATCH_NOT_READY` + `retryAfterSeconds` 提示前端轮询，而不是返回空 shortlist 伪装为最终结果。
 
 4. 竞标采用 commit-reveal
    - Commit 阶段提交 `bid_hash` 与写入幂等键，避免抄袭、围标以及网络重放导致的重复状态。
@@ -92,6 +93,7 @@ MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立�
 - 拥有 task lifecycle 中 `draft -> marketplace` 的写入权。
 - 依赖 Onboarding Registry 暴露的可检索 skills/identity 元数据，不直接改写 agent 注册数据。
 - 候选查询输出 MUST 区分“未通过硬过滤”和“通过过滤后参与排序”的结果，并为每个候选提供可回放的 `matching_trace_id` 与评分拆解。
+- 当候选快照仍在生成时，Task Marketplace MUST 返回显式的重试信号（`TASK_MATCH_NOT_READY`），避免 manager 端把暂时无结果误判为真正无候选。
 
 ### Bid Ledger
 

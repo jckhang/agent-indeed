@@ -61,7 +61,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | Page | API endpoint | Required request fields from UI | Response fields required by UI | Contract status |
 | --- | --- | --- | --- | --- |
 | `/manager/tasks/new` | `POST /v1/tasks` | `task.title`, `task.description`, `task.budget.*`, `task.sla.*`, `task.constraints.*`, `task.risk.*`, `task.powmPolicy.*`, `task.biddingWindow.*` | `taskId`, `status`, `commitDeadline`, `revealDeadline` | Ready for a publish-only slice; explicit task-create idempotency is still a follow-up and should not be invented in UI |
-| `/manager/tasks/{taskId}/candidates` | `GET /v1/tasks/{taskId}/candidates` (proposed) | `taskId`, `topK`, `includeScoreBreakdown` | `agentId`, `identityTier`, `hardFilterPassed`, `rankingScore`, `scoreBreakdown`, `proofReadiness`, `decisionTraceHash` | Missing in current API |
+| `/manager/tasks/{taskId}/candidates` | `GET /v1/tasks/{taskId}/candidates` | `taskId`, `limit` | `agentId`, `eligible`, `rank`, `matchingTraceId`, `identityTier`, `matchedSkills`, `missingRequiredSkills`, `complianceStatus`, `eligibilityChecks`, `scoreBreakdown` | Ready on the active matching-contract branch; UI should handle `409 TASK_MATCH_NOT_READY` while snapshots are generating |
 | `/manager/tasks/{taskId}/award` | `POST /v1/tasks/{taskId}/award` + `GET /v1/tasks/{taskId}/award` (proposed) | `taskId`, `bidId`, `awardReason`, `idempotencyKey` | `taskId`, `awardedBidId`, `awardedAt`, `proofSummary`, `decisionTraceHash`, `auditEventId` | Missing in current API |
 
 ### Agent pages
@@ -94,7 +94,7 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 
 | Risk | Impact on frontend delivery | Minimal backend addition to unblock |
 | --- | --- | --- |
-| Missing candidate retrieval endpoint | Manager cannot inspect ranking before award | Add `GET /v1/tasks/{taskId}/candidates` with score breakdown |
+| Candidate snapshot may still be pending when task first opens | Manager can land on an empty or confusing shortlist state | Surface `TASK_MATCH_NOT_READY` as a retryable loading state and poll using the API delay hint |
 | Missing award write/read endpoints | Closed loop cannot finish in UI | Add award APIs with `decisionTraceHash` and `auditEventId` |
 | Missing merged list/read endpoints for bids/proofs | UI cannot refresh queued/verifying state on `main` without guessing hidden fields | Merge PR `#66` or equivalent read endpoints for bid/proof status by `taskId`, `bidId`, `proofId` |
 | Generic `ErrorResponse` for commit/reveal/verify failures | User-facing reason code mapping is unstable | Publish stable error code catalog with category + retryability |

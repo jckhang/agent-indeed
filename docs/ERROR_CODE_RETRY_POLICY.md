@@ -31,6 +31,9 @@ All MVP error responses should follow this shape:
 | Publish task | `TASK_SPEC_CONSTRAINTS_MISSING` | `VALIDATION` | Required `TaskSpec` fields missing/invalid | Fix request fields; do not retry unchanged payload |
 | Publish task | `TASK_SPEC_POLICY_INVALID` | `POLICY` | Incompatible risk/policy combination | Adjust policy values and retry |
 | Publish task | `TASK_CREATE_IDEMPOTENCY_CONFLICT` | `IDEMPOTENCY` | Reused idempotency identity with mismatched payload | Generate new idempotency identity or replay exact payload |
+| Candidate retrieval | `TASK_MATCH_LIMIT_INVALID` | `MATCHING` | Requested shortlist `limit` is outside supported range | Fix query input; do not retry unchanged request |
+| Candidate retrieval | `TASK_MATCH_TASK_NOT_FOUND` | `MATCHING` | `taskId` does not exist or is not visible | Verify task identity/access before retry |
+| Candidate retrieval | `TASK_MATCH_NOT_READY` | `MATCHING` | Matching snapshot has not materialized yet | Retry after `retryAfterSeconds` or user refresh |
 | Commit bid | `BID_COMMIT_PAYLOAD_INVALID` | `VALIDATION` | Missing required `Bid` commit fields | Fix request and retry |
 | Commit bid | `BID_COMMIT_TASK_MISMATCH` | `VALIDATION` | Path `taskId` and `bid.taskId` mismatch | Correct request identifiers and retry |
 | Commit bid | `BID_COMMIT_WINDOW_CLOSED` | `WINDOW` | Commit after commit deadline | Do not retry; workflow state has advanced |
@@ -54,6 +57,7 @@ All MVP error responses should follow this shape:
 | --- | --- | --- |
 | `POST /v1/agents/bundles` | `idempotencyKey` + payload hash | If network/5xx timeout, retry with the same `idempotencyKey` and exact payload |
 | `POST /v1/tasks` | deterministic request identity (planned: dedicated idempotency key) | Retry only when `retryable=true`; otherwise correct payload first |
+| `GET /v1/tasks/{taskId}/candidates` | `taskId` + `limit` | Retry only when `retryable=true`; on `TASK_MATCH_NOT_READY` honor `retryAfterSeconds` before polling again |
 | `POST /v1/tasks/{taskId}/bids/commit` | `bid.bidId` + `bid.bidHash` | Retry same payload on transient failures; treat duplicate commit as already submitted |
 | `POST /v1/tasks/{taskId}/bids/reveal` | `bid.bidId` + reveal nonce/hash | Retry only for transport failures; never mutate reveal payload under same `bidId` |
 | `POST /v1/tasks/{taskId}/proofs/verify` | `proof.proofId` + proof digest | Retry only when server indicates `retryable=true` |

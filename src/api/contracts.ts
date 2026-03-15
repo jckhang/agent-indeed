@@ -375,22 +375,6 @@ export interface TaskSpec {
   };
 }
 
-export interface CreateTaskRequest {
-  task: TaskSpec;
-}
-
-export interface CreateTaskHttpRequest {
-  headers: TaskWriteContextHeaders;
-  body: CreateTaskRequest;
-}
-
-export interface CreateTaskResponse {
-  taskId: string;
-  status: "OPEN_FOR_MATCHING" | "OPEN_FOR_BIDDING";
-  commitDeadline?: string;
-  revealDeadline?: string;
-}
-
 export type CandidateEligibilityGate =
   | "IDENTITY_TIER"
   | "REQUIRED_SKILL"
