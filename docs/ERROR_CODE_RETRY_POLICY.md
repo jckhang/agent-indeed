@@ -43,6 +43,8 @@ All MVP error responses should follow this shape:
 | Verify proof | `PROOF_VERIFY_POLICY_INVALID` | `POLICY` | Policy input incompatible with task/identity tier | Correct policy inputs and retry |
 | Verify proof | `PROOF_VERIFY_FAILED` | `VERIFICATION` | Proof does not satisfy required difficulty | Do not blind retry; improve proof first |
 | Verify proof | `PROOF_VERIFY_NEEDS_REVIEW` | `VERIFICATION` | Automated verification cannot make final decision | Route to manual review; no automatic retry loop |
+| Query bid/proof status | `BID_STATUS_NOT_FOUND` | `AUDIT` | Requested bid status record does not exist | Retry once for eventual consistency, then show not-found state |
+| Query bid/proof status | `PROOF_STATUS_NOT_FOUND` | `AUDIT` | Requested proof status record does not exist | Retry once for eventual consistency, then show not-found state |
 | Award/audit | `TASK_AWARD_PRECONDITION_FAILED` | `PRECONDITION` | Award attempted before verify-ready state | Retry only after lifecycle preconditions pass |
 | Award/audit | `TASK_AWARD_PROOF_NOT_VERIFIED` | `PRECONDITION` | Candidate proof not in pass state | Do not retry without proof status change |
 | Award/audit | `TASK_AWARD_CANDIDATE_NOT_ELIGIBLE` | `POLICY` | Candidate fails hard filters/policy gate | Pick another candidate or update constraints |
