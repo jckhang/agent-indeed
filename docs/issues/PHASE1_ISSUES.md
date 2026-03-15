@@ -233,7 +233,7 @@ Implementation notes:
 ### P1-07 Implement ProofPack verifier + result codes
 
 Acceptance criteria:
-- Verification status is explicit (`passed`, `failed`, `needs_review`).
+- Verification status is explicit and aligned with the current contract enums (`PENDING_VERIFY`, `PASS`, `FAIL`, `MANUAL_REVIEW`).
 - Failure reason codes are stable and documented.
 
 ### P1-08 Implement audit events + award decision trace
@@ -397,4 +397,3 @@ Acceptance criteria:
 - Validation hints and blocking states are rendered for missing or invalid required fields.
 - Submission flow documents any backend contract mismatch found during implementation instead of silently inventing fields.
 - Scope stays focused on task creation and does not absorb shortlist or award UI work.
-
