@@ -1,6 +1,6 @@
 # Phase 1 Epic Status
 
-Last updated: 2026-03-15
+Last updated: 2026-03-16
 
 This document is the execution snapshot for epic #2 (`[Phase 1 Epic] Agent Dispatch Foundation MVP`).
 It complements `docs/PHASE1_GOALS.md` by mapping the epic acceptance criteria to the current issue, PR,
@@ -15,10 +15,10 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 
 | Epic acceptance area | Current status | Source of truth | Next gate |
 | --- | --- | --- | --- |
-| OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts` | Keep open PRs #55, #66, #68, #77 aligned with current spec/contracts. |
-| End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, issue #11 | Needs remaining M2-M4 backend/UI contracts plus active QA smoke follow-through in issue #87 / PR #84 before E2E issue #11 can be closed. |
-| Core negative scenarios are covered | Blocked | issue #11, issue #72, `docs/SECURITY_COMPLIANCE_BASELINE.md` | Convert merged security/readiness guidance into executable QA coverage after verifier and award flows settle. |
-| Audit events cover key state transitions | In progress | issue #10, `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md` | Land award/audit trace work after shortlist, status polling, and verifier outputs are stable. |
+| OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts` | Keep open PRs #55, #66, #68, #83, #90, and #92 aligned with the current spec/contracts surface. |
+| End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, issue #11 | Needs the remaining M2-M4 contract PRs plus QA handoff docs (#84, #95, #96) before issue #11 can turn into executable coverage. |
+| Core negative scenarios are covered | Blocked | issue #11, `docs/CLOSED_BETA_SECURITY_READINESS.md`, `docs/ERROR_CODE_RETRY_POLICY.md` | Security-readiness guidance is merged; the next gate is converting it into smoke/E2E assertions once verifier and award traces stabilize. |
+| Audit events cover key state transitions | In progress | issue #10, PR #92, `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md` | Land audit-event stream and award-trace contracts, then fold them into the QA example and smoke-pack work. |
 
 ## Delivery Slice Status
 
@@ -29,35 +29,39 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 - #5 TaskSpec publish behavior defined.
 - #7 Commit-reveal bidding APIs landed.
 - #8 PoMW policy contract landed.
+- #72 Closed-beta security readiness checklist merged.
 - #62 Award-readiness UI slice merged.
 - #63 Agent bid commit/reveal workspace UI merged.
+- #64 Verification timeline UX merged.
+- #93 QA-facing MVP API example outline scope closed and handed to PR #96.
+- #94 Frontend data-gap capture scope closed and handed to PR #95.
 
 ### Active implementation slices
 
 | Epic step | Active issue / PR | Why it still matters to epic #2 |
 | --- | --- | --- |
-| Match | issue #6 / PR #55 | Matching shortlist contract is still the backend gate before publish -> match is stable. |
+| Match | issue #6 (closed) / PR #55 | Matching shortlist contract is still the backend gate before publish -> match is stable. |
 | Verify status reads | issue #59 / PR #66 | Async status polling is required so verification remains durable beyond synchronous responses. |
-| Verify UX | issue #64 / PR #73 | Timeline UX is the first consumer-facing proof that verification results are understandable. |
-| Award reads | issue #58 / PR #68 | Manager shortlist and award-read contracts are still the main backend dependency before award review is trustworthy. |
-| Security gate | issue #72 / PR #77 | Closed-beta auth, secrets, and redaction guidance must merge before epic sign-off. |
+| Verifier contract | issue #9 (closed) / PR #83 | The canonical verifier/result contract still has to merge before downstream QA examples and polling semantics are fully stable. |
+| Award reads | issue #58 (closed) / PR #68 | Manager shortlist and award-read contracts are still the main backend dependency before award review is trustworthy. |
+| Audit trace | issue #10 / PR #92 | Audit-event stream and award-trace contracts are now the main backend gate for the beta evidence trail. |
 | Planning sync | issue #80 / PR #82 | Planning docs must stay aligned so epic status is not tracking already-merged work as active. |
 | QA smoke coverage | issue #87 / PR #84 | Smoke validation is the bridge between the merged UI slices and final E2E confidence. |
+| QA handoff pack | issue #11, PR #95, PR #96 | The QA-facing API outline and frontend data-gap docs still need to merge so smoke and E2E work use one current handoff set. |
 
 ### Remaining blocked slices
 
-- #9 ProofPack verifier result codes still depend on the now-merged policy baseline and the still-open async status work.
-- #10 Audit events and award trace still depend on M2 and M3 outputs landing in stable read/write contracts.
-- #11 End-to-end tests and examples still depend on verifier, award-read, and smoke-matrix work becoming stable enough to automate.
+- #10 Audit events and award trace still depend on the M2/M3 contracts landing in stable read/write forms and merging through PR #92.
+- #11 End-to-end tests and examples still depend on verifier, award-read, audit-trace, and smoke-pack work becoming stable enough to automate.
 
 ## Checkpoint Rollup
 
 | Checkpoint | Epic relevance | Current note |
 | --- | --- | --- |
-| M1 | Upload baseline | Complete enough for kickoff; issue #30 can proceed from the merged contract baseline. |
-| M2 | Publish, shortlist, and bid foundation | Still gated by PR #55 even though task composer work already merged. |
-| M3 | Verify and agent flow | Policy baseline is merged; status reads and agent UX remain the active gate. |
-| M4 | Award, audit, and beta readiness | Security, award-read, smoke coverage, and planning sync remain the open gates. |
+| M1 | Upload baseline | Issue #30 is closed; PR #90 is the only remaining M1 example/kickoff thread. |
+| M2 | Publish, shortlist, and bid foundation | Still gated by PR #55 even though manager task-composer and shortlist UI slices are merged. |
+| M3 | Verify and agent flow | Agent UX slices are merged; status reads (#66) and verifier contract finalization (#83) remain the active gate. |
+| M4 | Award, audit, and beta readiness | Security is merged, but award-read, audit-trace, smoke coverage, QA handoff docs, and planning sync still need to close. |
 
 ## Epic Exit Checklist
 
@@ -67,7 +71,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 - [ ] Award-read contracts and award-readiness UI are merged.
 - [ ] Audit trace outputs are defined for beta review.
 - [ ] QA smoke matrix and MVP E2E coverage are ready to run.
-- [ ] Security/compliance readiness checklist is merged and linked to QA validation.
+- [x] Security/compliance readiness checklist is merged and linked to QA validation.
 
 ## Review Routine
 
