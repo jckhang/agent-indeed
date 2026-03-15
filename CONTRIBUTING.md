@@ -13,6 +13,7 @@ Thanks for contributing. This repository is currently API/spec-first, so most ch
   - `docs/PHASE1_GOALS.md`
   - `docs/ROADMAP.md`
   - `docs/issues/PHASE1_ISSUES.md`
+  - Prefer GitHub issue links or milestone queries over copying live issue/PR status into repo docs.
 
 ## Branch and PR Flow
 
@@ -83,7 +84,7 @@ Before requesting review, ensure:
 
 - [ ] OpenSpec artifacts are updated for behavior/scope changes.
 - [ ] `openapi.yaml` and `contracts.ts` remain aligned.
-- [ ] Roadmap/goals/issues docs are updated when planning scope changes.
+- [ ] Roadmap/goals/index docs are updated when stable planning scope changes.
 - [ ] Work is on a dedicated `codex/<topic>` branch (not `main`).
 - [ ] `openspec validate --all` passes locally.
 - [ ] Related issue links are added in the PR description.

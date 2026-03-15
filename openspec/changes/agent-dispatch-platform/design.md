@@ -60,6 +60,10 @@
    - 对审计关联事件、错误日志、trace、指标分别定义最小保留期，优先保留脱敏后的调试上下文而非原始敏感负载。
    - 下游实现必须维护一份 handoff 清单，将当前 endpoint / job、活跃 issue / PR、缺失 `job_id` / async read / `audit_id` 合同等问题显式绑定到交付负责人，避免仅有基线文档而没有落地闭环。
 
+8. 规划文档只保留稳定索引
+   - `docs/issues/PHASE1_ISSUES.md` 与 `docs/PHASE1_CHECKPOINT_BOARD.md` 只保留稳定 issue 索引、里程碑入口、owner/date 等低频变更信息。
+   - 活跃状态、评论、PR 关联、review note 以 GitHub issue / PR / milestone 查询为唯一真源，减少多分支并行时的冲突面。
+
 ## Backend Module Boundaries
 
 MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立即拆成独立微服务。每个模块拥有清晰写入边界，并通过共享 contract layer（OpenSpec + OpenAPI + `contracts.ts`）交互。
