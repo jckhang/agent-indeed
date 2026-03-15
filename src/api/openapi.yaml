@@ -379,6 +379,10 @@ paths:
       tags: [proofs]
       summary: Verify proof pack against task PoMW policy
       operationId: verifyProofPack
+      description: |
+        Verifies a `ProofPack` against a previously resolved PoMW policy trace.
+        Clients MUST provide the persisted `policyTraceId` so later audit and
+        award replay use the same verifier basis instead of recalculating policy.
       parameters:
         - $ref: '#/components/parameters/TaskIdParam'
       requestBody:
@@ -396,6 +400,12 @@ paths:
                 $ref: '#/components/schemas/ProofVerificationResponse'
         '400':
           description: Invalid proof payload or policy mapping input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProofVerifyErrorResponse'
+        '404':
+          description: Referenced policy trace was not found for the task
           content:
             application/json:
               schema:
@@ -785,8 +795,10 @@ components:
           type: string
           pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
         verificationStatus:
-          type: string
-          enum: [PENDING_VERIFY, PASS, FAIL, MANUAL_REVIEW]
+          oneOf:
+            - type: string
+              enum: [PENDING_VERIFY]
+            - $ref: '#/components/schemas/ProofVerificationStatus'
 
     CommitBidAcceptedResponse:
       type: object
@@ -933,22 +945,68 @@ components:
     VerifyProofPackRequest:
       type: object
       additionalProperties: false
-      required: [proof]
+      required: [policyTraceId, proof]
       properties:
+        policyTraceId:
+          type: string
+          pattern: '^policytrace_[a-zA-Z0-9_-]{8,64}$'
+          description: Persisted PoMW policy decision reference used for deterministic replay.
         proof:
           $ref: '#/components/schemas/ProofPack'
+
+    ProofVerificationStatus:
+      type: string
+      enum: [PASSED, FAILED, NEEDS_REVIEW]
+
+    ProofVerificationReasonCode:
+      type: string
+      enum:
+        - PROOF_IDENTITY_SIGNATURE_INVALID
+        - PROOF_IDENTITY_TIER_MISMATCH
+        - PROOF_SAMPLE_OUTPUT_INVALID
+        - PROOF_SAMPLE_QUALITY_BELOW_THRESHOLD
+        - PROOF_TRACE_HASH_MISMATCH
+        - PROOF_TRACE_SIGNATURE_INVALID
+        - PROOF_CHALLENGE_INSUFFICIENT
+        - PROOF_RUNTIME_EXCEEDED
+        - PROOF_REVIEW_REQUIRED_ARTIFACT_GAP
+        - PROOF_REVIEW_REQUIRED_IDENTITY_GAP
+
+    ProofVerifierOutcome:
+      type: object
+      additionalProperties: false
+      required: [identityChecksPassed, traceChecksPassed, challengeChecksPassed]
+      properties:
+        identityChecksPassed:
+          type: boolean
+        traceChecksPassed:
+          type: boolean
+        challengeChecksPassed:
+          type: boolean
 
     ProofVerificationResponse:
       type: object
       additionalProperties: false
-      required: [proofId, result, requiredDifficulty, achievedDifficulty]
+      required:
+        - proofId
+        - verificationStatus
+        - policyTraceId
+        - decisionTraceId
+        - requiredDifficulty
+        - achievedDifficulty
+        - verifierOutcome
       properties:
         proofId:
           type: string
           pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
-        result:
+        verificationStatus:
+          $ref: '#/components/schemas/ProofVerificationStatus'
+        policyTraceId:
           type: string
-          enum: [PASS, FAIL, MANUAL_REVIEW]
+          pattern: '^policytrace_[a-zA-Z0-9_-]{8,64}$'
+        decisionTraceId:
+          type: string
+          pattern: '^decisiontrace_[a-zA-Z0-9_-]{8,64}$'
         requiredDifficulty:
           type: number
           minimum: 0
@@ -958,7 +1016,9 @@ components:
         reasonCodes:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/ProofVerificationReasonCode'
+        verifierOutcome:
+          $ref: '#/components/schemas/ProofVerifierOutcome'
         verifiedAt:
           type: string
           format: date-time
@@ -966,6 +1026,8 @@ components:
     ProofVerifyErrorCode:
       type: string
       enum:
+        - PROOF_POLICY_TRACE_MISSING
+        - PROOF_POLICY_TRACE_NOT_FOUND
         - PROOF_VERIFY_PAYLOAD_INVALID
         - PROOF_VERIFY_POLICY_INVALID
         - PROOF_VERIFY_FAILED
@@ -989,12 +1051,18 @@ components:
                   type: string
                 policyTraceId:
                   type: string
+                decisionTraceId:
+                  type: string
                 requiredDifficulty:
                   type: number
                   minimum: 0
                 achievedDifficulty:
                   type: number
                   minimum: 0
+                reasonCodes:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ProofVerificationReasonCode'
 
     AgentBundle:
       type: object
@@ -1316,13 +1384,18 @@ components:
       type: object
       additionalProperties: false
       required:
+        - proofSchemaVersion
         - proofId
         - taskId
         - agentId
+        - capturedAt
         - identityProof
         - sampleWork
         - executionTrace
       properties:
+        proofSchemaVersion:
+          type: string
+          enum: ['1.0']
         proofId:
           type: string
           pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
@@ -1332,6 +1405,9 @@ components:
         agentId:
           type: string
           pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        capturedAt:
+          type: string
+          format: date-time
         identityProof:
           type: object
           additionalProperties: false
@@ -1415,6 +1491,8 @@ components:
         - BID_REVEAL_COMMIT_NOT_FOUND
         - BID_REVEAL_HASH_MISMATCH
         - BID_REVEAL_WINDOW_CLOSED
+        - PROOF_POLICY_TRACE_MISSING
+        - PROOF_POLICY_TRACE_NOT_FOUND
         - PROOF_VERIFY_PAYLOAD_INVALID
         - PROOF_VERIFY_POLICY_INVALID
         - PROOF_VERIFY_FAILED

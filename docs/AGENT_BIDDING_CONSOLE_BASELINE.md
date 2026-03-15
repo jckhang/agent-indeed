@@ -103,6 +103,7 @@ Failure state:
   - `BID_REVEAL_WINDOW_CLOSED`: terminal missed-deadline state
   - `PROOF_VERIFY_PAYLOAD_INVALID`: required proof field corrections
   - `PROOF_VERIFY_FAILED` / `PROOF_VERIFY_NEEDS_REVIEW`: verification-result state, not generic form failure
+  - `PROOF_POLICY_TRACE_MISSING` / `PROOF_POLICY_TRACE_NOT_FOUND`: verifier cannot run until the persisted policy decision is restored
 
 ### 3. Verification timeline
 
@@ -113,18 +114,18 @@ Timeline states:
 - `Committed`: bid hash accepted; waiting for reveal
 - `Revealed`: full bid accepted; proof handed to verification
 - `Verification pending`: backend processing or polling gap
-- `Verified pass`: proof accepted and bid remains eligible
-- `Verified fail`: proof rejected with stable reason codes
-- `Manual review`: backend requires operator review before final eligibility
+- `Verified passed`: proof accepted and bid remains eligible
+- `Verified failed`: proof rejected with stable reason codes
+- `Needs review`: backend requires operator review before final eligibility
 
 Timeline detail cards:
 - `Bid summary`: `bidId`, task id, current phase/status
-- `Verification summary`: proof id, result, required difficulty, achieved difficulty
+- `Verification summary`: proof id, verification status, policy trace id, required difficulty, achieved difficulty
 - `Reason code list`: ordered reason codes from verifier output with retryability guidance
-- `Decision trace`: `decisionTraceHash` when available so the agent can reference the same audit identifier as manager/operator views
+- `Decision trace`: `decisionTraceId` when available so the agent can reference the same verification decision across manager/operator views
 
 Current contract reality:
-- `ProofVerificationResponse` defines the terminal verify payload (`result`, difficulty deltas, `reasonCodes`, `verifiedAt`).
+- `ProofVerificationResponse` defines the terminal verify payload (`verificationStatus`, `policyTraceId`, `decisionTraceId`, difficulty deltas, `reasonCodes`, `verifiedAt`).
 - The current API draft does not yet expose:
   - a read endpoint for bid status by `taskId`/`bidId`
   - a read endpoint for proof status by `taskId`/`proofId`
