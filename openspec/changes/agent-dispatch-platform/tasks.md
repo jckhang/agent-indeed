@@ -6,6 +6,7 @@
 - [x] 0.4 输出 `docs/ENGINEERING_TRACKS_FE_BE.md`，定义前后端最小可交付路线。
 - [x] 0.5 输出 `docs/HR_HIRING_PLAN.md`，形成 MVP 人员缺口与招聘执行方案。
 - [x] 0.6 输出 `docs/BACKEND_SERVICE_BOUNDARIES.md`，定义后端模块边界与所有权映射。
+- [x] 0.7 收敛 `docs/issues/PHASE1_ISSUES.md` 与 `docs/PHASE1_CHECKPOINT_BOARD.md` 为稳定索引，改用 GitHub 查询承载高频 issue / PR 状态。
 - [x] 0.8 输出 `docs/MVP_STATE_MODEL.md`，冻结 MVP 状态机与关键写入时序约束。
 
 ## 1. OpenSpec 基础落地

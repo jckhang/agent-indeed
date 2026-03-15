@@ -30,5 +30,6 @@
 
 - 新增 OpenSpec 规范文件，作为后续服务拆分与 API 设计依据。
 - 新增 `docs/OBSERVABILITY_BASELINE.md`，作为后续后端埋点、运维告警与审计可视化的统一契约。
+- 规划类 repo 文档改为稳定索引与 GitHub 查询入口，避免在仓库内复制高频变化的 issue / PR 状态。
 - 将影响后续模块：Registry、Matching、Bidding、PoMW Verifier、Audit/Reputation、Settlement。
 - 该变更当前不直接引入运行时代码，但会约束后续实现与测试。

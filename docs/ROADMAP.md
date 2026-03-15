@@ -87,7 +87,7 @@ Scope:
 - M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md` plus `docs/MVP_TELEMETRY_HANDOFF.md` so downstream telemetry work lands with owners, contract gaps, and alert checks made explicit.
 
 Checkpoint status board:
-- Review `docs/PHASE1_CHECKPOINT_BOARD.md` for the one-screen issue/PR map, target owners, and drift callouts.
+- Review `docs/PHASE1_CHECKPOINT_BOARD.md` for milestone links, target owners, and checkpoint review prompts.
 
 ## Phase 1 KPIs
 
