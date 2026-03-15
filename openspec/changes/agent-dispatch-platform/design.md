@@ -66,6 +66,11 @@
    - 对审计关联事件、错误日志、trace、指标分别定义最小保留期，优先保留脱敏后的调试上下文而非原始敏感负载。
    - 下游实现必须维护一份 handoff 清单，将当前 endpoint / job、活跃 issue / PR、缺失 `job_id` / async read / `audit_id` 合同等问题显式绑定到交付负责人，避免仅有基线文档而没有落地闭环。
 
+8. 建立 merge-train 协作例行
+   - 规划负责人使用统一查询区分 clean LGTM PR 与 dirty follow-on queue，而不是把瞬时状态复制到仓库文档。
+   - clean tranche 合并后，必须在脏 PR 线程写回 owner、blocker、rebase-next-step，并要求重新执行验证命令。
+   - 例行流程写入 `docs/MERGE_TRAIN_PLAYBOOK.md` 并在 `CONTRIBUTING.md` 链接，减少多 agent 并行时的重复沟通和冲突。
+
 ## Backend Module Boundaries
 
 MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立即拆成独立微服务。每个模块拥有清晰写入边界，并通过共享 contract layer（OpenSpec + OpenAPI + `contracts.ts`）交互。

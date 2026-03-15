@@ -42,6 +42,15 @@ Thanks for contributing. This repository is currently API/spec-first, so most ch
 4. Re-run required validation commands.
 5. Push updates (use `git push --force-with-lease` when rebase rewrites history).
 
+## Merge-Train Routine
+
+When planning-owner PRs or cross-lane dependency PRs pile up:
+
+1. Use `docs/MERGE_TRAIN_PLAYBOOK.md` to separate the clean LGTM tranche from the dirty follow-on queue.
+2. Merge only the clean tranche first, in dependency-aware order.
+3. For dirty PRs, leave a signed blocker/rebase note on the PR thread instead of copying transient state into repo docs.
+4. Keep `docs/issues/PHASE1_ISSUES.md` and `docs/PHASE1_CHECKPOINT_BOARD.md` focused on durable links/structure, not day-to-day queue status.
+
 ## Multi-Agent Commit Identity Isolation
 
 When multiple agents share one machine/worktree pool, isolate git commit identity per agent.

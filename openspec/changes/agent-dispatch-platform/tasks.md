@@ -7,6 +7,7 @@
 - [x] 0.5 输出 `docs/HR_HIRING_PLAN.md`，形成 MVP 人员缺口与招聘执行方案。
 - [x] 0.6 输出 `docs/BACKEND_SERVICE_BOUNDARIES.md`，定义后端模块边界与所有权映射。
 - [x] 0.8 输出 `docs/MVP_STATE_MODEL.md`，冻结 MVP 状态机与关键写入时序约束。
+- [x] 0.9 输出 `docs/MERGE_TRAIN_PLAYBOOK.md`，统一 clean LGTM merge train、dirty queue 回写与 rebase 协作流程。
 
 ## 1. OpenSpec 基础落地
 
