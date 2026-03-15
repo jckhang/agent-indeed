@@ -11,7 +11,7 @@
 ## 1. OpenSpec 基础落地
 
 - [x] 1.1 完成 proposal/design/specs/tasks 四类工件并通过 `openspec validate`。
-- [ ] 1.2 建立 capability 命名约定与目录规范（kebab-case + 单能力单 spec）。
+- [x] 1.2 建立 capability 命名约定与目录规范（kebab-case + 单能力单 spec）。
 
 ## 2. Agent 上传与同步 API 设计
 
