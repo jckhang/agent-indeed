@@ -9,7 +9,7 @@ This is the single review surface for milestone drift across active Phase 1 issu
 | Checkpoint | Target date | Checkpoint owner | Scope | Active issues | Active PRs | Status | Drift / next action |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | Contract finalization, observability baseline, onboarding kickoff | #30, #38 | #50 | On track | Finish PR #50 review, then start #30 from the merged contract baseline. |
-| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | Candidate matching, commit-reveal APIs, manager console baseline | #6, #7, #43, #61 | #53, #55 | At risk | Matching contract is in review, commit-reveal work has not started, and the task-composer slice still needs explicit task-create idempotency follow-through. |
+| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | Candidate matching, commit-reveal APIs, manager console baseline | #6, #7, #43 | #53, #55, #70 | At risk | Matching contract is in review, commit-reveal work has not started, and PR #70 still needs explicit task-create idempotency follow-through before the slice can merge. |
 | M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | PoMW policy, verifier, agent console, bid/proof async status reads | #8, #9, #44, #59 | #56 | At risk | #56 is active, but verifier and policy slices are still unmerged and issue #59 remains queued behind them. |
 | M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | Audit trail, operator console, manager award reads, E2E pack | #10, #11, #47, #58, #65 | #67, #74 | At risk | PR #67 now defines the focused operator audit timeline slice while PR #74 keeps the broader audit visibility baseline visible; both still depend on backend audit/event and award-read contracts. |
 
@@ -22,7 +22,7 @@ This is the single review surface for milestone drift across active Phase 1 issu
 | #6 `Implement candidate matching baseline` | M2 | 2026-03-27 | kestrel | in-review | Backed by PR #55. |
 | #7 `Implement commit-reveal bidding APIs` | M2 | 2026-03-27 | kestrel | ready-next | Immediate follow-on after shortlist/matching contract merge. |
 | #43 `Build manager console baseline` | M2 | 2026-03-27 | lanzhou-fe-agent | in-review | Reopened because PR #53 is still active; manager award view depends on read-model/API follow-up. |
-| #61 `Implement manager task composer UI slice` | M2 | 2026-03-27 | lanzhou-fe-agent | in-progress | Focused publish-only manager page; keeps the current task-create contract explicit and calls out missing idempotency support. |
+| #61 `Implement manager task composer UI slice` | M2 | 2026-03-27 | lanzhou-fe-agent | closed | Issue is closed while PR #70 remains in review; keep task-create idempotency follow-through tracked on the PR until merge. |
 | #8 `Implement PoMW policy engine` | M3 | 2026-04-03 | kestrel | ready-next | Drives the verifier and status-read work behind it. |
 | #9 `Implement ProofPack verifier and result codes` | M3 | 2026-04-03 | kestrel | blocked | Blocked on the policy baseline in #8. |
 | #44 `Build agent bidding console baseline` | M3 | 2026-04-03 | lanzhou-fe-agent | in-review | Reopened because PR #56 is still active; async verification status remains a dependency. |

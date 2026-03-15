@@ -27,7 +27,7 @@
 - P1-15 #44: https://github.com/jckhang/agent-indeed/issues/44
 - P1-12 #38: https://github.com/jckhang/agent-indeed/issues/38
 - P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
-- P1-19 #61: https://github.com/jckhang/agent-indeed/issues/61
+- P1-19 #61 (closed): https://github.com/jckhang/agent-indeed/issues/61
 - P1-23 #65: https://github.com/jckhang/agent-indeed/issues/65
 
 ## P0 Readiness
