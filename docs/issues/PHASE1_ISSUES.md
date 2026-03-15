@@ -29,6 +29,7 @@
 - P1-12 #38: https://github.com/jckhang/agent-indeed/issues/38
 - P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
 - P1-19 #61 (closed): https://github.com/jckhang/agent-indeed/issues/61
+- P1-21 #63: https://github.com/jckhang/agent-indeed/issues/63
 - P1-23 #65: https://github.com/jckhang/agent-indeed/issues/65
 
 ## P0 Readiness
@@ -313,6 +314,26 @@ Acceptance criteria:
 Backlog notes:
 - Bid status refresh still needs a task-scoped bid read model before the UI can survive browser refreshes or cross-device resume.
 - Proof verification status still needs a proof read endpoint and polling/event guidance before the timeline can promise live updates.
+
+### P1-21 Implement agent bid commit/reveal workspace UI
+
+References:
+- `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`
+- `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`
+- `docs/FRONTEND_MVP_SURFACE.md`
+- `docs/ERROR_CODE_RETRY_POLICY.md`
+- `src/api/openapi.yaml`
+- `src/api/contracts.ts`
+
+Acceptance criteria:
+- Agent can prepare commit and reveal payloads from one task-scoped workflow with clear server-authored deadline and phase feedback.
+- Required `ProofPack` sections are explicit in the UI slice, and missing required sections are highlighted before submit.
+- UX states cover commit-window closed, reveal-without-commit, reveal hash mismatch, and proof payload validation failures.
+- Any missing refresh-safe bid/proof read contract remains a documented backend dependency rather than an implicit frontend assumption.
+
+Backlog notes:
+- Issue #59 remains the follow-up for task-scoped bid/proof reads and async refresh behavior.
+- Any `ProofPack` contract change must update this slice, `src/api/openapi.yaml`, and `src/api/contracts.ts` together.
 
 ### P1-14 Build manager console baseline for task publish and award
 
