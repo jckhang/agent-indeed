@@ -36,6 +36,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - historical similarity
 - Manager console baseline is captured in `docs/MANAGER_CONSOLE_BASELINE.md` so task publish, shortlist review, and award-state acceptance criteria stay reviewable while shortlist/award read-model gaps are still backend follow-ups.
 - The focused shortlist/award manager review slice is captured in `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` so fallback states and award blockers stay explicit while shortlist/award contracts remain under review.
+- The merged manager and agent frontend slices feed their remaining data gaps into `docs/FRONTEND_POST_MERGE_DATA_GAP_LEDGER.md` so issue #58 and related contract PRs have one frontend follow-through ledger.
 
 ### G3. Bidding and PoMW baseline
 
@@ -43,6 +44,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Reveal rejected when no valid commit exists.
 - `ProofPack` accepted and verified with T0/T1/T2 policy mapping.
 - Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, and the focused execution slice is refined in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` so commit/reveal workspace behavior stays reviewable while bid/proof status reads remain backend follow-ups through issue #59.
+- Post-reveal verification loading/failure follow-through is tracked in `docs/FRONTEND_POST_MERGE_DATA_GAP_LEDGER.md` so issue #64 and PRs #73/#83 stay tied to concrete UI gaps.
 
 ### G4. Audit and observability baseline
 

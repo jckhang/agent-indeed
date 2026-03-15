@@ -46,6 +46,7 @@ Scope:
 - Commit-reveal bidding workflow.
 - Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps the broader commit/reveal + verification journey visible.
 - Dedicated bid workspace slice (`docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, issue #63 / PR #76) narrows the next frontend delivery item to one commit/reveal workflow while leaving async refresh on the backend follow-up track (#59).
+- Post-merge frontend data-gap ledger (`docs/FRONTEND_POST_MERGE_DATA_GAP_LEDGER.md`, issue #94) keeps the merged manager/agent UI slices aligned with open contract PRs #68, #73, and #83.
 - Audit visibility console baseline (`docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`, issue #47) keeps task/bid timeline review, failure translation, and missing-field alert requirements visible while audit query and award-read contracts are still pending.
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.

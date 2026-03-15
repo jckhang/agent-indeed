@@ -31,6 +31,7 @@
 - P1-19 #61 (closed): https://github.com/jckhang/agent-indeed/issues/61
 - P1-21 #63: https://github.com/jckhang/agent-indeed/issues/63
 - P1-23 #65: https://github.com/jckhang/agent-indeed/issues/65
+- P1-30 #94: https://github.com/jckhang/agent-indeed/issues/94
 
 ## P0 Readiness
 
@@ -373,6 +374,27 @@ Acceptance criteria:
 Backlog notes:
 - The shortlisted-candidate experience still depends on the contract proposal in PR `#68`; until it merges, the UI must preserve partial-data states and dependency copy.
 - Award-readiness visibility must stay separate from the eventual award command execution path so manager UX does not imply unsupported write behavior.
+
+### P1-30 Capture frontend data gaps after manager/agent UI merges
+
+References:
+- `docs/FRONTEND_POST_MERGE_DATA_GAP_LEDGER.md`
+- `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`
+- `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`
+- `docs/FRONTEND_MVP_SURFACE.md`
+- issue `#58` / PR `#68`
+- issue `#64` / PR `#73`
+- issue `#9` / PR `#83`
+
+Acceptance criteria:
+- Remaining verify and award-review frontend data gaps are consolidated into one reviewable ledger after the manager and agent UI slices merge.
+- The ledger explicitly names the missing backend fields, loading states, and failure-copy follow-through still needed for verification and award review.
+- Every gap is mapped back to the owning issue or PR instead of being left as anonymous frontend debt.
+- Planning surfaces stay synchronized so the merged UI docs do not imply contracts that are still under review.
+
+Backlog notes:
+- Verification refresh and result-copy gaps remain downstream of issue `#59`, issue `#64`, and PR `#83`.
+- Award-readiness field and audit-link gaps remain downstream of issue `#58` / PR `#68` and later audit follow-through in issue `#10`.
 
 ### P1-16 Build audit visibility console baseline
 

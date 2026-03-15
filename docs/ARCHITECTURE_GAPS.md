@@ -31,6 +31,7 @@ Identify the smallest set of missing decisions that block delivery of the Phase 
 - Manager shortlist/award-readiness guidance now exists in `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`, but the shortlist and award contracts are still pending backend merge work.
 - Agent-side bidding baseline is now documented in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, but bid/proof read contracts are still missing.
 - Focused commit/reveal workspace guidance now exists in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, but it still depends on backend window/proof reads staying synchronized.
+- The merged manager and agent UI slices now share one follow-up ledger in `docs/FRONTEND_POST_MERGE_DATA_GAP_LEDGER.md`, but the underlying shortlist, verification, and verifier contracts are still open review work.
 - Operator audit timeline baseline is now documented in `docs/OPERATOR_AUDIT_TIMELINE_BASELINE.md`, but task-scoped event reads and completeness guarantees are still missing.
 - No contract for sync/async updates (polling, event stream, or both).
 - Commit/reveal/proof error codes are documented, but route-level UX mapping still needs to stay synchronized with backend responses.
