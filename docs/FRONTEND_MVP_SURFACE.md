@@ -101,9 +101,12 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 | No audit event query contract | Operator and manager cannot verify decisions without logs | Add task/bid event stream endpoint with pagination |
 | No audit-field completeness contract | Operator cannot distinguish incomplete records from clean lifecycle history | Add required-vs-optional event fields or explicit completeness markers |
 
+Detailed post-merge frontend dependency tracking now lives in `docs/FRONTEND_POST_MERGE_DATA_GAP_LEDGER.md`, which compares the merged manager/agent UI slices with the still-open contract PRs.
+
 ## Recommended Contract Follow-Ups
 
 1. Add frontend-critical read APIs before Manager F1 and Agent F2 implementation starts.
 2. Standardize error shape (`code`, `category`, `message`, `retryable`, `details`, `auditId`) across all write endpoints.
 3. Add task-scoped bid/proof read endpoints that reuse the existing `window` snapshot shape so the unified bid workspace can recover state after refresh.
 4. Freeze state enums for task, bid, proof, and award in `openapi.yaml` and `contracts.ts` to reduce UI branching drift.
+5. Keep `docs/FRONTEND_POST_MERGE_DATA_GAP_LEDGER.md` aligned with PRs #68, #73, and #83 so merged UI docs do not drift from the next contract round.
