@@ -57,6 +57,8 @@ All MVP error responses should follow this shape:
 | `POST /v1/tasks/{taskId}/bids/commit` | `bid.bidId` + `bid.bidHash` | Retry same payload on transient failures; treat duplicate commit as already submitted |
 | `POST /v1/tasks/{taskId}/bids/reveal` | `bid.bidId` + reveal nonce/hash | Retry only for transport failures; never mutate reveal payload under same `bidId` |
 | `POST /v1/tasks/{taskId}/proofs/verify` | `proof.proofId` + proof digest | Retry only when server indicates `retryable=true` |
+| `GET /v1/tasks/{taskId}/events` | `taskId` + optional `bidId` + `cursor` | Safe to retry idempotently; reuse `nextCursor` from the prior page when continuing |
+| `GET /v1/bids/{bidId}/events` | `bidId` + `cursor` | Safe to retry idempotently; treat `AUDIT_QUERY_NOT_FOUND` as eventual-consistency sensitive before escalating |
 | Award command/query (P1-08 scope) | `taskId` + selected `bidId` | Retry reads for eventual consistency; writes require lifecycle precondition checks |
 
 ## Canonical source mapping

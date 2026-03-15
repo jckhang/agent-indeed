@@ -521,17 +521,6 @@ export interface RevealBidErrorResponse extends ApiErrorResponse {
   };
 }
 
-export interface ProofVerifyErrorResponse extends ApiErrorResponse {
-  code: ProofVerifyErrorCode;
-  details?: {
-    proofId?: string;
-    taskId?: string;
-    policyTraceId?: string;
-    requiredDifficulty?: number;
-    achievedDifficulty?: number;
-  };
-}
-
 export type BidStatus = "COMMITTED" | "REVEALED" | "REJECTED" | "SCORED";
 
 export interface BidResponse {
@@ -565,4 +554,155 @@ export interface ProofVerificationResponse {
   achievedDifficulty: number;
   reasonCodes?: string[];
   verifiedAt?: string;
+}
+
+export interface ProofVerifyErrorResponse extends ApiErrorResponse {
+  code: ProofVerifyErrorCode;
+  details?: {
+    proofId?: string;
+    taskId?: string;
+    policyTraceId?: string;
+    requiredDifficulty?: number;
+    achievedDifficulty?: number;
+  };
+}
+
+export type AuditEventType =
+  | "TASK_CREATED"
+  | "BID_COMMITTED"
+  | "BID_REVEALED"
+  | "POMW_VERIFIED"
+  | "TASK_AWARDED";
+
+export type AuditActorRole =
+  | "MANAGER"
+  | "AGENT"
+  | "SYSTEM"
+  | "OPERATOR"
+  | "VERIFIER_SERVICE";
+
+export type AuditTaskLifecycleState =
+  | "OPEN_FOR_MATCHING"
+  | "OPEN_FOR_BIDDING"
+  | "VERIFYING"
+  | "AWARDED"
+  | "CLOSED_NO_AWARD";
+
+export type AuditRecordCompleteness = "COMPLETE" | "PARTIAL";
+
+export interface TaskCreatedAuditPayload {
+  taskStatus: "OPEN_FOR_MATCHING" | "OPEN_FOR_BIDDING";
+  riskLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  proofPolicyMode: "AUTO_TIERED" | "MANUAL";
+}
+
+export interface BidCommittedAuditPayload {
+  bidHash: string;
+  windowPhase: BidWindowPhase;
+  commitDeadline: string;
+}
+
+export interface BidRevealedAuditPayload {
+  price: {
+    currency: string;
+    amount: number;
+  };
+  proofId: string;
+  rankingScore?: number;
+  decisionTraceHash?: string;
+}
+
+export interface ProofVerifiedAuditPayload {
+  result: ProofVerificationResult;
+  policyTraceId: string;
+  requiredDifficulty: number;
+  achievedDifficulty: number;
+  reasonCodes?: string[];
+  manualReviewRequired: boolean;
+}
+
+export interface TaskAwardScoreSummary {
+  rankingScore: number;
+  budgetFitScore?: number;
+  latencyScore?: number;
+}
+
+export interface TaskAwardProofSummary {
+  proofId?: string;
+  result: ProofVerificationResult;
+  reasonCodes?: string[];
+  policyTraceId?: string;
+}
+
+export interface TaskAwardedAuditPayload {
+  awardedBidId: string;
+  awardedAgentId: string;
+  taskStatus: "AWARDED" | "CLOSED_NO_AWARD";
+  awardReason?: string;
+  decisionTraceHash: string;
+  scoreSummary: TaskAwardScoreSummary;
+  proofSummary: TaskAwardProofSummary;
+}
+
+interface AuditEventBase {
+  eventId: string;
+  eventType: AuditEventType;
+  taskId: string;
+  bidId?: string;
+  proofId?: string;
+  actorRole: AuditActorRole;
+  actorId?: string;
+  occurredAt: string;
+  auditId: string;
+  traceHash: string;
+  payloadVersion: string;
+  summary: string;
+  completeness: AuditRecordCompleteness;
+  missingFields?: string[];
+}
+
+export interface TaskCreatedAuditEvent extends AuditEventBase {
+  eventType: "TASK_CREATED";
+  payload: TaskCreatedAuditPayload;
+}
+
+export interface BidCommittedAuditEvent extends AuditEventBase {
+  eventType: "BID_COMMITTED";
+  bidId: string;
+  payload: BidCommittedAuditPayload;
+}
+
+export interface BidRevealedAuditEvent extends AuditEventBase {
+  eventType: "BID_REVEALED";
+  bidId: string;
+  proofId: string;
+  payload: BidRevealedAuditPayload;
+}
+
+export interface ProofVerifiedAuditEvent extends AuditEventBase {
+  eventType: "POMW_VERIFIED";
+  bidId: string;
+  proofId: string;
+  payload: ProofVerifiedAuditPayload;
+}
+
+export interface TaskAwardedAuditEvent extends AuditEventBase {
+  eventType: "TASK_AWARDED";
+  bidId: string;
+  payload: TaskAwardedAuditPayload;
+}
+
+export type AuditEvent =
+  | TaskCreatedAuditEvent
+  | BidCommittedAuditEvent
+  | BidRevealedAuditEvent
+  | ProofVerifiedAuditEvent
+  | TaskAwardedAuditEvent;
+
+export interface AuditEventListResponse {
+  taskId: string;
+  bidId?: string;
+  hasMore: boolean;
+  nextCursor?: string;
+  events: AuditEvent[];
 }

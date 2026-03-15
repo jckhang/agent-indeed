@@ -79,7 +79,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | --- | --- | --- | --- | --- |
 | `/operator/proofs/queue` | `GET /v1/proofs` (proposed) | `result`, `updatedSince`, `cursor` | `proofId`, `taskId`, `agentId`, `result`, `reasonCodes`, `verifiedAt`, `needsManualReview` | Missing in current API |
 | `/operator/proofs/{proofId}/review` | `POST /v1/tasks/{taskId}/proofs/verify` + `PATCH /v1/proofs/{proofId}/decision` (proposed override) | verify payload `proof.*`; override payload `decision`, `reason`, `operatorId` | `proofId`, `result`, `reasonCodes`, `verifiedAt`, `decisionTraceHash`; error `code`, `category`, `retryable`, `details.policyTraceId` | Partial: verify now has typed proof failure codes, manual override still missing |
-| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` (proposed) | `taskId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `entityId`, `summary`, `traceHash`, `occurredAt`, completeness flags or equivalent missing-field signal | Missing in current API |
+| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` | `taskId`, optional `bidId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `taskId`, `bidId`, `proofId`, `summary`, `traceHash`, `auditId`, `occurredAt`, completeness flags or equivalent missing-field signal | Ready for timeline rendering; award summary/read CTA still depends on issue `#58` |
 
 ## State-Driven UI Requirements
 
@@ -99,7 +99,7 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 | Missing merged list/read endpoints for bids/proofs | UI cannot refresh queued/verifying state on `main` without guessing hidden fields | Merge PR `#66` or equivalent read endpoints for bid/proof status by `taskId`, `bidId`, `proofId` |
 | Generic `ErrorResponse` for commit/reveal/verify failures | User-facing reason code mapping is unstable | Publish stable error code catalog with category + retryability |
 | No idempotency support beyond bundle upload | Retry-safe UX cannot be guaranteed for task publish/award | Add idempotency key contract to task and award writes |
-| No audit event query contract | Operator and manager cannot verify decisions without logs | Add task/bid event stream endpoint with pagination |
+| No award summary read contract | Manager and operator still need a winner-focused read model beyond the event stream | Add award read surface with `decisionTraceHash`, proof summary, and blocker fields |
 | No audit-field completeness contract | Operator cannot distinguish incomplete records from clean lifecycle history | Add required-vs-optional event fields or explicit completeness markers |
 
 ## Recommended Contract Follow-Ups

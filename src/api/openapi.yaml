@@ -14,6 +14,7 @@ tags:
   - name: tasks
   - name: bids
   - name: proofs
+  - name: audit
 
 paths:
   /v1/agents/bundles:
@@ -559,6 +560,205 @@ paths:
                     auditId: audit_proof_policy_input_invalid
                     retryable: false
 
+
+  /v1/tasks/{taskId}/events:
+    get:
+      tags: [audit]
+      summary: Query the ordered audit timeline for a task
+      operationId: listTaskAuditEvents
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+        - $ref: '#/components/parameters/BidIdFilterParam'
+        - $ref: '#/components/parameters/AuditCursorParam'
+        - $ref: '#/components/parameters/AuditLimitParam'
+      responses:
+        '200':
+          description: Ordered audit event page for the task or one bid within the task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEventListResponse'
+              examples:
+                taskTimeline:
+                  summary: Full task timeline through award
+                  value:
+                    taskId: task_ops_triage_001
+                    hasMore: false
+                    events:
+                      - eventId: aev_task_create_001
+                        eventType: TASK_CREATED
+                        taskId: task_ops_triage_001
+                        actorRole: MANAGER
+                        actorId: mgr_ops_console
+                        occurredAt: '2026-03-14T12:00:00Z'
+                        auditId: audit_task_created_001
+                        traceHash: sha256:1111111111111111111111111111111111111111111111111111111111111111
+                        payloadVersion: '1.0'
+                        summary: Task published with medium-risk matching constraints.
+                        completeness: COMPLETE
+                        payload:
+                          taskStatus: OPEN_FOR_BIDDING
+                          riskLevel: MEDIUM
+                          proofPolicyMode: AUTO_TIERED
+                      - eventId: aev_bid_commit_001
+                        eventType: BID_COMMITTED
+                        taskId: task_ops_triage_001
+                        bidId: bid_alpha_commit_01
+                        actorRole: AGENT
+                        actorId: agent_kestrel_alpha
+                        occurredAt: '2026-03-14T13:05:01Z'
+                        auditId: audit_bid_commit_001
+                        traceHash: sha256:2222222222222222222222222222222222222222222222222222222222222222
+                        payloadVersion: '1.0'
+                        summary: Bid hash committed during the open commit window.
+                        completeness: COMPLETE
+                        payload:
+                          bidHash: sha256:3b6447d58f3386261f9fcb3f298e51fb67dbf0fa7ed9f4a186b2d0f4ed57f3c2
+                          windowPhase: COMMIT_OPEN
+                          commitDeadline: '2026-03-14T13:30:00Z'
+                      - eventId: aev_bid_reveal_001
+                        eventType: BID_REVEALED
+                        taskId: task_ops_triage_001
+                        bidId: bid_alpha_commit_01
+                        proofId: proof_ops_triage_001
+                        actorRole: AGENT
+                        actorId: agent_kestrel_alpha
+                        occurredAt: '2026-03-14T14:02:12Z'
+                        auditId: audit_bid_reveal_001
+                        traceHash: sha256:3333333333333333333333333333333333333333333333333333333333333333
+                        payloadVersion: '1.0'
+                        summary: Reveal accepted with proof forwarded for verification.
+                        completeness: COMPLETE
+                        payload:
+                          price:
+                            currency: USD
+                            amount: 420
+                          proofId: proof_ops_triage_001
+                          rankingScore: 0.91
+                          decisionTraceHash: sha256:44d306afd06c8d0ef82b0a5e2ab3abfbc8b1d67d3fd6c1ed44d7ed0f40c5c27f
+                      - eventId: aev_proof_verified_001
+                        eventType: POMW_VERIFIED
+                        taskId: task_ops_triage_001
+                        bidId: bid_alpha_commit_01
+                        proofId: proof_ops_triage_001
+                        actorRole: VERIFIER_SERVICE
+                        actorId: verifier_policy_engine
+                        occurredAt: '2026-03-14T14:04:00Z'
+                        auditId: audit_proof_verified_001
+                        traceHash: sha256:4444444444444444444444444444444444444444444444444444444444444444
+                        payloadVersion: '1.0'
+                        summary: Proof verification passed against the persisted policy snapshot.
+                        completeness: COMPLETE
+                        payload:
+                          result: PASS
+                          policyTraceId: policytrace_ops_triage_001
+                          requiredDifficulty: 0.82
+                          achievedDifficulty: 0.91
+                          reasonCodes: []
+                          manualReviewRequired: false
+                      - eventId: aev_task_awarded_001
+                        eventType: TASK_AWARDED
+                        taskId: task_ops_triage_001
+                        bidId: bid_alpha_commit_01
+                        proofId: proof_ops_triage_001
+                        actorRole: MANAGER
+                        actorId: mgr_ops_console
+                        occurredAt: '2026-03-14T14:06:30Z'
+                        auditId: audit_task_awarded_001
+                        traceHash: sha256:5555555555555555555555555555555555555555555555555555555555555555
+                        payloadVersion: '1.0'
+                        summary: Winning bid selected with score and proof summary attached.
+                        completeness: COMPLETE
+                        payload:
+                          awardedBidId: bid_alpha_commit_01
+                          awardedAgentId: agent_kestrel_alpha
+                          taskStatus: AWARDED
+                          awardReason: Highest score among fully verified candidates.
+                          decisionTraceHash: sha256:6666666666666666666666666666666666666666666666666666666666666666
+                          scoreSummary:
+                            rankingScore: 0.91
+                            budgetFitScore: 0.88
+                            latencyScore: 0.94
+                          proofSummary:
+                            proofId: proof_ops_triage_001
+                            result: PASS
+                            reasonCodes: []
+                            policyTraceId: policytrace_ops_triage_001
+        '404':
+          description: Audit stream was not found for the requested task or bid filter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                taskAuditMissing:
+                  summary: No task audit timeline exists for the requested identifiers
+                  value:
+                    code: AUDIT_QUERY_NOT_FOUND
+                    category: AUDIT
+                    message: no audit timeline exists for task task_missing_001
+                    auditId: audit_query_not_found_001
+                    retryable: true
+                    retryAfterSeconds: 5
+
+  /v1/bids/{bidId}/events:
+    get:
+      tags: [audit]
+      summary: Query the ordered audit timeline for a single bid
+      operationId: listBidAuditEvents
+      parameters:
+        - $ref: '#/components/parameters/BidIdParam'
+        - $ref: '#/components/parameters/AuditCursorParam'
+        - $ref: '#/components/parameters/AuditLimitParam'
+      responses:
+        '200':
+          description: Ordered audit event page narrowed to one bid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEventListResponse'
+              examples:
+                bidTimeline:
+                  summary: Single bid lifecycle through award
+                  value:
+                    taskId: task_ops_triage_001
+                    bidId: bid_alpha_commit_01
+                    hasMore: false
+                    events:
+                      - eventId: aev_bid_commit_001
+                        eventType: BID_COMMITTED
+                        taskId: task_ops_triage_001
+                        bidId: bid_alpha_commit_01
+                        actorRole: AGENT
+                        actorId: agent_kestrel_alpha
+                        occurredAt: '2026-03-14T13:05:01Z'
+                        auditId: audit_bid_commit_001
+                        traceHash: sha256:2222222222222222222222222222222222222222222222222222222222222222
+                        payloadVersion: '1.0'
+                        summary: Bid hash committed during the open commit window.
+                        completeness: COMPLETE
+                        payload:
+                          bidHash: sha256:3b6447d58f3386261f9fcb3f298e51fb67dbf0fa7ed9f4a186b2d0f4ed57f3c2
+                          windowPhase: COMMIT_OPEN
+                          commitDeadline: '2026-03-14T13:30:00Z'
+                    nextCursor: audit_cursor_bid_alpha_02
+        '404':
+          description: Audit stream was not found for the requested bid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                bidAuditMissing:
+                  summary: No bid audit timeline exists for the requested bid
+                  value:
+                    code: AUDIT_QUERY_NOT_FOUND
+                    category: AUDIT
+                    message: no audit timeline exists for bid bid_missing_001
+                    auditId: audit_query_not_found_002
+                    retryable: true
+                    retryAfterSeconds: 5
+
 components:
   securitySchemes:
     AgentBearer:
@@ -607,6 +807,42 @@ components:
         minLength: 8
         maxLength: 512
       description: Required when an operator triggers a manual proof verification override.
+
+    BidIdParam:
+      name: bidId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+
+    BidIdFilterParam:
+      name: bidId
+      in: query
+      required: false
+      description: Narrow a task timeline to one candidate bid path.
+      schema:
+        type: string
+        pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+
+    AuditCursorParam:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 160
+
+    AuditLimitParam:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 50
 
   schemas:
     UploadAgentBundleRequest:
@@ -1703,6 +1939,241 @@ components:
               minimum: 0
             stakeAsset:
               type: string
+
+    AuditEventListResponse:
+      type: object
+      additionalProperties: false
+      required: [taskId, hasMore, events]
+      properties:
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        bidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        hasMore:
+          type: boolean
+        nextCursor:
+          type: string
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEvent'
+
+    AuditEvent:
+      type: object
+      additionalProperties: false
+      required:
+        - eventId
+        - eventType
+        - taskId
+        - actorRole
+        - occurredAt
+        - auditId
+        - traceHash
+        - payloadVersion
+        - summary
+        - completeness
+        - payload
+      properties:
+        eventId:
+          type: string
+          pattern: '^aev_[a-zA-Z0-9_-]{8,64}$'
+        eventType:
+          $ref: '#/components/schemas/AuditEventType'
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        bidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        proofId:
+          type: string
+          pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
+        actorRole:
+          $ref: '#/components/schemas/AuditActorRole'
+        actorId:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+        auditId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+        traceHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+        payloadVersion:
+          type: string
+          pattern: '^[0-9]+\.[0-9]+$'
+        summary:
+          type: string
+        completeness:
+          $ref: '#/components/schemas/AuditRecordCompleteness'
+        missingFields:
+          type: array
+          items:
+            type: string
+        payload:
+          oneOf:
+            - $ref: '#/components/schemas/TaskCreatedAuditPayload'
+            - $ref: '#/components/schemas/BidCommittedAuditPayload'
+            - $ref: '#/components/schemas/BidRevealedAuditPayload'
+            - $ref: '#/components/schemas/ProofVerifiedAuditPayload'
+            - $ref: '#/components/schemas/TaskAwardedAuditPayload'
+
+    AuditEventType:
+      type: string
+      enum: [TASK_CREATED, BID_COMMITTED, BID_REVEALED, POMW_VERIFIED, TASK_AWARDED]
+
+    AuditActorRole:
+      type: string
+      enum: [MANAGER, AGENT, SYSTEM, OPERATOR, VERIFIER_SERVICE]
+
+    AuditRecordCompleteness:
+      type: string
+      enum: [COMPLETE, PARTIAL]
+
+    TaskCreatedAuditPayload:
+      type: object
+      additionalProperties: false
+      required: [taskStatus, riskLevel, proofPolicyMode]
+      properties:
+        taskStatus:
+          type: string
+          enum: [OPEN_FOR_MATCHING, OPEN_FOR_BIDDING]
+        riskLevel:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+        proofPolicyMode:
+          type: string
+          enum: [AUTO_TIERED, MANUAL]
+
+    BidCommittedAuditPayload:
+      type: object
+      additionalProperties: false
+      required: [bidHash, windowPhase, commitDeadline]
+      properties:
+        bidHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+        windowPhase:
+          type: string
+          enum: [COMMIT_OPEN, REVEAL_OPEN, CLOSED]
+        commitDeadline:
+          type: string
+          format: date-time
+
+    BidRevealedAuditPayload:
+      type: object
+      additionalProperties: false
+      required: [price, proofId]
+      properties:
+        price:
+          type: object
+          additionalProperties: false
+          required: [currency, amount]
+          properties:
+            currency:
+              type: string
+              minLength: 3
+              maxLength: 3
+            amount:
+              type: number
+              minimum: 0
+        proofId:
+          type: string
+          pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
+        rankingScore:
+          type: number
+          minimum: 0
+        decisionTraceHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+
+    ProofVerifiedAuditPayload:
+      type: object
+      additionalProperties: false
+      required:
+        [result, policyTraceId, requiredDifficulty, achievedDifficulty, manualReviewRequired]
+      properties:
+        result:
+          type: string
+          enum: [PASS, FAIL, MANUAL_REVIEW]
+        policyTraceId:
+          type: string
+          pattern: '^policytrace_[a-zA-Z0-9_-]{8,64}$'
+        requiredDifficulty:
+          type: number
+          minimum: 0
+        achievedDifficulty:
+          type: number
+          minimum: 0
+        reasonCodes:
+          type: array
+          items:
+            type: string
+        manualReviewRequired:
+          type: boolean
+
+    TaskAwardedAuditPayload:
+      type: object
+      additionalProperties: false
+      required:
+        [awardedBidId, awardedAgentId, taskStatus, decisionTraceHash, scoreSummary, proofSummary]
+      properties:
+        awardedBidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        awardedAgentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        taskStatus:
+          type: string
+          enum: [AWARDED, CLOSED_NO_AWARD]
+        awardReason:
+          type: string
+        decisionTraceHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+        scoreSummary:
+          $ref: '#/components/schemas/TaskAwardScoreSummary'
+        proofSummary:
+          $ref: '#/components/schemas/TaskAwardProofSummary'
+
+    TaskAwardScoreSummary:
+      type: object
+      additionalProperties: false
+      required: [rankingScore]
+      properties:
+        rankingScore:
+          type: number
+          minimum: 0
+        budgetFitScore:
+          type: number
+          minimum: 0
+        latencyScore:
+          type: number
+          minimum: 0
+
+    TaskAwardProofSummary:
+      type: object
+      additionalProperties: false
+      required: [result]
+      properties:
+        proofId:
+          type: string
+          pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
+        result:
+          type: string
+          enum: [PASS, FAIL, MANUAL_REVIEW]
+        reasonCodes:
+          type: array
+          items:
+            type: string
+        policyTraceId:
+          type: string
+          pattern: '^policytrace_[a-zA-Z0-9_-]{8,64}$'
 
     ErrorCode:
       type: string
