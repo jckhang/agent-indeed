@@ -277,6 +277,23 @@ Acceptance criteria:
 - Closed-beta guardrails and minimum compliance checklist are explicit and testable.
 - The baseline identifies follow-on implementation issues needed before beta readiness.
 
+### P1-24 Track MVP telemetry implementation handoff
+
+References:
+- `docs/OBSERVABILITY_BASELINE.md`
+- `docs/MVP_TELEMETRY_HANDOFF.md`
+- `docs/PHASE1_GOALS.md`
+- `docs/ROADMAP.md`
+- `docs/PHASE1_CHECKPOINT_BOARD.md`
+- `openspec/changes/agent-dispatch-platform/design.md`
+- `openspec/changes/agent-dispatch-platform/specs/task-marketplace-bidding-powm/spec.md`
+
+Acceptance criteria:
+- Required events, trace fields, logs, and metrics are mapped from the baseline to the current MVP modules, endpoints, and async jobs.
+- Active issues and open PRs are assigned the telemetry they must land before beta readiness.
+- Missing business identifiers or async-read contracts that block instrumentation are called out explicitly.
+- A minimal alert/review checklist exists for M4 telemetry readiness.
+
 ### P1-15 Build agent bidding console baseline
 
 References:

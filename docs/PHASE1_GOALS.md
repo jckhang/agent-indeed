@@ -55,6 +55,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Lifecycle observability contract is documented in `docs/OBSERVABILITY_BASELINE.md`.
 - Audit visibility console baseline is captured in `docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md` so timeline, failure-translation, and missing-field acceptance criteria stay reviewable while audit query and award-read contracts are still backend follow-ups.
 - Operator audit timeline baseline is captured in `docs/OPERATOR_AUDIT_TIMELINE_BASELINE.md` so chronological event rendering, failure translation, and missing-field alerts are reviewed as explicit Phase 1 audit acceptance criteria.
+- Downstream implementation handoff for telemetry owners, contract gaps, and M4 checks is tracked in `docs/MVP_TELEMETRY_HANDOFF.md`.
 
 ## Out of Scope (Phase 1)
 

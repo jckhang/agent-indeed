@@ -58,6 +58,7 @@
    - 统一相关性主键：`trace_id`, `request_id`, `task_id`, `bid_id`, `proof_id`, `audit_id`, `job_id`。
    - 对关键失败族建立最小告警面：上载校验失败、候选检索退化、commit/reveal 完整性异常、PoMW 校验超时、award/audit 缺失。
    - 对审计关联事件、错误日志、trace、指标分别定义最小保留期，优先保留脱敏后的调试上下文而非原始敏感负载。
+   - 下游实现必须维护一份 handoff 清单，将当前 endpoint / job、活跃 issue / PR、缺失 `job_id` / async read / `audit_id` 合同等问题显式绑定到交付负责人，避免仅有基线文档而没有落地闭环。
 
 ## Backend Module Boundaries
 

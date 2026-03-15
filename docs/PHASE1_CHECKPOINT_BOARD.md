@@ -1,6 +1,6 @@
 # Phase 1 Checkpoint Board
 
-Last updated: 2026-03-14
+Last updated: 2026-03-15
 
 This is the single review surface for milestone drift across active Phase 1 issues and PRs.
 
@@ -11,7 +11,7 @@ This is the single review surface for milestone drift across active Phase 1 issu
 | M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | Contract finalization, observability baseline, onboarding kickoff | #30, #38 | #50 | On track | Finish PR #50 review, then start #30 from the merged contract baseline. |
 | M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | Candidate matching, commit-reveal APIs, manager console baseline | #6, #7, #43 | #53, #55, #70 | At risk | Matching contract is in review, commit-reveal work has not started, and PR #70 still needs explicit task-create idempotency follow-through before the slice can merge. |
 | M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | PoMW policy, verifier, agent console, bid/proof async status reads | #8, #9, #44, #59 | #56 | At risk | #56 is active, but verifier and policy slices are still unmerged and issue #59 remains queued behind them. |
-| M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | Audit trail, operator console, manager award reads, E2E pack | #10, #11, #47, #58, #65 | #67, #74 | At risk | PR #67 now defines the focused operator audit timeline slice while PR #74 keeps the broader audit visibility baseline visible; both still depend on backend audit/event and award-read contracts. |
+| M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | Audit trail, operator console, manager award reads, E2E pack | #10, #11, #58, #71, #72 | #77, #81 | At risk | Security readiness and telemetry handoff are both in review, but award/audit telemetry still depends on M2/M3 backend outputs and the pending award-read contract. |
 
 ## Active P1 Issue Map
 
@@ -29,9 +29,9 @@ This is the single review surface for milestone drift across active Phase 1 issu
 | #59 `Define bid/proof status reads and async refresh contract` | M3 | 2026-04-03 | kestrel | ready-next | Required to make PR #56 durable once verifier status becomes asynchronous. |
 | #10 `Implement audit events and award decision trace` | M4 | 2026-04-10 | kestrel | blocked | Depends on M2 and M3 state/result contracts. |
 | #11 `Add E2E tests and API examples for MVP flow` | M4 | 2026-04-10 | QA | blocked | No dedicated owner label exists yet; keep this visible as a staffing + sequencing risk. |
-| #47 `Build audit visibility console baseline` | M4 | 2026-04-10 | lanzhou-fe-agent | in-review | Backed by PR #74; executable audit/event wiring still depends on issue #10 and issue #58. |
-| #65 `Implement operator audit timeline and failure-state UI` | M4 | 2026-04-10 | lanzhou-fe-agent | in-review | Backed by PR #67 as a focused child slice under #47 covering chronological timeline, failure translation, and missing-field alerts. |
 | #58 `Define manager shortlist and award read-model contracts` | M4 | 2026-04-10 | kestrel | ready-next | Unblocks the final manager award experience and keeps M2 UI work from drifting. |
+| #71 `Track MVP telemetry implementation handoff` | M4 | 2026-04-10 | albatross-dev-agent | in-review | `docs/MVP_TELEMETRY_HANDOFF.md` now maps required emitters, contract gaps, and beta review checks for downstream work while PR #81 is still open. |
+| #72 `Operationalize closed-beta security readiness checklist` | M4 | 2026-04-10 | albatross-dev-agent | in-review | Backed by PR #77; keep it open until the checklist, API security draft, and contract sync merge. |
 
 ## Active P1 PR Map
 
@@ -41,10 +41,13 @@ This is the single review surface for milestone drift across active Phase 1 issu
 | #53 `Build manager console baseline` | M2 | It is the frontend execution slice for task publish, shortlist review, and award summary. | Monitor for read-model contract gaps feeding into issue #58. |
 | #55 `Define candidate matching shortlist contract` | M2 | It anchors the shortlist/ranking contract that gates matching implementation and manager UI wiring. | This is the main M2 backend merge dependency. |
 | #56 `Build agent bidding console baseline` | M3 | It covers the agent commit/reveal loop that depends on verifier/status-read semantics. | Keep issue #44 open until merge and pair follow-up work with issue #59. |
-| #74 `Build audit visibility console baseline` | M4 | It defines the operator/task audit review slice so timeline, failure translation, and missing-field expectations stay visible ahead of backend query/read models. | Keep issue #47 open until merge and pair backend follow-up with issues #10 and #58. |
+| #81 `[P1-24] Track MVP telemetry implementation handoff` | M4 | It keeps the telemetry emitter rollout, gap list, and beta validation expectations reviewable while downstream implementation catches up. | Keep issue #71 open until merge so the beta-readiness dependency stays visible. |
+| #77 `[P1-25] Operationalize closed-beta security readiness checklist` | M4 | It makes the beta auth/redaction checklist reviewable and syncs the current security draft back into the API/contracts docs. | Blocking API sync feedback has been addressed; watch for final review/merge. |
+| #81 `[P1-24] Track MVP telemetry implementation handoff` | M4 | It keeps the telemetry emitter rollout, gap list, and beta validation expectations reviewable while downstream implementation catches up. | Keep issue #71 open until merge so the beta-readiness dependency stays visible. |
 
 ## Normalizations Applied
 
 - Reopened issues #38, #43, and #44 because they were closed while their linked PRs (#50, #53, #56) were still active.
 - Created GitHub milestones for M1-M4 and assigned every active P1 issue plus every open P1 PR to a checkpoint.
 - Moved issue #57 (`P0-09`) to `owner:albatross` so planning execution stays with albatross instead of lan.
+- Added issues #71/#72 and PR #81 to the M4 board so telemetry/security beta-readiness follow-ons stay visible alongside backend dependencies, while leaving merged issue #47 off the active list.
