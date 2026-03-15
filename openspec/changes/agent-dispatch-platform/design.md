@@ -119,6 +119,9 @@ MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立�
   - `challengeProfile`: `SAMPLE_EXECUTION` / `HASHCASH` / `STAKE` / `HYBRID`
   - `verifierParams`: `minSampleCount`, `minQualityScore`, `maxRuntimeMs`, `hashcashBits`, `stakeMinAmount`
   - `policy_trace_id`: 决策持久化引用，verify / audit / award 统一引用
+- Proof capture 与校验输出必须保持结构化：
+  - `ProofPack` 至少包含 `proofSchemaVersion`、`capturedAt`、identity / sample / trace 证据，以及可选 anti-sybil challenge
+  - verifier 输出统一状态：`PASS`、`FAIL`、`MANUAL_REVIEW`，并附带稳定 `reason_code[]` 与 `decisionTraceHash`，供 audit / UI / replay 直接消费
 - 建议的基线映射：
   - `LOW`: T0 + LOW risk + 高 trust，允许最小样本执行与签名轨迹
   - `MEDIUM`: T1 或中等风险任务，要求更高样本质量阈值
