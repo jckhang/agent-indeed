@@ -92,6 +92,35 @@ export interface UploadAgentBundleRequest {
   bundle: AgentBundle;
 }
 
+export interface TaskWriteContextHeaders {
+  workspaceId: string;
+}
+
+export interface ProofVerifyRequestContext {
+  auditReason?: string;
+}
+
+export interface CreateTaskRequest {
+  task: TaskSpec;
+}
+
+export interface CreateTaskHttpRequest {
+  headers: TaskWriteContextHeaders;
+  body: CreateTaskRequest;
+}
+
+export interface VerifyProofPackHttpRequest {
+  headers: ProofVerifyRequestContext;
+  body: VerifyProofPackRequest;
+}
+
+export interface CreateTaskResponse {
+  taskId: string;
+  status: "OPEN_FOR_MATCHING" | "OPEN_FOR_BIDDING";
+  commitDeadline?: string;
+  revealDeadline?: string;
+}
+
 export interface UploadAgentBundleCreatedResponse {
   agentId: string;
   version: string;
@@ -343,6 +372,11 @@ export interface CreateTaskRequest {
   task: TaskSpec;
 }
 
+export interface CreateTaskHttpRequest {
+  headers: TaskWriteContextHeaders;
+  body: CreateTaskRequest;
+}
+
 export interface CreateTaskResponse {
   taskId: string;
   status: "OPEN_FOR_MATCHING" | "OPEN_FOR_BIDDING";
@@ -487,19 +521,6 @@ export interface RevealBidErrorResponse extends ApiErrorResponse {
   };
 }
 
-export interface VerifyProofPackRequest {
-  proof: ProofPack;
-}
-
-export interface ProofVerificationResponse {
-  proofId: string;
-  result: "PASS" | "FAIL" | "MANUAL_REVIEW";
-  requiredDifficulty: number;
-  achievedDifficulty: number;
-  reasonCodes?: string[];
-  verifiedAt?: string;
-}
-
 export interface ProofVerifyErrorResponse extends ApiErrorResponse {
   code: ProofVerifyErrorCode;
   details?: {
@@ -528,6 +549,11 @@ export type ProofVerificationResult = "PASS" | "FAIL" | "MANUAL_REVIEW";
 export interface VerifyProofPackRequest {
   policyTraceId: string;
   proof: ProofPack;
+}
+
+export interface VerifyProofPackHttpRequest {
+  headers: ProofVerifyRequestContext;
+  body: VerifyProofPackRequest;
 }
 
 export interface ProofVerificationResponse {
