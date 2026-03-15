@@ -28,6 +28,6 @@
 ## 4. PoMW 与审计闭环
 
 - [x] 4.1 定义身份层级（T0/T1/T2）和 PoMW 强度映射规则。
-- [ ] 4.2 定义 `ProofPack` 结构与验证结果状态码。
+- [x] 4.2 定义 `ProofPack` 结构与验证结果状态码。
 - [ ] 4.3 规范审计事件模型并预留信誉回写接口。
 - [x] 4.4 定义 MVP 生命周期可观测性基线（事件/trace/log/metric/retention/alerts）。

@@ -392,6 +392,31 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/VerifyProofPackRequest'
+            examples:
+              verifyAgainstResolvedPolicy:
+                summary: Replay the persisted policy trace against a captured proof pack
+                value:
+                  policyTraceId: policytrace_ops_triage_001
+                  proof:
+                    proofSchemaVersion: '1.0'
+                    proofId: proof_ops_triage_001
+                    taskId: task_ops_triage_001
+                    agentId: agent_ops_triage_001
+                    capturedAt: '2026-03-14T05:23:11Z'
+                    identityProof:
+                      credentialLevel: T1
+                      signerDid: did:key:z6MkopsTriageAgent
+                      signature: base64:proof-signature-example==
+                    sampleWork:
+                      sampleTaskDigest: sha256:5f5b26929b64ef9d7af18bc1dbbb4d6265c10f0f70a1c9cbbf0a1f94c20c7f09
+                      outputDigest: sha256:3f4e6aeb9a70d8a376fb4258a89d3506d4f6db7f622d4f1f64f6ef68b1c3f227
+                      qualityScore: 0.91
+                      runtimeMs: 143000
+                    executionTrace:
+                      traceHash: sha256:95c88f8e33d4db7b19022df23908f4ea5e20272ed4f25506c4379368dbb0d737
+                      traceUri: s3://proof-traces/task_ops_triage_001/proof_ops_triage_001.jsonl
+                      traceSignature: base64:trace-signature-example==
+                      toolCallCount: 12
       responses:
         '200':
           description: Verification result
@@ -425,6 +450,7 @@ paths:
                       persistedAt: '2026-03-14T05:20:00Z'
                     requiredDifficulty: 0.82
                     achievedDifficulty: 0.91
+                    decisionTraceHash: sha256:7b0ad2dbfe8d5c55a7de5a1f8d348c710f412ce64f18d17ca4b70f9d66c8d7aa
                     verifiedAt: '2026-03-14T05:24:00Z'
         '400':
           description: Invalid proof payload or policy trace reference
@@ -1088,10 +1114,13 @@ components:
         achievedDifficulty:
           type: number
           minimum: 0
+        decisionTraceHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
         reasonCodes:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/ProofVerificationReasonCode'
         verifiedAt:
           type: string
           format: date-time
@@ -1130,6 +1159,26 @@ components:
                 achievedDifficulty:
                   type: number
                   minimum: 0
+                decisionTraceHash:
+                  type: string
+                  pattern: '^sha256:[a-f0-9]{64}$'
+                reasonCodes:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ProofVerificationReasonCode'
+
+    ProofVerificationReasonCode:
+      type: string
+      enum:
+        - IDENTITY_TIER_MISMATCH
+        - SAMPLE_COUNT_BELOW_MINIMUM
+        - QUALITY_SCORE_BELOW_MINIMUM
+        - RUNTIME_EXCEEDED
+        - TRACE_SIGNATURE_INVALID
+        - HASHCASH_BITS_BELOW_MINIMUM
+        - STAKE_AMOUNT_BELOW_MINIMUM
+        - DEVICE_ATTESTATION_MISSING
+        - MANUAL_REVIEW_REQUIRED
 
     ResolveProofPolicyRequest:
       type: object
@@ -1557,13 +1606,18 @@ components:
       type: object
       additionalProperties: false
       required:
+        - proofSchemaVersion
         - proofId
         - taskId
         - agentId
+        - capturedAt
         - identityProof
         - sampleWork
         - executionTrace
       properties:
+        proofSchemaVersion:
+          type: string
+          enum: ['1.0']
         proofId:
           type: string
           pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
@@ -1573,6 +1627,9 @@ components:
         agentId:
           type: string
           pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        capturedAt:
+          type: string
+          format: date-time
         identityProof:
           type: object
           additionalProperties: false

@@ -350,35 +350,60 @@ export interface CreateTaskResponse {
   revealDeadline?: string;
 }
 
+export type ProofSchemaVersion = "1.0";
+
+export interface ProofIdentityProof {
+  credentialLevel: IdentityTier;
+  signerDid: string;
+  signature: string;
+  attestationRefs?: string[];
+}
+
+export interface ProofSampleWork {
+  sampleTaskDigest: string;
+  outputDigest: string;
+  qualityScore?: number;
+  runtimeMs?: number;
+}
+
+export interface ProofExecutionTrace {
+  traceHash: string;
+  traceUri: string;
+  traceSignature: string;
+  toolCallCount?: number;
+}
+
+export interface ProofAntiSybilChallenge {
+  challengeType?: "HASHCASH" | "STAKE" | "DEVICE_ATTESTATION" | "NONE";
+  challengeInput?: string;
+  challengeOutput?: string;
+  stakeAmount?: number;
+  stakeAsset?: string;
+}
+
+export type ProofVerificationStatus = "PASS" | "FAIL" | "MANUAL_REVIEW";
+
+export type ProofVerificationReasonCode =
+  | "IDENTITY_TIER_MISMATCH"
+  | "SAMPLE_COUNT_BELOW_MINIMUM"
+  | "QUALITY_SCORE_BELOW_MINIMUM"
+  | "RUNTIME_EXCEEDED"
+  | "TRACE_SIGNATURE_INVALID"
+  | "HASHCASH_BITS_BELOW_MINIMUM"
+  | "STAKE_AMOUNT_BELOW_MINIMUM"
+  | "DEVICE_ATTESTATION_MISSING"
+  | "MANUAL_REVIEW_REQUIRED";
+
 export interface ProofPack {
+  proofSchemaVersion: ProofSchemaVersion;
   proofId: string;
   taskId: string;
   agentId: string;
-  identityProof: {
-    credentialLevel: IdentityTier;
-    signerDid: string;
-    signature: string;
-    attestationRefs?: string[];
-  };
-  sampleWork: {
-    sampleTaskDigest: string;
-    outputDigest: string;
-    qualityScore?: number;
-    runtimeMs?: number;
-  };
-  executionTrace: {
-    traceHash: string;
-    traceUri: string;
-    traceSignature: string;
-    toolCallCount?: number;
-  };
-  antiSybil?: {
-    challengeType?: "HASHCASH" | "STAKE" | "DEVICE_ATTESTATION" | "NONE";
-    challengeInput?: string;
-    challengeOutput?: string;
-    stakeAmount?: number;
-    stakeAsset?: string;
-  };
+  capturedAt: string;
+  identityProof: ProofIdentityProof;
+  sampleWork: ProofSampleWork;
+  executionTrace: ProofExecutionTrace;
+  antiSybil?: ProofAntiSybilChallenge;
 }
 
 export type BidWindowPhase = "COMMIT_OPEN" | "REVEAL_OPEN" | "CLOSED";
@@ -434,7 +459,7 @@ export interface RevealBidRequest {
 
 export interface BidProofSubmission {
   proofId: string;
-  verificationStatus: "PENDING_VERIFY" | "PASS" | "FAIL" | "MANUAL_REVIEW";
+  verificationStatus: "PENDING_VERIFY" | ProofVerificationStatus;
 }
 
 export interface CommitBidAcceptedResponse {
@@ -488,15 +513,19 @@ export interface RevealBidErrorResponse extends ApiErrorResponse {
 }
 
 export interface VerifyProofPackRequest {
+  policyTraceId: string;
   proof: ProofPack;
 }
 
 export interface ProofVerificationResponse {
   proofId: string;
-  result: "PASS" | "FAIL" | "MANUAL_REVIEW";
+  result: ProofVerificationStatus;
+  policyTraceId: string;
+  requiredPolicy: ProofPolicyDecision;
   requiredDifficulty: number;
   achievedDifficulty: number;
-  reasonCodes?: string[];
+  decisionTraceHash?: string;
+  reasonCodes?: ProofVerificationReasonCode[];
   verifiedAt?: string;
 }
 
@@ -508,6 +537,8 @@ export interface ProofVerifyErrorResponse extends ApiErrorResponse {
     policyTraceId?: string;
     requiredDifficulty?: number;
     achievedDifficulty?: number;
+    decisionTraceHash?: string;
+    reasonCodes?: ProofVerificationReasonCode[];
   };
 }
 
@@ -523,20 +554,3 @@ export interface BidResponse {
   decisionTraceHash?: string;
 }
 
-export type ProofVerificationResult = "PASS" | "FAIL" | "MANUAL_REVIEW";
-
-export interface VerifyProofPackRequest {
-  policyTraceId: string;
-  proof: ProofPack;
-}
-
-export interface ProofVerificationResponse {
-  proofId: string;
-  result: ProofVerificationResult;
-  policyTraceId: string;
-  requiredPolicy: ProofPolicyDecision;
-  requiredDifficulty: number;
-  achievedDifficulty: number;
-  reasonCodes?: string[];
-  verifiedAt?: string;
-}

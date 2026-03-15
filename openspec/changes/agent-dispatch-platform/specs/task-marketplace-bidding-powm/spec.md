@@ -60,6 +60,16 @@
 - **WHEN** 提交的 `ProofPack` 未满足任务要求的 PoMW 强度
 - **THEN** 平台返回稳定验证错误码（`PROOF_VERIFY_FAILED` 或 `PROOF_VERIFY_NEEDS_REVIEW`）并附带可审计标识
 
+#### Scenario: Proof verification status is explicit for downstream consumers
+- **WHEN** verifier 完成一次 `ProofPack` 校验
+- **THEN** 平台返回显式状态（`passed`、`failed`、`needs_review`）
+- **AND** 平台返回 `policy_trace_id`、`decision_trace_id`、required/achieved difficulty，便于 UI、audit 与回放链路直接复用
+
+#### Scenario: Proof verifier emits stable reason codes for replay and audit
+- **WHEN** verifier 判定 proof 缺失、篡改、强度不足或需要人工复核
+- **THEN** 平台返回稳定 `reason_code[]`
+- **AND** `reason_code[]` 可直接映射到 operator 文案、审计事件和后续奖惩/信誉策略，而不依赖自由文本解析
+
 ### Requirement: Award Decision Must Be Auditable
 
 平台 MUST 记录中标决策依据并可追溯到候选评分与 PoMW 校验结果。

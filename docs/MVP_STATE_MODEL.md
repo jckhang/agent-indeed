@@ -100,7 +100,7 @@ contract work must map these rows onto the authoritative catalog instead of inve
 ### Verify sequence
 
 1. Accept `proofId` only when bid state is `REVEALED`.
-2. Execute policy + verifier checks and persist terminal proof state.
+2. Load and validate the persisted `policyTraceId`, then execute verifier checks against that frozen policy snapshot.
 3. Materialize verification reason codes and difficulty fields.
 4. Emit `POMW_VERIFIED` audit event.
 

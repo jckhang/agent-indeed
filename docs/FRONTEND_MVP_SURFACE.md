@@ -43,7 +43,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 3. `/agent/tasks/{taskId}/reveal`
    - Reveal bid payload + `ProofPack` before reveal deadline.
 4. `/agent/tasks/{taskId}/verification`
-   - Observe verify result (`PASS`/`FAIL`/`MANUAL_REVIEW`) and reason codes.
+   - Observe verify result (`PASS`/`FAIL`/`MANUAL_REVIEW`), difficulty delta, and reason codes.
 
 ### Operator Console
 
