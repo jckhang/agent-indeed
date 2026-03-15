@@ -1,6 +1,6 @@
 # Phase 1 Epic Status
 
-Last updated: 2026-03-15
+Last updated: 2026-03-16
 
 This document is the execution snapshot for epic #2 (`[Phase 1 Epic] Agent Dispatch Foundation MVP`).
 It complements `docs/PHASE1_GOALS.md` by mapping the epic acceptance criteria to the current issue, PR,
@@ -16,7 +16,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | Epic acceptance area | Current status | Source of truth | Next gate |
 | --- | --- | --- | --- |
 | OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts` | Keep open PRs #55, #66, #68, #77 aligned with current spec/contracts. |
-| End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, issue #11 | Needs remaining M2-M4 backend/UI contracts plus active QA smoke follow-through in issue #87 / PR #84 before E2E issue #11 can be closed. |
+| End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, issue #11, `docs/MVP_API_QA_HANDOFF_PACK.md` | Needs remaining M2-M4 backend/UI contracts plus the new QA handoff pack in issue #100 and active smoke follow-through in issue #87 / PR #84 before E2E issue #11 can be closed. |
 | Core negative scenarios are covered | Blocked | issue #11, issue #72, `docs/SECURITY_COMPLIANCE_BASELINE.md` | Convert merged security/readiness guidance into executable QA coverage after verifier and award flows settle. |
 | Audit events cover key state transitions | In progress | issue #10, `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md` | Land award/audit trace work after shortlist, status polling, and verifier outputs are stable. |
 
@@ -43,6 +43,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | Security gate | issue #72 / PR #77 | Closed-beta auth, secrets, and redaction guidance must merge before epic sign-off. |
 | Planning sync | issue #80 / PR #82 | Planning docs must stay aligned so epic status is not tracking already-merged work as active. |
 | QA smoke coverage | issue #87 / PR #84 | Smoke validation is the bridge between the merged UI slices and final E2E confidence. |
+| QA API handoff pack | issue #100 | The pack converts the API outline into one ordered contract/evidence bundle that issue #87 and issue #11 can both consume. |
 
 ### Remaining blocked slices
 
@@ -66,7 +67,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 - [ ] Proof verification result codes and async status reads are merged.
 - [ ] Award-read contracts and award-readiness UI are merged.
 - [ ] Audit trace outputs are defined for beta review.
-- [ ] QA smoke matrix and MVP E2E coverage are ready to run.
+- [ ] QA smoke matrix, API handoff pack, and MVP E2E coverage are ready to run.
 - [ ] Security/compliance readiness checklist is merged and linked to QA validation.
 
 ## Review Routine

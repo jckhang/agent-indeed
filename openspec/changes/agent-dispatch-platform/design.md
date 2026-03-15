@@ -65,6 +65,7 @@
    - 对关键失败族建立最小告警面：上载校验失败、候选检索退化、commit/reveal 完整性异常、PoMW 校验超时、award/audit 缺失。
    - 对审计关联事件、错误日志、trace、指标分别定义最小保留期，优先保留脱敏后的调试上下文而非原始敏感负载。
    - 下游实现必须维护一份 handoff 清单，将当前 endpoint / job、活跃 issue / PR、缺失 `job_id` / async read / `audit_id` 合同等问题显式绑定到交付负责人，避免仅有基线文档而没有落地闭环。
+- 闭测 QA handoff 文档必须对 `publish -> match -> bid -> verify -> award` 提供单一路径说明，逐步标注 source of truth（OpenSpec / OpenAPI / TypeScript contract / open PR）以及未合并合同阻塞，避免 smoke/E2E 用例自行发明字段或枚举别名。
 
 8. 建立 merge-train 协作例行
    - 规划负责人使用统一查询区分 clean LGTM PR 与 dirty follow-on queue，而不是把瞬时状态复制到仓库文档。

@@ -39,6 +39,7 @@
 - P1-23 #65: https://github.com/jckhang/agent-indeed/issues/65
 - P1-24 #71: https://github.com/jckhang/agent-indeed/issues/71
 - P1-25 #72: https://github.com/jckhang/agent-indeed/issues/72
+- P1-32 #100: https://github.com/jckhang/agent-indeed/issues/100
 
 ## P0 Readiness
 
@@ -474,3 +475,17 @@ Acceptance criteria:
 Backlog notes:
 - `queued` and `verifying` remain dependency states until the bid/proof status read contract merges.
 - Refresh metadata should stay shared between agent and operator read models.
+
+### P1-32 Turn API example outline into QA-ready handoff pack
+
+References:
+- `docs/MVP_API_QA_HANDOFF_PACK.md`
+- `docs/PHASE1_EPIC_STATUS.md`
+- `docs/PHASE1_CHECKPOINT_BOARD.md`
+- `src/api/openapi.yaml`
+- `src/api/contracts.ts`
+
+Acceptance criteria:
+- One ordered handoff artifact exists for the MVP happy path.
+- Every blocked step cites the owning contract PR or issue.
+- QA can reuse exact field and enum names without guessing missing values.
