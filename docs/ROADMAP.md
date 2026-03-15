@@ -50,6 +50,7 @@ Scope:
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.
 - Lifecycle observability baseline for `upload -> match -> bid -> verify -> award`.
+- MVP QA handoff outline (`docs/MVP_API_EXAMPLE_OUTLINE.md`, issue #93) freezes the ready-now example slices and names the open PR blockers for the remaining verify/award evidence.
 - Operator audit timeline baseline (`docs/OPERATOR_AUDIT_TIMELINE_BASELINE.md`, issue #65 / PR #67) defines the first focused operator read surface and keeps audit-event completeness gaps visible before backend event reads are finalized.
 
 Exit criteria:

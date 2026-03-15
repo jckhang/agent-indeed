@@ -238,6 +238,10 @@ Acceptance criteria:
 - Happy path and core abuse path tests pass in CI.
 - API examples cover upload, publish, commit, reveal, verify, award.
 
+Backlog notes:
+- Use `docs/MVP_API_EXAMPLE_OUTLINE.md` as the QA prep surface for ready-now fixtures while issue #11 stays blocked on PRs #68, #83, and #92.
+- Keep smoke-tranche follow-through tied to issue #87 so merged-slice validation can progress before the full example pack is unblocked.
+
 ### P1-11 Publish error-code catalog and retry/idempotency policy
 
 References:
@@ -299,6 +303,19 @@ Acceptance criteria:
 - Active issues and open PRs are assigned the telemetry they must land before beta readiness.
 - Missing business identifiers or async-read contracts that block instrumentation are called out explicitly.
 - A minimal alert/review checklist exists for M4 telemetry readiness.
+
+### P1-29 Draft MVP API example outline for QA handoff
+
+References:
+- `docs/MVP_API_EXAMPLE_OUTLINE.md`
+- `docs/MANAGER_TASK_COMPOSER_UI_SLICE.md`
+- `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`
+- `src/api/openapi.yaml`
+
+Acceptance criteria:
+- A reviewable outline covers `upload -> publish -> commit -> reveal -> verify -> award`.
+- Each step states whether QA can freeze examples now or is blocked by an open contract PR.
+- The outline links the blocked final pack back to issue `#11` and the near-term smoke follow-through in issue `#87`.
 
 ### P1-15 Build agent bidding console baseline
 

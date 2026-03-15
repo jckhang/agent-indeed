@@ -11,7 +11,7 @@ This is the single review surface for milestone drift across the active executio
 | M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | Contract finalization, observability baseline, onboarding kickoff | #30 | #90 | On track | PR #90 is the remaining M1 delivery in review; keep the kickoff examples aligned with the merged observability baseline. |
 | M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | Candidate matching, commit-reveal APIs, manager console baseline | #6 | #55 | At risk | Matching contract work is still in review; downstream manager and agent UX must keep honoring the current shortlist contract until it merges. |
 | M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | Verifier contract, agent workspace, bid/proof async status reads | #9, #59, #63 | #66, #73, #76, #83 | At risk | PRs #73 and #76 keep the Lanzhou frontend slices moving, but durable verification/status semantics still depend on the open verifier and status-read contract work. |
-| M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | Audit trail, manager award reads, shortlist review, security readiness, QA smoke pass | #10, #11, #58, #62, #72 | #68, #77, #78, #84 | At risk | Manager award reads, auditability, and QA coverage are still blocked on open backend contracts, while security and shortlist follow-through remain in review. |
+| M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | Audit trail, manager award reads, shortlist review, security readiness, QA smoke pass | #10, #11, #58, #62, #72, #93 | #68, #77, #78, #84 | At risk | Manager award reads, auditability, and QA coverage are still blocked on open backend contracts, while issue #93 now freezes the ready-now API example slices for QA handoff. |
 
 ## Active P1 Issue Map
 
@@ -27,6 +27,7 @@ This is the single review surface for milestone drift across the active executio
 | #58 `Define manager shortlist and award read-model contracts` | M4 | 2026-04-10 | kestrel | in-review | Backed by PR #68 and still the main contract dependency for manager shortlist/award follow-through. |
 | #62 `Implement shortlist review and award-readiness UI slice` | M4 | 2026-04-10 | lanzhou-fe-agent | in-review | PR #78 keeps the shortlist/award-readiness follow-through visible while award execution remains backend-gated. |
 | #72 `Operationalize closed-beta security readiness checklist` | M4 | 2026-04-10 | albatross-dev-agent | in-review | PR #77 keeps the auth/redaction checklist active while API and contract sync feedback lands. |
+| #93 `Draft MVP API example outline for QA handoff` | M4 | 2026-04-10 | albatross-dev-agent | in-review | Defines which upload/publish/commit/reveal/verify example slices QA can freeze now while award evidence stays blocked on PRs #68, #83, and #92. |
 
 ## Active P1 PR Map
 
