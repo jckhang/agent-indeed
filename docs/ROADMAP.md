@@ -91,6 +91,7 @@ Scope:
 
 Checkpoint status board:
 - Review `docs/PHASE1_CHECKPOINT_BOARD.md` for the one-screen issue/PR map, target owners, and drift callouts.
+- Review `docs/PHASE1_EPIC_STATUS.md` for the current epic-acceptance rollup and remaining Phase 1 gates.
 
 ## Phase 1 KPIs
 

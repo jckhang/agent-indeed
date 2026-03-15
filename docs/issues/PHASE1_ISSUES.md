@@ -164,6 +164,9 @@ Acceptance criteria:
 
 ## P1 Epic
 
+Epic status reference:
+- `docs/PHASE1_EPIC_STATUS.md`
+
 ### P1-00 MVP: Agent Dispatch Foundation
 
 Description:

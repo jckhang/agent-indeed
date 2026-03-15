@@ -72,6 +72,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - API draft and TypeScript contracts are consistent for `AgentBundle`, `TaskSpec`, `Bid`, `ProofPack`.
 - End-to-end happy path + key negative paths are covered by automated tests.
 - GitHub issues for Phase 1 epics/tasks are created and linked to this plan.
+- Epic #2 execution status is maintained in `docs/PHASE1_EPIC_STATUS.md` so acceptance gaps stay tied to live issue/PR state.
 - Every active P1 issue/PR is mapped to an M1-M4 checkpoint in `docs/PHASE1_CHECKPOINT_BOARD.md` with an owner and target date.
 - Merge-train coordination follows `docs/MERGE_TRAIN_PLAYBOOK.md` so clean LGTM PRs merge promptly and dirty follow-on PRs keep an explicit owner/blocker note.
 - P0 baseline issues that block collaboration quality are closed or explicitly waived.
