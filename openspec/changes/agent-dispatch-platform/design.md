@@ -59,6 +59,11 @@
    - 对关键失败族建立最小告警面：上载校验失败、候选检索退化、commit/reveal 完整性异常、PoMW 校验超时、award/audit 缺失。
    - 对审计关联事件、错误日志、trace、指标分别定义最小保留期，优先保留脱敏后的调试上下文而非原始敏感负载。
 
+8. QA 在完整 E2E 自动化落地前先采用 smoke matrix 过渡
+   - 先验证已合并的 task publish 与 commit/reveal 写路径，避免 QA 完全等待 issue `#11` 的全链路自动化。
+   - shortlist review 与 proof-status handoff 允许基于基线文档和返回样例做人工校验，但必须把缺失的读模型明确记回 issue `#11`。
+   - smoke matrix 必须区分“已可直接调用的 API”与“仅能通过基线文档核对的预期”，避免把未合并合同误写成可执行能力。
+
 ## Backend Module Boundaries
 
 MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立即拆成独立微服务。每个模块拥有清晰写入边界，并通过共享 contract layer（OpenSpec + OpenAPI + `contracts.ts`）交互。

@@ -53,6 +53,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Award decision includes score summary + proof result trace.
 - Lifecycle observability contract is documented in `docs/OBSERVABILITY_BASELINE.md`.
 - Audit visibility console baseline is captured in `docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md` so timeline, failure-translation, and missing-field acceptance criteria stay reviewable while audit query and award-read contracts are still backend follow-ups.
+- MVP smoke coverage is staged in `docs/MVP_SMOKE_MATRIX.md` so QA can validate the merged publish + bid slices before the full E2E pack in issue `#11` is complete.
 
 ## Out of Scope (Phase 1)
 
