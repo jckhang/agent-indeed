@@ -112,6 +112,43 @@ Schema-invalid response:
 }
 ```
 
+Payload-hash-mismatch response:
+
+```json
+{
+  "code": "AGENT_BUNDLE_SIGNATURE_PAYLOAD_MISMATCH",
+  "category": "SIGNATURE",
+  "message": "signature.payloadHash must match the canonical bundle payload hash",
+  "auditId": "audit_bundle_upload_payload_hash_mismatch",
+  "retryable": false,
+  "details": {
+    "fieldPath": "bundle.signature.payloadHash",
+    "rule": "payload_hash_matches_bundle",
+    "expected": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+    "actual": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+  }
+}
+```
+
+Version-conflict response:
+
+```json
+{
+  "code": "AGENT_BUNDLE_VERSION_CONFLICT",
+  "category": "VERSION",
+  "message": "agent_supporttriage001@1.2.0 already exists with a different payload hash",
+  "auditId": "audit_bundle_upload_version_conflict",
+  "retryable": false,
+  "conflict": {
+    "strategy": "REJECT_ON_HASH_MISMATCH",
+    "existingAgentId": "agent_supporttriage001",
+    "existingVersion": "1.2.0",
+    "existingPayloadHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+    "incomingPayloadHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+  }
+}
+```
+
 ## Skill Index Contract
 
 Each accepted upload creates one index record per skill:
