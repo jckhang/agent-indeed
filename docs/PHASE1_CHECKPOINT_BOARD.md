@@ -40,6 +40,7 @@ This is the single review surface for milestone drift across active Phase 1 issu
 | #53 `Build manager console baseline` | M2 | It is the frontend execution slice for task publish, shortlist review, and award summary. | Monitor for read-model contract gaps feeding into issue #58. |
 | #55 `Define candidate matching shortlist contract` | M2 | It anchors the shortlist/ranking contract that gates matching implementation and manager UI wiring. | This is the main M2 backend merge dependency. |
 | #56 `Build agent bidding console baseline` | M3 | It covers the agent commit/reveal loop that depends on verifier/status-read semantics. | Keep issue #44 open until merge and pair follow-up work with issue #59. |
+| #81 `[P1-24] Track MVP telemetry implementation handoff` | M4 | It keeps the telemetry emitter rollout, gap list, and beta validation expectations reviewable while downstream implementation catches up. | Keep issue #71 open until merge so the beta-readiness dependency stays visible. |
 | #77 `[P1-25] Operationalize closed-beta security readiness checklist` | M4 | It makes the beta auth/redaction checklist reviewable and syncs the current security draft back into the API/contracts docs. | Blocking API sync feedback has been addressed; watch for final review/merge. |
 | #81 `[P1-24] Track MVP telemetry implementation handoff` | M4 | It keeps the telemetry emitter rollout, gap list, and beta validation expectations reviewable while downstream implementation catches up. | Keep issue #71 open until merge so the beta-readiness dependency stays visible. |
 
