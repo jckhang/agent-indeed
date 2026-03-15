@@ -16,29 +16,32 @@
 - P1-01 #3: https://github.com/jckhang/agent-indeed/issues/3
 - P1-02 #4: https://github.com/jckhang/agent-indeed/issues/4
 - P1-03 #5: https://github.com/jckhang/agent-indeed/issues/5
-- P1-04 #6: https://github.com/jckhang/agent-indeed/issues/6
-- P1-05 #7: https://github.com/jckhang/agent-indeed/issues/7
-- P1-06 #8: https://github.com/jckhang/agent-indeed/issues/8
-- P1-07 #9: https://github.com/jckhang/agent-indeed/issues/9
+- P1-04 #6 (closed): https://github.com/jckhang/agent-indeed/issues/6
+- P1-05 #7 (closed): https://github.com/jckhang/agent-indeed/issues/7
+- P1-06 #8 (closed): https://github.com/jckhang/agent-indeed/issues/8
+- P1-07 #9 (closed): https://github.com/jckhang/agent-indeed/issues/9
 - P1-08 #10: https://github.com/jckhang/agent-indeed/issues/10
 - P1-09 #11: https://github.com/jckhang/agent-indeed/issues/11
-- P1-14 #43: https://github.com/jckhang/agent-indeed/issues/43
-- P1-20 #62: https://github.com/jckhang/agent-indeed/issues/62
 - P1-11 #37: https://github.com/jckhang/agent-indeed/issues/37
-- P1-15 #44: https://github.com/jckhang/agent-indeed/issues/44
-- P1-12 #38: https://github.com/jckhang/agent-indeed/issues/38
+- P1-15 #44 (closed): https://github.com/jckhang/agent-indeed/issues/44
+- P1-12 #38 (closed): https://github.com/jckhang/agent-indeed/issues/38
 - P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
-- P1-14 #43: https://github.com/jckhang/agent-indeed/issues/43
-- P1-16 #47: https://github.com/jckhang/agent-indeed/issues/47
-- P1-17 #58: https://github.com/jckhang/agent-indeed/issues/58
+- P1-14 #43 (closed): https://github.com/jckhang/agent-indeed/issues/43
+- P1-16 #47 (closed): https://github.com/jckhang/agent-indeed/issues/47
+- P1-17 #58 (closed): https://github.com/jckhang/agent-indeed/issues/58
 - P1-18 #59: https://github.com/jckhang/agent-indeed/issues/59
 - P1-19 #61 (closed): https://github.com/jckhang/agent-indeed/issues/61
-- P1-20 #62: https://github.com/jckhang/agent-indeed/issues/62
-- P1-21 #63: https://github.com/jckhang/agent-indeed/issues/63
-- P1-22 #64: https://github.com/jckhang/agent-indeed/issues/64
-- P1-23 #65: https://github.com/jckhang/agent-indeed/issues/65
-- P1-24 #71: https://github.com/jckhang/agent-indeed/issues/71
-- P1-25 #72: https://github.com/jckhang/agent-indeed/issues/72
+- P1-20 #62 (closed): https://github.com/jckhang/agent-indeed/issues/62
+- P1-21 #63 (closed): https://github.com/jckhang/agent-indeed/issues/63
+- P1-22 #64 (closed): https://github.com/jckhang/agent-indeed/issues/64
+- P1-23 #65 (closed): https://github.com/jckhang/agent-indeed/issues/65
+- P1-24 #71 (closed): https://github.com/jckhang/agent-indeed/issues/71
+- P1-25 #72 (closed): https://github.com/jckhang/agent-indeed/issues/72
+- P1-26 #79 (closed): https://github.com/jckhang/agent-indeed/issues/79
+- P1-27 #80: https://github.com/jckhang/agent-indeed/issues/80
+- P1-28 #87: https://github.com/jckhang/agent-indeed/issues/87
+- P1-29 #93 (closed): https://github.com/jckhang/agent-indeed/issues/93
+- P1-30 #94 (closed): https://github.com/jckhang/agent-indeed/issues/94
 
 ## P0 Readiness
 
@@ -164,9 +167,6 @@ Acceptance criteria:
 
 ## P1 Epic
 
-Epic status reference:
-- `docs/PHASE1_EPIC_STATUS.md`
-
 ### P1-00 MVP: Agent Dispatch Foundation
 
 Description:
@@ -233,7 +233,7 @@ Implementation notes:
 ### P1-07 Implement ProofPack verifier + result codes
 
 Acceptance criteria:
-- Verification status is explicit (`PASS`, `FAIL`, `MANUAL_REVIEW`).
+- Verification status is explicit (`passed`, `failed`, `needs_review`).
 - Failure reason codes are stable and documented.
 
 ### P1-08 Implement audit events + award decision trace
@@ -315,10 +315,6 @@ Acceptance criteria:
 
 References:
 - `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`
-- `docs/ENGINEERING_TRACKS_FE_BE.md`
-- `docs/ARCHITECTURE_GAPS.md`
-- `src/api/openapi.yaml`
-- `openspec/changes/agent-dispatch-platform/specs/task-marketplace-bidding-powm/spec.md`
 
 Acceptance criteria:
 - Agent can complete commit and reveal flows from UI with deadline/status feedback.
@@ -329,26 +325,6 @@ Acceptance criteria:
 Backlog notes:
 - Bid status refresh still needs a task-scoped bid read model before the UI can survive browser refreshes or cross-device resume.
 - Proof verification status still needs a proof read endpoint and polling/event guidance before the timeline can promise live updates.
-
-### P1-21 Implement agent bid commit/reveal workspace UI
-
-References:
-- `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`
-- `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`
-- `docs/FRONTEND_MVP_SURFACE.md`
-- `docs/ERROR_CODE_RETRY_POLICY.md`
-- `src/api/openapi.yaml`
-- `src/api/contracts.ts`
-
-Acceptance criteria:
-- Agent can prepare commit and reveal payloads from one task-scoped workflow with clear server-authored deadline and phase feedback.
-- Required `ProofPack` sections are explicit in the UI slice, and missing required sections are highlighted before submit.
-- UX states cover commit-window closed, reveal-without-commit, reveal hash mismatch, and proof payload validation failures.
-- Any missing refresh-safe bid/proof read contract remains a documented backend dependency rather than an implicit frontend assumption.
-
-Backlog notes:
-- Issue #59 remains the follow-up for task-scoped bid/proof reads and async refresh behavior.
-- Any `ProofPack` contract change must update this slice, `src/api/openapi.yaml`, and `src/api/contracts.ts` together.
 
 ### P1-14 Build manager console baseline for task publish and award
 
@@ -369,26 +345,6 @@ Acceptance criteria:
 Backlog notes:
 - Manager candidate review still needs a task-scoped ranking read model from matching work before the UI can move beyond placeholders.
 - Award summary and award command contracts are still pending and must align with audit/award trace work before an interactive CTA can ship.
-
-### P1-20 Implement shortlist review and award-readiness UI slice
-
-References:
-- `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`
-- `docs/MANAGER_CONSOLE_BASELINE.md`
-- `docs/FRONTEND_MVP_SURFACE.md`
-- `docs/MVP_STATE_MODEL.md`
-- issue `#58` / PR `#68`
-
-Acceptance criteria:
-- Candidate shortlist UI renders ranking breakdown, missing-field fallback, and loading/empty/error states.
-- Award-readiness panel shows current task/bid status, blocking reasons, and dependency callouts without assuming unavailable backend fields.
-- Any missing shortlist/award read contract is linked back to issue `#58` or a named follow-up instead of being hidden in the UI.
-- Scope excludes task-composer implementation details.
-
-Backlog notes:
-- The shortlisted-candidate experience still depends on the contract proposal in PR `#68`; until it merges, the UI must preserve partial-data states and dependency copy.
-- Award-readiness visibility must stay separate from the eventual award command execution path so manager UX does not imply unsupported write behavior.
-
 ### P1-16 Build audit visibility console baseline
 
 References:
@@ -442,35 +398,3 @@ Acceptance criteria:
 - Submission flow documents any backend contract mismatch found during implementation instead of silently inventing fields.
 - Scope stays focused on task creation and does not absorb shortlist or award UI work.
 
-### P1-20 Implement shortlist review and award-readiness UI slice
-
-Acceptance criteria:
-- Candidate shortlist states and award blockers are visible with manager-friendly copy.
-- Missing ranking/proof read-model fields are called out instead of being treated as current API reality.
-- Dependencies on shortlist and award contracts stay linked to backend follow-up work.
-
-### P1-21 Implement agent bid commit/reveal workspace UI
-
-Acceptance criteria:
-- Agent can progress through commit and reveal from one bounded workspace.
-- Commit/reveal validation, deadline, and error-copy branches are explicit.
-- Verification timeline dependencies are handed off cleanly to P1-22.
-
-### P1-22 Implement bid/proof verification timeline UX
-
-References:
-- `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`
-- `docs/FRONTEND_MVP_SURFACE.md`
-- `docs/ENGINEERING_TRACKS_FE_BE.md`
-- `src/api/openapi.yaml`
-- `src/api/contracts.ts`
-
-Acceptance criteria:
-- Verification timeline covers queued, verifying, `PASS`, `FAIL`, and `MANUAL_REVIEW` states with operator-friendly copy.
-- Refresh strategy assumptions are explicit and bounded by the current backend contract.
-- UI does not treat unavailable bid/proof read fields as existing contract reality.
-- Any missing async status contract is linked back to backend issue `#59` / PR `#66` or a new follow-up issue.
-
-Backlog notes:
-- `queued` and `verifying` remain dependency states until the bid/proof status read contract merges.
-- Refresh metadata should stay shared between agent and operator read models.

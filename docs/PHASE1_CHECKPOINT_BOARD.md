@@ -1,6 +1,6 @@
 # Phase 1 Checkpoint Board
 
-Last updated: 2026-03-15
+Last updated: 2026-03-16
 
 This is the single review surface for milestone drift across the active execution-track Phase 1 issues and PRs.
 
@@ -8,44 +8,40 @@ This is the single review surface for milestone drift across the active executio
 
 | Checkpoint | Target date | Checkpoint owner | Scope | Active issues | Active PRs | Status | Drift / next action |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | Contract finalization, observability baseline, onboarding kickoff | #30 | #90 | On track | PR #90 is the remaining M1 delivery in review; keep the kickoff examples aligned with the merged observability baseline. |
-| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | Candidate matching, commit-reveal APIs, manager console baseline | #6 | #55 | At risk | Matching contract work is still in review; downstream manager and agent UX must keep honoring the current shortlist contract until it merges. |
-| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | Verifier contract, agent workspace, bid/proof async status reads | #9, #59, #63, #64 | #66, #73, #76, #83 | At risk | PRs #73 and #76 keep the Lanzhou frontend slices moving, but durable verification/status semantics still depend on the open verifier and status-read contract work. |
-| M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | Audit trail, manager award reads, shortlist review, security readiness, QA smoke pass | #10, #11, #58, #62, #72 | #68, #77, #78, #84 | At risk | Manager award reads, auditability, and QA coverage are still blocked on open backend contracts, while security and shortlist follow-through remain in review. |
+| M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | Contract finalization, observability baseline, onboarding kickoff | None | #90 | On track | Issue #30 is closed, but PR #90 is still open as the last M1 kickoff/examples thread to land against the current onboarding baseline. |
+| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | Candidate matching, commit-reveal APIs, manager console baseline | None | #55 | At risk | Issue #6 is closed, but PR #55 still gates the remaining M2 shortlist contract before downstream slices can treat the baseline as settled. |
+| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | Verifier contract, agent workspace, bid/proof async status reads | #59 | #66, #83 | At risk | The manager and agent UI slices are merged, but durable verification/status semantics still depend on the open status-read and verifier contracts. |
+| M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | Audit trail, manager award reads, QA smoke pass, beta handoff docs | #10, #11, #80, #87 | #68, #82, #84, #92, #95, #96 | At risk | Audit/E2E follow-through (#10, #11), this planning-sync pass (#80 / PR #82), the next QA smoke pass (#87), and the still-open audit/QA handoff PRs keep M4 as the active convergence checkpoint. |
 
 ## Active P1 Issue Map
 
 | Issue | Checkpoint | Target date | Owner | Status | Notes |
 | --- | --- | --- | --- | --- | --- |
-| #30 `Kestrel backend onboarding kickoff` | M1 | 2026-03-20 | kestrel | in-review | Backed by PR #90 while the onboarding examples and pipeline draft finish converging. |
-| #6 `Implement candidate matching baseline` | M2 | 2026-03-27 | kestrel | in-review | Backed by PR #55; this remains the main M2 backend merge dependency. |
-| #9 `Implement ProofPack verifier and result codes` | M3 | 2026-04-03 | kestrel | blocked | Blocked on the final verifier contract shape and should stay aligned with PR #83. |
-| #59 `Define bid/proof status reads and async refresh contract` | M3 | 2026-04-03 | kestrel | in-review | Backed by PR #66; this is the contract gate for refresh-safe verification UX. |
-| #63 `Implement agent bid commit/reveal workspace UI` | M3 | 2026-04-03 | lanzhou-fe-agent | in-review | PR #76 carries the focused bid workspace slice while keeping async refresh assumptions tied to issue #59. |
-| #64 `Implement bid/proof verification timeline UX` | M3 | 2026-04-03 | lanzhou-fe-agent | in-review | PR #73 tracks the queued/verifying/terminal timeline slice while keeping live refresh explicitly gated on PR #66. |
-| #10 `Implement audit events and award decision trace` | M4 | 2026-04-10 | kestrel | blocked | Depends on the M3 verification/result contract outputs plus final manager award reads. |
-| #11 `Add E2E tests and API examples for MVP flow` | M4 | 2026-04-10 | QA | blocked | QA coverage stays gated on the open manager/agent read contracts and shortlist-to-award flow stability. |
-| #58 `Define manager shortlist and award read-model contracts` | M4 | 2026-04-10 | kestrel | in-review | Backed by PR #68 and still the main contract dependency for manager shortlist/award follow-through. |
-| #62 `Implement shortlist review and award-readiness UI slice` | M4 | 2026-04-10 | lanzhou-fe-agent | in-review | PR #78 keeps the shortlist/award-readiness follow-through visible while award execution remains backend-gated. |
-| #72 `Operationalize closed-beta security readiness checklist` | M4 | 2026-04-10 | albatross-dev-agent | in-review | PR #77 keeps the auth/redaction checklist active while API and contract sync feedback lands. |
+| #59 `Define bid/proof status reads and async refresh contract` | M3 | 2026-04-03 | kestrel | in-review | Backed by PR #66 and remains the contract gate for durable agent-side refresh semantics. |
+| #10 `Implement audit events and award decision trace` | M4 | 2026-04-10 | kestrel | in-review | PR #92 is now the active contract thread for the audit-event stream and award-trace work. |
+| #11 `Add E2E tests and API examples for MVP flow` | M4 | 2026-04-10 | QA | blocked | Still depends on the open status/audit follow-ons plus the next smoke pass in issue #87 before the full MVP pack can be automated. |
+| #80 `Refresh checkpoint board and roadmap mappings after M2/M3 merges` | M4 | 2026-04-10 | planning | in-review | Backed by PR #82 so the planning docs stay aligned with the actual merged and open queue. |
+| #87 `Run QA smoke pass on next merged tranche` | M4 | 2026-04-10 | QA | ready-next | Uses PR #84 as the current smoke-matrix baseline while the remaining audit and QA handoff PRs converge. |
 
 ## Active P1 PR Map
 
 | PR | Checkpoint | Why it belongs there | Review note |
 | --- | --- | --- | --- |
-| #90 `[P1-10] Finalize onboarding kickoff contract examples` | M1 | It is the remaining open M1 backend kickoff slice and carries the onboarding examples needed for downstream implementation. | Keep examples aligned with the merged telemetry baseline and the current API draft before merge. |
-| #55 `[P1-04] Define candidate matching shortlist contract` | M2 | It anchors the shortlist/ranking contract that gates matching implementation and manager UI wiring. | This is still the main M2 backend merge dependency. |
-| #66 `Define bid/proof status polling contract` | M3 | It defines the async proof-status read model needed for refresh-safe agent and operator flows. | Keep queued/verifying read fields honest until this contract lands. |
-| #73 `[P1-22] Implement bid/proof verification timeline UX` | M3 | It documents the verification timeline slice that sits on top of the open status-read and verifier contract work. | Keep enum vocabulary aligned with the current API/contracts until PR #83 merges. |
-| #76 `[P1-21] Implement agent bid commit/reveal workspace UI` | M3 | It narrows the next frontend delivery to one bid workspace while keeping async refresh scoped to the backend follow-up. | Keep issue #63 open until merge and track verification refresh against PR #66 / PR #83. |
+| #90 `[P1-10] Finalize onboarding kickoff contract examples` | M1 | It is the remaining open M1 kickoff/examples slice and carries the onboarding examples needed for downstream implementation. | Keep examples aligned with the merged telemetry baseline and current API draft before merge. |
+| #55 `[P1-04] Define candidate matching shortlist contract` | M2 | It anchors the shortlist/ranking contract that gates matching implementation and manager award-read wiring. | This remains the main M2 backend merge dependency. |
+| #66 `Define bid/proof status polling contract` | M3 | It defines the async status model that keeps the verifier and agent console durable once verification is no longer synchronous. | Keep issue #59 open until merge and pair review with the remaining verifier work. |
 | #83 `[P1-07] Define ProofPack verifier contract` | M3 | It is the canonical verifier/result contract that downstream UX and docs must follow. | Merge this before renaming shared verification enums anywhere else in the repo. |
-| #68 `[P1-17] Define manager shortlist and award read-model contracts` | M4 | It defines the shortlist/award read contract that manager review and award-readiness UX depend on. | This is the main backend gate for PR #78 and the remaining manager follow-through. |
-| #77 `[P1-25] Operationalize closed-beta security readiness checklist` | M4 | It keeps the beta auth/redaction checklist reviewable and syncs the security draft back into the API/contracts docs. | Blocking API sync feedback has been addressed; watch for final review and merge. |
-| #78 `[P1-20] Implement shortlist review and award-readiness UI slice` | M4 | It isolates the post-publish manager review experience while keeping shortlist and award contract gaps visible. | Keep issue #62 open until merge and rebase as merge-train updates land. |
-| #84 `[P1-26] Draft MVP smoke matrix for merged manager/agent flows` | M4 | It captures the QA smoke coverage needed once the manager and agent milestone slices start merging together. | Keep expected manager/agent checkpoints aligned with the latest merged frontend/backend contracts. |
+| #68 `[P1-17] Define manager shortlist and award read-model contracts` | M4 | It defines the manager read models that award-readiness UI and QA checks depend on. | The linked issue is already closed, so keep review focused on contract drift rather than issue state. |
+| #82 `[P1-27] Refresh checkpoint board and roadmap mappings after M2/M3 merges` | M4 | It reconciles the planning docs with the current merged and open checkpoint queue. | Merge after the board, roadmap, and issue backlog all reflect current GitHub state. |
+| #84 `[P1-26] Draft MVP smoke matrix for merged manager/agent flows` | M4 | It documents the smoke matrix that issue #87 now uses as the validation baseline for the next merged tranche. | Keep the PR open only until the matrix language matches the current merged manager/agent slices and QA handoff. |
+| #92 `[P1-08] Define audit event stream and award trace contracts` | M4 | It is the active backend contract thread for audit-event reads and award-trace payloads. | Keep it aligned with issue #10 so audit work does not drift from the live API draft. |
+| #95 `[P1-30] Capture frontend data gaps after manager/agent UI merges` | M4 | It records the remaining manager/agent UI data dependencies that QA and backend owners still need to close. | The linked issue is closed, so merge once the documented gaps reflect the current open contracts and owners. |
+| #96 `[P1-29] Draft MVP API example outline for QA handoff` | M4 | It packages the QA-facing API example outline needed for the next smoke and E2E handoff. | The linked issue is closed, so merge once the examples stay aligned with the still-open contract PRs. |
 
 ## Normalizations Applied
 
-- Removed merged PRs (`#50`, `#53`, `#56`, `#81`) from the active checkpoint tables so only currently open PRs appear here.
-- Removed closed issues (`#7`, `#8`, `#38`, `#43`, `#44`, `#47`, `#61`, `#71`) from the active issue map to match current GitHub state.
-- Kept the active Lanzhou frontend slices (`#62` / PR #78, `#63` / PR #76, `#64` / PR #73) visible alongside their open backend contract dependencies.
+- Dropped merged PRs #50, #53, #56, #70, #73, #75, #76, #77, #78, and #81 from the active board so merged work is not still presented as in-flight.
+- Dropped closed issues #6, #7, #8, #9, #30, #38, #43, #44, #58, #61, #62, #63, #64, #71, #72, #79, #93, and #94 from the active issue map so only genuinely open issue threads remain there.
+- Added still-open PRs #92, #95, and #96 to the M4 tracking surface because their linked issues closed before the review threads did.
+- Kept open issues #10, #11, #59, #80, and #87 visible because they are the remaining active GitHub issue threads tied to open M3/M4 work.
+- Kept issue #57 (`P0-09`) as the historical source for the checkpoint-board workflow while this update refreshes current Phase 1 state.
