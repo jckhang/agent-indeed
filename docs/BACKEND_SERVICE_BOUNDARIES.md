@@ -24,7 +24,7 @@ This baseline is intentionally module-first, not microservice-first. Phase 1 sho
 | Task Marketplace | Validate `TaskSpec`, create tasks, and compute candidate eligibility/ranking | task records, marketplace visibility state, candidate score snapshot | agent registry projection, policy defaults | `POST /v1/tasks` and future candidate query surface |
 | Bid Ledger | Enforce commit/reveal windows and persist bid commitments/reveals | bid commit record, reveal record, bid phase status | task window snapshot, candidate eligibility snapshot | `POST /v1/tasks/{taskId}/bids/commit`, `POST /v1/tasks/{taskId}/bids/reveal` |
 | PoMW Policy and Verifier | Calculate required proof strength and verify `ProofPack` | policy decision trace, proof verification result | task risk/value, bidder identity tier, reveal payload | `POST /v1/tasks/{taskId}/proof-policy`, `POST /v1/tasks/{taskId}/proofs/verify` |
-| Audit Ledger | Persist immutable lifecycle events and award decision trace | audit event stream, decision trace projection | event envelopes from all modules | append-only event contract and query surface |
+| Audit Ledger | Persist immutable lifecycle events and award decision trace | audit event stream, decision trace projection | event envelopes from all modules | `GET /v1/tasks/{taskId}/events`, `GET /v1/bids/{bidId}/events` |
 
 ## Flow Ownership
 
@@ -81,9 +81,10 @@ This baseline is intentionally module-first, not microservice-first. Phase 1 sho
 - Published data:
   - event type
   - actor identity
-  - entity id (`task_id`, `bid_id`, `agent_id`)
+  - entity id (`task_id`, `bid_id`, `agent_id`, `proof_id`)
   - timestamp
   - content hash / trace id
+  - award `decisionTraceHash`, score summary, and proof summary for `TASK_AWARDED`
 - Contract dependency:
   - audit event envelope
   - award decision summary payload

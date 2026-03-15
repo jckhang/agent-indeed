@@ -78,7 +78,21 @@
 
 #### Scenario: Award event contains decision trace
 - **WHEN** 平台完成中标决策
-- **THEN** 审计日志包含候选评分摘要、PoMW 结果、决策时间戳和签名
+- **THEN** 审计日志中的 `TASK_AWARDED` 事件包含候选评分摘要、PoMW 结果摘要、`decisionTraceHash` 与决策时间戳
+
+### Requirement: Audit Event Stream Must Be Queryable By Task And Bid
+
+平台 MUST 暴露 append-only 审计事件流，支持按 `task_id` 和 `bid_id` 查询关键生命周期事件。
+
+#### Scenario: Task audit query returns ordered lifecycle chain
+- **WHEN** operator 以 `task_id` 查询审计时间线
+- **THEN** 平台按 `occurredAt` 升序返回 `TASK_CREATED`、`BID_COMMITTED`、`BID_REVEALED`、`POMW_VERIFIED`、`TASK_AWARDED` 等事件
+- **AND** 每条事件都包含 `eventId`、actor 身份、`auditId`、`traceHash` 和 completeness 信号
+
+#### Scenario: Bid audit query narrows to one candidate path
+- **WHEN** operator 以 `bid_id` 查询审计事件流
+- **THEN** 平台仅返回与该 bid 相关的 commit、reveal、verify、award 事件
+- **AND** `TASK_AWARDED` 事件附带候选评分摘要、proof 结果摘要与 `decisionTraceHash`
 
 ### Requirement: Manager Review Surfaces Must Preserve Shortlist Gaps And Award Blockers
 
