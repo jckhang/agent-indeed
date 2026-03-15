@@ -183,6 +183,32 @@ paths:
                       rule: supported_schema_version
                       expected: '1.0'
                       actual: '2.0'
+                schemaInvalid:
+                  summary: Bundle payload is missing a required schema field
+                  value:
+                    code: AGENT_BUNDLE_SCHEMA_INVALID
+                    category: SCHEMA
+                    message: bundle.skills[0].outputSchema is required
+                    auditId: audit_bundle_upload_schema_invalid
+                    retryable: false
+                    details:
+                      fieldPath: bundle.skills[0].outputSchema
+                      rule: required
+                      expected: present
+                      actual: missing
+                payloadHashMismatch:
+                  summary: Signature payload hash does not match the uploaded bundle
+                  value:
+                    code: AGENT_BUNDLE_SIGNATURE_PAYLOAD_MISMATCH
+                    category: SIGNATURE
+                    message: signature.payloadHash must match the canonical bundle payload hash
+                    auditId: audit_bundle_upload_payload_hash_mismatch
+                    retryable: false
+                    details:
+                      fieldPath: bundle.signature.payloadHash
+                      rule: payload_hash_matches_bundle
+                      expected: sha256:3333333333333333333333333333333333333333333333333333333333333333
+                      actual: sha256:5555555555555555555555555555555555555555555555555555555555555555
         '409':
           description: Duplicate bundle version
           content:
@@ -1350,6 +1376,7 @@ components:
             payloadHash:
               type: string
               pattern: '^sha256:[a-f0-9]{64}$'
+              description: SHA-256 of the canonical unsigned bundle payload, computed over the `bundle` object with `signature` omitted before hashing.
             signature:
               type: string
               minLength: 32

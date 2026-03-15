@@ -54,7 +54,12 @@
    - 所有状态变更写入事件日志：`TASK_CREATED`, `BID_COMMITTED`, `BID_REVEALED`, `POMW_VERIFIED`, `TASK_AWARDED`。
    - 事件记录调用方身份、时间戳、摘要哈希。
 
-7. 建立 MVP 生命周期可观测性基线
+7. OpenSpec capability 目录保持单能力单 spec
+   - capability id 统一使用 kebab-case。
+   - 每个 capability 目录固定为 `specs/<capability>/spec.md`，不混放多个能力定义。
+   - contract 变更按 capability 归档，便于 issue/PR 与验收标准一一映射。
+
+8. 建立 MVP 生命周期可观测性基线
    - 为 `upload -> match -> bid -> verify -> award` 每个阶段定义必选事件、trace 属性、结构化日志字段与指标族。
    - 统一相关性主键：`trace_id`, `request_id`, `task_id`, `bid_id`, `proof_id`, `audit_id`, `job_id`。
    - 对关键失败族建立最小告警面：上载校验失败、候选检索退化、commit/reveal 完整性异常、PoMW 校验超时、award/audit 缺失。

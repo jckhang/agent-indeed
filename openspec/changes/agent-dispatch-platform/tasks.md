@@ -10,12 +10,12 @@
 
 ## 1. OpenSpec 基础落地
 
-- [ ] 1.1 完成 proposal/design/specs/tasks 四类工件并通过 `openspec validate`。
-- [ ] 1.2 建立 capability 命名约定与目录规范（kebab-case + 单能力单 spec）。
+- [x] 1.1 完成 proposal/design/specs/tasks 四类工件并通过 `openspec validate`。
+- [x] 1.2 建立 capability 命名约定与目录规范（kebab-case + 单能力单 spec）。
 
 ## 2. Agent 上传与同步 API 设计
 
-- [ ] 2.1 定义 `AgentBundle` schema（manifest/identity/skills/memoryRef）。
+- [x] 2.1 定义 `AgentBundle` schema（manifest/identity/skills/memoryRef）。
 - [x] 2.2 设计上传校验流水线（签名、schema、能力索引、版本冲突处理）。
 - [x] 2.3 定义上传失败错误码与可重试策略（见 `docs/ERROR_CODE_RETRY_POLICY.md`）。
 

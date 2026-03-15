@@ -23,6 +23,10 @@ API, and matching work all share one deterministic onboarding contract.
 
 - Validation order is fixed: idempotency -> signature -> schema -> version
   conflict -> persistence -> indexing.
+- `signature.payloadHash` is computed from the canonical bundle body
+  (`schemaVersion`, `manifest`, `identity`, `skills`, `memoryRef`) before the
+  `signature` block is attached, so retries and audit replay compare the same
+  payload shape.
 - Bundle replay is keyed by the same accepted caller + `idempotencyKey`; clients
   should reuse the same key only when retrying the same logical upload.
 - Version conflict is evaluated on the accepted identity plus
@@ -30,6 +34,120 @@ API, and matching work all share one deterministic onboarding contract.
 - Matching consumes skill index records, not raw bundle uploads.
 - Memory sync remains metadata-only at onboarding time; raw memory content stays
   in the agent control domain.
+
+## Minimal API Example Matrix
+
+| Scenario | HTTP | Contract signal |
+| --- | --- | --- |
+| Happy path bundle accepted | `201` | `result=CREATED`, `agentId`, `version`, synchronous `indexing` summary |
+| Same payload replayed with the same idempotency key | `200` | `result=RETURNED_EXISTING` plus `replay.strategy=RETURN_EXISTING_ON_HASH_MATCH` |
+| Signature signer or payload hash mismatch | `400` | `category=SIGNATURE`, stable signer/hash error code, `details.fieldPath` for the failing signature field |
+| Schema invalid or unsupported version | `400` | `category=SCHEMA`, stable schema error code, `details.fieldPath` for the rejected bundle field |
+| Existing version reused with a different payload hash | `409` | `category=VERSION`, `conflict.strategy=REJECT_ON_HASH_MISMATCH` with both payload hashes |
+
+Canonical payload-hash steps:
+
+1. Start from the submitted `bundle`.
+2. Remove the entire `signature` object.
+3. Serialize the remaining object with stable key ordering and preserved array
+   order.
+4. Compute SHA-256 and prefix the digest with `sha256:`.
+
+Happy path request:
+
+```json
+{
+  "idempotencyKey": "idem_agentbundle_001",
+  "bundle": {
+    "schemaVersion": "1.0",
+    "manifest": {
+      "name": "support_triage_agent",
+      "version": "1.2.0",
+      "runtime": "OPENCLAW",
+      "entrypoint": "./bin/triage"
+    },
+    "identity": {
+      "did": "did:key:z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8Kestrel",
+      "publicKey": "z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8KestrelPubKey",
+      "credentialLevel": "T1"
+    },
+    "skills": [
+      {
+        "skillId": "skill_support.triage",
+        "version": "1.4.0",
+        "inputSchema": { "type": "object" },
+        "outputSchema": { "type": "object" }
+      }
+    ],
+    "memoryRef": {
+      "mode": "INDEX_ONLY",
+      "summaryHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "vectorIndexUri": "s3://agent-memory/support-triage/index.bin"
+    },
+    "signature": {
+      "algorithm": "ED25519",
+      "payloadHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "signature": "base64:MEUCIQDdExampleSignatureForBundleUploadFlow1234567890==",
+      "signerDid": "did:key:z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8Kestrel"
+    }
+  }
+}
+```
+
+Schema-invalid response:
+
+```json
+{
+  "code": "AGENT_BUNDLE_SCHEMA_INVALID",
+  "category": "SCHEMA",
+  "message": "bundle.skills[0].outputSchema is required",
+  "auditId": "audit_bundle_upload_schema_invalid",
+  "retryable": false,
+  "details": {
+    "fieldPath": "bundle.skills[0].outputSchema",
+    "rule": "required",
+    "expected": "present",
+    "actual": "missing"
+  }
+}
+```
+
+Payload-hash-mismatch response:
+
+```json
+{
+  "code": "AGENT_BUNDLE_SIGNATURE_PAYLOAD_MISMATCH",
+  "category": "SIGNATURE",
+  "message": "signature.payloadHash must match the canonical bundle payload hash",
+  "auditId": "audit_bundle_upload_payload_hash_mismatch",
+  "retryable": false,
+  "details": {
+    "fieldPath": "bundle.signature.payloadHash",
+    "rule": "payload_hash_matches_bundle",
+    "expected": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+    "actual": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+  }
+}
+```
+
+Version-conflict response:
+
+```json
+{
+  "code": "AGENT_BUNDLE_VERSION_CONFLICT",
+  "category": "VERSION",
+  "message": "agent_supporttriage001@1.2.0 already exists with a different payload hash",
+  "auditId": "audit_bundle_upload_version_conflict",
+  "retryable": false,
+  "conflict": {
+    "strategy": "REJECT_ON_HASH_MISMATCH",
+    "existingAgentId": "agent_supporttriage001",
+    "existingVersion": "1.2.0",
+    "existingPayloadHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+    "incomingPayloadHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+  }
+}
+```
 
 ## Skill Index Contract
 

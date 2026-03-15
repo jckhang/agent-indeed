@@ -26,6 +26,12 @@
 ### Modified Capabilities
 - None.
 
+### Capability Layout Convention
+- capability 名称统一使用 kebab-case，与目录名保持一一对应。
+- 每个 capability 只保留单独的 `spec.md`，路径固定为
+  `openspec/changes/agent-dispatch-platform/specs/<capability>/spec.md`。
+- API 草案与 TypeScript contract 变更必须映射回对应 capability，避免多能力共用同一 spec 导致验收边界混淆。
+
 ## Impact
 
 - 新增 OpenSpec 规范文件，作为后续服务拆分与 API 设计依据。
