@@ -42,7 +42,8 @@ Ship the first usable agent dispatch loop for closed beta:
 - Commit-reveal bidding APIs available.
 - Reveal rejected when no valid commit exists.
 - `ProofPack` accepted and verified with T0/T1/T2 policy mapping.
-- Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, and the focused execution slice is refined in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` so commit/reveal workspace behavior stays reviewable while bid/proof status reads remain backend follow-ups through issue #59.
+- Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, with focused follow-through in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` and `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`, so commit/reveal and verification acceptance criteria stay reviewable while bid/proof status reads remain backend follow-ups through issue #59.
+- Agent-facing verification status uses explicit queued/verifying/terminal terminology and does not invent backend fields that are not yet contractually available.
 
 ### G4. Audit and observability baseline
 

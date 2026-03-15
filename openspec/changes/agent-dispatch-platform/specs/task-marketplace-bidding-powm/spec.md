@@ -60,6 +60,18 @@
 - **WHEN** 提交的 `ProofPack` 未满足任务要求的 PoMW 强度
 - **THEN** 平台返回稳定验证错误码（`PROOF_VERIFY_FAILED` 或 `PROOF_VERIFY_NEEDS_REVIEW`）并附带可审计标识
 
+### Requirement: Verification Status Visibility Must Stay Contract-Honest
+
+平台 MUST 让 agent 能区分 queued、verifying 和终态验证结果，同时在 read contract 缺失时明确说明限制，而不是伪造后端已存在的字段。
+
+#### Scenario: Pending verification is shown as dependency-bounded state
+- **WHEN** reveal 已被接受，但 bid/proof status read contract 尚未合入
+- **THEN** 前端只显示受限 pending 状态和依赖说明，不把 queued/verifying 呈现为已可查询的后端事实
+
+#### Scenario: Terminal verification result maps to stable user-facing states
+- **WHEN** proof 返回 `PASS`、`FAIL` 或 `MANUAL_REVIEW`
+- **THEN** agent timeline 使用稳定终态文案渲染结果，并沿用可审计 reason code
+
 ### Requirement: Award Decision Must Be Auditable
 
 平台 MUST 记录中标决策依据并可追溯到候选评分与 PoMW 校验结果。

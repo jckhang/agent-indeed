@@ -28,8 +28,14 @@
 - P1-15 #44: https://github.com/jckhang/agent-indeed/issues/44
 - P1-12 #38: https://github.com/jckhang/agent-indeed/issues/38
 - P1-13 #39: https://github.com/jckhang/agent-indeed/issues/39
+- P1-14 #43: https://github.com/jckhang/agent-indeed/issues/43
+- P1-16 #47: https://github.com/jckhang/agent-indeed/issues/47
+- P1-17 #58: https://github.com/jckhang/agent-indeed/issues/58
+- P1-18 #59: https://github.com/jckhang/agent-indeed/issues/59
 - P1-19 #61 (closed): https://github.com/jckhang/agent-indeed/issues/61
+- P1-20 #62: https://github.com/jckhang/agent-indeed/issues/62
 - P1-21 #63: https://github.com/jckhang/agent-indeed/issues/63
+- P1-22 #64: https://github.com/jckhang/agent-indeed/issues/64
 - P1-23 #65: https://github.com/jckhang/agent-indeed/issues/65
 
 ## P0 Readiness
@@ -222,7 +228,7 @@ Implementation notes:
 ### P1-07 Implement ProofPack verifier + result codes
 
 Acceptance criteria:
-- Verification status is explicit (`passed`, `failed`, `needs_review`).
+- Verification status is explicit (`PASS`, `FAIL`, `MANUAL_REVIEW`).
 - Failure reason codes are stable and documented.
 
 ### P1-08 Implement audit events + award decision trace
@@ -304,6 +310,10 @@ Acceptance criteria:
 
 References:
 - `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`
+- `docs/ENGINEERING_TRACKS_FE_BE.md`
+- `docs/ARCHITECTURE_GAPS.md`
+- `src/api/openapi.yaml`
+- `openspec/changes/agent-dispatch-platform/specs/task-marketplace-bidding-powm/spec.md`
 
 Acceptance criteria:
 - Agent can complete commit and reveal flows from UI with deadline/status feedback.
@@ -426,3 +436,36 @@ Acceptance criteria:
 - Validation hints and blocking states are rendered for missing or invalid required fields.
 - Submission flow documents any backend contract mismatch found during implementation instead of silently inventing fields.
 - Scope stays focused on task creation and does not absorb shortlist or award UI work.
+
+### P1-20 Implement shortlist review and award-readiness UI slice
+
+Acceptance criteria:
+- Candidate shortlist states and award blockers are visible with manager-friendly copy.
+- Missing ranking/proof read-model fields are called out instead of being treated as current API reality.
+- Dependencies on shortlist and award contracts stay linked to backend follow-up work.
+
+### P1-21 Implement agent bid commit/reveal workspace UI
+
+Acceptance criteria:
+- Agent can progress through commit and reveal from one bounded workspace.
+- Commit/reveal validation, deadline, and error-copy branches are explicit.
+- Verification timeline dependencies are handed off cleanly to P1-22.
+
+### P1-22 Implement bid/proof verification timeline UX
+
+References:
+- `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`
+- `docs/FRONTEND_MVP_SURFACE.md`
+- `docs/ENGINEERING_TRACKS_FE_BE.md`
+- `src/api/openapi.yaml`
+- `src/api/contracts.ts`
+
+Acceptance criteria:
+- Verification timeline covers queued, verifying, `PASS`, `FAIL`, and `MANUAL_REVIEW` states with operator-friendly copy.
+- Refresh strategy assumptions are explicit and bounded by the current backend contract.
+- UI does not treat unavailable bid/proof read fields as existing contract reality.
+- Any missing async status contract is linked back to backend issue `#59` / PR `#66` or a new follow-up issue.
+
+Backlog notes:
+- `queued` and `verifying` remain dependency states until the bid/proof status read contract merges.
+- Refresh metadata should stay shared between agent and operator read models.
