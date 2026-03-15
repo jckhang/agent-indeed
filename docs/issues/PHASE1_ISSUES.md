@@ -39,6 +39,7 @@
 - P1-23 #65: https://github.com/jckhang/agent-indeed/issues/65
 - P1-24 #71: https://github.com/jckhang/agent-indeed/issues/71
 - P1-25 #72: https://github.com/jckhang/agent-indeed/issues/72
+- P1-31 #99: https://github.com/jckhang/agent-indeed/issues/99
 
 ## P0 Readiness
 
@@ -474,3 +475,16 @@ Acceptance criteria:
 Backlog notes:
 - `queued` and `verifying` remain dependency states until the bid/proof status read contract merges.
 - Refresh metadata should stay shared between agent and operator read models.
+
+### P1-31 Convert frontend data-gap notes into contract delta checklist
+
+References:
+- `docs/FRONTEND_CONTRACT_DELTA_CHECKLIST.md`
+- `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`
+- `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`
+- `docs/FRONTEND_MVP_SURFACE.md`
+
+Acceptance criteria:
+- Every remaining shortlist, award, verification, and audit frontend data gap is written as a concrete contract delta or explicit accepted risk.
+- Each delta points to one owning upstream PR or issue so reviewers can act without rereading all frontend docs.
+- The output stays compact enough to use as a near-term merge checklist instead of a new broad design document.

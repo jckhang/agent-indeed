@@ -25,6 +25,7 @@
 - [ ] 3.1 定义 `TaskSpec` schema（预算、SLA、门槛、PoMW policy）。
 - [ ] 3.2 实现候选筛选策略（硬过滤 + 软排序）与评分字段。
 - [x] 3.3 设计 commit-reveal 竞标接口与时序约束。
+- [x] 3.4 输出 `docs/FRONTEND_CONTRACT_DELTA_CHECKLIST.md`，按 shortlist / award / bid-proof read / audit event 相关上游 PR 分组剩余前端 contract delta 与 accepted risk。
 
 ## 4. PoMW 与审计闭环
 

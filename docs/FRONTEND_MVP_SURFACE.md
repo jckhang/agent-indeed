@@ -4,6 +4,9 @@ Last updated: 2026-03-15
 
 Related issue: [#33](https://github.com/jckhang/agent-indeed/issues/33)
 
+Related follow-up:
+- `docs/FRONTEND_CONTRACT_DELTA_CHECKLIST.md` converts the current frontend shortlist, award, verification, and audit data gaps into one owner-grouped backend merge checklist for issue [#99](https://github.com/jckhang/agent-indeed/issues/99).
+
 ## Goal
 
 Define the minimum manager, agent, and operator console surface needed to execute the closed-beta lifecycle:

@@ -36,6 +36,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - historical similarity
 - Manager console baseline is captured in `docs/MANAGER_CONSOLE_BASELINE.md` so task publish, shortlist review, and award-state acceptance criteria stay reviewable while shortlist/award read-model gaps are still backend follow-ups.
 - The focused shortlist/award manager review slice is captured in `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` so fallback states and award blockers stay explicit while shortlist/award contracts remain under review.
+- The contract-delta checklist in `docs/FRONTEND_CONTRACT_DELTA_CHECKLIST.md` groups remaining shortlist, award, verification, and audit asks by upstream PR owner so frontend follow-ups stay actionable without inventing payloads.
 
 ### G3. Bidding and PoMW baseline
 

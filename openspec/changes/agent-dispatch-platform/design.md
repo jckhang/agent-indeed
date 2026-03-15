@@ -58,6 +58,7 @@
    - agent 侧验证时间线至少区分 queued、verifying、PASS、FAIL、MANUAL_REVIEW 五类状态。
    - 在 bid/proof read contract 合入前，前端不得把 queued/verifying 当作已可查询事实，只能作为受限 pending UX 呈现。
    - MVP 的刷新策略以显式轮询 contract 为目标；若 read endpoint 尚未合入，必须展示依赖说明而不是伪造实时刷新。
+   - 前端后续跟进应通过一份按上游 contract owner 分组的 delta checklist 维护，明确哪些字段仍待合入、哪些风险被显式接受，避免在多个 slice 文档里重复散落同一批 contract ask。
 
 8. 建立 MVP 生命周期可观测性基线
    - 为 `upload -> match -> bid -> verify -> award` 每个阶段定义必选事件、trace 属性、结构化日志字段与指标族。

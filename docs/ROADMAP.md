@@ -43,6 +43,7 @@ Scope:
 - Manager console baseline (`docs/MANAGER_CONSOLE_BASELINE.md`, issue #43 / PR #53) keeps the publish form, shortlist evidence, and award-summary dependency notes visible while interactive award APIs are still pending.
 - Manager task-composer frontend slice (`docs/MANAGER_TASK_COMPOSER_UI_SLICE.md`, issue #61 / PR #70) documents the current task-create contract and calls out idempotency follow-up explicitly.
 - Manager shortlist review slice (`docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`, issue #62) keeps shortlist fallback states and award blockers reviewable while shortlist/award contracts remain in flight.
+- Frontend contract-delta checklist (`docs/FRONTEND_CONTRACT_DELTA_CHECKLIST.md`, issue #99) turns the latest shortlist, award, verification, and audit data gaps into one merge-order checklist for backend reviewers.
 - Commit-reveal bidding workflow.
 - Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps the broader commit/reveal + verification journey visible.
 - Dedicated bid workspace slice (`docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, issue #63 / PR #76) narrows the next frontend delivery item to one commit/reveal workflow while leaving async refresh on the backend follow-up track (#59).
