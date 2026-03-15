@@ -31,3 +31,4 @@
 - [ ] 4.2 定义 `ProofPack` 结构与验证结果状态码。
 - [ ] 4.3 规范审计事件模型并预留信誉回写接口。
 - [x] 4.4 定义 MVP 生命周期可观测性基线（事件/trace/log/metric/retention/alerts）。
+- [x] 4.5 输出 `docs/MVP_SMOKE_MATRIX.md`，让 QA 在完整 E2E 自动化前先验证 merged publish/commit/reveal 与 proof-handoff 基线。

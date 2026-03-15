@@ -14,6 +14,7 @@
   - agent 上传与生产资料同步能力
   - 任务市场匹配、竞标与 PoMW 验证能力
 - 补充 MVP 生命周期可观测性基线，覆盖事件、trace、日志、指标、告警与保留期约束。
+- 补充 MVP smoke matrix，给 QA 一个可立即执行的 publish -> shortlist -> commit -> reveal -> proof-handoff 最小验证路径。
 - 明确身份分层（T0/T1/T2）下的 PoMW 强度策略。
 - 定义从任务发布到中标执行的关键状态流转与审计要求。
 

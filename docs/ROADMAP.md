@@ -44,6 +44,7 @@ Scope:
 - Commit-reveal bidding workflow.
 - Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps commit/reveal workspace expectations and async refresh gaps explicit until polling/event-stream support lands.
 - Audit visibility console baseline (`docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`, issue #47) keeps task/bid timeline review, failure translation, and missing-field alert requirements visible while audit query and award-read contracts are still pending.
+- MVP smoke matrix (`docs/MVP_SMOKE_MATRIX.md`, issue #79) gives QA a smallest-ready publish -> shortlist -> commit -> reveal -> proof-handoff validation path while the full E2E suite remains blocked.
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.
 - Lifecycle observability baseline for `upload -> match -> bid -> verify -> award`.
@@ -83,6 +84,7 @@ Scope:
 - M3 (2026-04-03): PoMW policy + verifier baseline.
 - M4 (2026-04-10): audit/reputation hook + E2E test pack + security/compliance readiness review.
 - M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md` to be implemented by downstream telemetry work.
+- M4 readiness now also depends on `docs/MVP_SMOKE_MATRIX.md` so QA can start with merged surfaces before the complete E2E pack is automated.
 
 Checkpoint status board:
 - Review `docs/PHASE1_CHECKPOINT_BOARD.md` for the one-screen issue/PR map, target owners, and drift callouts.

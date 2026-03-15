@@ -328,3 +328,22 @@ Acceptance criteria:
 Backlog notes:
 - Task-scoped audit event reads still need a normalized event stream contract before the UI can move beyond documented placeholders.
 - Award trace and shortlist-read dependencies must stay aligned with issue `#10` and issue `#58` so audit review does not infer missing backend evidence.
+
+### P1-26 Draft MVP smoke matrix for merged manager/agent flows
+
+References:
+- `docs/MVP_SMOKE_MATRIX.md`
+- `docs/MANAGER_CONSOLE_BASELINE.md`
+- `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`
+- `docs/FRONTEND_MVP_SURFACE.md`
+- `docs/ERROR_CODE_RETRY_POLICY.md`
+
+Acceptance criteria:
+- Smoke coverage enumerates publish -> shortlist review -> commit -> reveal -> proof-status handoff expectations.
+- Example payloads or fixtures are listed for each smoke slice so QA can reproduce the same checks.
+- The matrix stays honest about which checks are live API exercises versus baseline-artifact reviews.
+- Remaining blockers for the full end-to-end pack stay explicitly attached to issue `#11`.
+
+Backlog notes:
+- Manager shortlist review is still fixture-driven until the manager candidate-read contract in issue `#58` lands.
+- Proof-status handoff remains a blocker for full automation until the bid/proof status read work in issue `#59` merges.
