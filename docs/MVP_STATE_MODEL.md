@@ -44,10 +44,10 @@ Notes:
 
 | State | Meaning | Allowed next | Terminal |
 | --- | --- | --- | --- |
-| `PENDING_VERIFY` | Proof accepted and queued for verifier | `PASS`, `FAIL`, `MANUAL_REVIEW` | no |
-| `PASS` | Proof meets required difficulty and policy checks | none | yes |
-| `FAIL` | Proof does not satisfy required checks | none | yes |
-| `MANUAL_REVIEW` | Automatic verifier cannot conclude safely | none (manual action required) | yes |
+| `PENDING_VERIFY` | Proof accepted and queued for verifier | `PASSED`, `FAILED`, `NEEDS_REVIEW` | no |
+| `PASSED` | Proof meets required difficulty and policy checks | none | yes |
+| `FAILED` | Proof does not satisfy required checks | none | yes |
+| `NEEDS_REVIEW` | Automatic verifier cannot conclude safely | none (manual action required) | yes |
 
 ### Audit state (append-only)
 
@@ -77,7 +77,7 @@ contract work must map these rows onto the authoritative catalog instead of inve
 | Reveal | Reveal window closed | `409` conflict response; exact code comes from the shared error catalog |
 | Reveal | Reveal hash does not match committed hash | `400` invalid reveal payload response; exact code comes from the shared error catalog |
 | Verify | Bid not in `REVEALED` | `409` invalid verification state response; exact code comes from the shared error catalog |
-| Award | Any candidate lacks completed verification (`PASS` or accepted manual decision) | `409` award precondition response; exact code comes from the shared error catalog |
+| Award | Any candidate lacks completed verification (`PASSED` or accepted manual decision) | `409` award precondition response; exact code comes from the shared error catalog |
 | Award | Task already awarded | idempotent replay or `409` conflict response from the shared error catalog |
 
 ## 3) Write Sequencing (Deterministic Order)
@@ -100,7 +100,7 @@ contract work must map these rows onto the authoritative catalog instead of inve
 ### Verify sequence
 
 1. Accept `proofId` only when bid state is `REVEALED`.
-2. Execute policy + verifier checks and persist terminal proof state.
+2. Load and validate the persisted `policyTraceId`, then execute verifier checks against that frozen policy snapshot.
 3. Materialize verification reason codes and difficulty fields.
 4. Emit `POMW_VERIFIED` audit event.
 
@@ -137,7 +137,7 @@ Use stable lock order to avoid deadlocks:
 - #5 (`TaskSpec`): must carry windows needed for deterministic commit/reveal gates.
 - #7 (commit/reveal APIs): must implement rejection behavior above using the authoritative P1-11 error-code catalog.
 - #8 (PoMW policy engine): must output verifier parameters consumed by `PENDING_VERIFY -> terminal` transitions.
-- #9 (Proof verifier): must return stable reason codes aligned to `PASS/FAIL/MANUAL_REVIEW`.
+- #9 (Proof verifier): must return stable reason codes aligned to `PASSED/FAILED/NEEDS_REVIEW`.
 - #10 (audit + award trace): must persist ordered lifecycle events and decision trace hash.
 
 ## Out of Scope

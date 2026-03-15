@@ -227,6 +227,8 @@ export type BidRevealErrorCode =
   | "BID_REVEAL_WINDOW_CLOSED";
 
 export type ProofVerifyErrorCode =
+  | "PROOF_POLICY_TRACE_MISSING"
+  | "PROOF_POLICY_TRACE_NOT_FOUND"
   | "PROOF_VERIFY_PAYLOAD_INVALID"
   | "PROOF_VERIFY_POLICY_INVALID"
   | "PROOF_VERIFY_FAILED"
@@ -293,35 +295,65 @@ export interface TaskSpec {
   };
 }
 
+export type ProofVerificationStatus = "PASSED" | "FAILED" | "NEEDS_REVIEW";
+
+export type ProofVerificationReasonCode =
+  | "PROOF_IDENTITY_SIGNATURE_INVALID"
+  | "PROOF_IDENTITY_TIER_MISMATCH"
+  | "PROOF_SAMPLE_OUTPUT_INVALID"
+  | "PROOF_SAMPLE_QUALITY_BELOW_THRESHOLD"
+  | "PROOF_TRACE_HASH_MISMATCH"
+  | "PROOF_TRACE_SIGNATURE_INVALID"
+  | "PROOF_CHALLENGE_INSUFFICIENT"
+  | "PROOF_RUNTIME_EXCEEDED"
+  | "PROOF_REVIEW_REQUIRED_ARTIFACT_GAP"
+  | "PROOF_REVIEW_REQUIRED_IDENTITY_GAP";
+
+export interface ProofIdentityProof {
+  credentialLevel: IdentityTier;
+  signerDid: string;
+  signature: string;
+  attestationRefs?: string[];
+}
+
+export interface ProofSampleWork {
+  sampleTaskDigest: string;
+  outputDigest: string;
+  qualityScore?: number;
+  runtimeMs?: number;
+}
+
+export interface ProofExecutionTrace {
+  traceHash: string;
+  traceUri: string;
+  traceSignature: string;
+  toolCallCount?: number;
+}
+
+export interface ProofAntiSybilChallenge {
+  challengeType?: "HASHCASH" | "STAKE" | "DEVICE_ATTESTATION" | "NONE";
+  challengeInput?: string;
+  challengeOutput?: string;
+  stakeAmount?: number;
+  stakeAsset?: string;
+}
+
+export interface ProofVerifierOutcome {
+  identityChecksPassed: boolean;
+  traceChecksPassed: boolean;
+  challengeChecksPassed: boolean;
+}
+
 export interface ProofPack {
+  proofSchemaVersion: "1.0";
   proofId: string;
   taskId: string;
   agentId: string;
-  identityProof: {
-    credentialLevel: IdentityTier;
-    signerDid: string;
-    signature: string;
-    attestationRefs?: string[];
-  };
-  sampleWork: {
-    sampleTaskDigest: string;
-    outputDigest: string;
-    qualityScore?: number;
-    runtimeMs?: number;
-  };
-  executionTrace: {
-    traceHash: string;
-    traceUri: string;
-    traceSignature: string;
-    toolCallCount?: number;
-  };
-  antiSybil?: {
-    challengeType?: "HASHCASH" | "STAKE" | "DEVICE_ATTESTATION" | "NONE";
-    challengeInput?: string;
-    challengeOutput?: string;
-    stakeAmount?: number;
-    stakeAsset?: string;
-  };
+  capturedAt: string;
+  identityProof: ProofIdentityProof;
+  sampleWork: ProofSampleWork;
+  executionTrace: ProofExecutionTrace;
+  antiSybil?: ProofAntiSybilChallenge;
 }
 
 export type BidWindowPhase = "COMMIT_OPEN" | "REVEAL_OPEN" | "CLOSED";
@@ -377,7 +409,7 @@ export interface RevealBidRequest {
 
 export interface BidProofSubmission {
   proofId: string;
-  verificationStatus: "PENDING_VERIFY" | "PASS" | "FAIL" | "MANUAL_REVIEW";
+  verificationStatus: "PENDING_VERIFY" | ProofVerificationStatus;
 }
 
 export interface CommitBidAcceptedResponse {
@@ -431,15 +463,19 @@ export interface RevealBidErrorResponse extends ApiErrorResponse {
 }
 
 export interface VerifyProofPackRequest {
+  policyTraceId: string;
   proof: ProofPack;
 }
 
 export interface ProofVerificationResponse {
   proofId: string;
-  result: "PASS" | "FAIL" | "MANUAL_REVIEW";
+  verificationStatus: ProofVerificationStatus;
+  policyTraceId: string;
+  decisionTraceId: string;
   requiredDifficulty: number;
   achievedDifficulty: number;
-  reasonCodes?: string[];
+  reasonCodes?: ProofVerificationReasonCode[];
+  verifierOutcome: ProofVerifierOutcome;
   verifiedAt?: string;
 }
 
@@ -449,8 +485,10 @@ export interface ProofVerifyErrorResponse extends ApiErrorResponse {
     proofId?: string;
     taskId?: string;
     policyTraceId?: string;
+    decisionTraceId?: string;
     requiredDifficulty?: number;
     achievedDifficulty?: number;
+    reasonCodes?: ProofVerificationReasonCode[];
   };
 }
 
@@ -464,27 +502,4 @@ export interface BidResponse {
   status: BidStatus;
   rankingScore?: number;
   decisionTraceHash?: string;
-}
-
-export type BidStatus = "COMMITTED" | "REVEALED" | "REJECTED" | "SCORED";
-
-export interface BidResponse {
-  bidId: string;
-  taskId: string;
-  agentId: string;
-  phase: "COMMIT" | "REVEAL";
-  status: BidStatus;
-  rankingScore?: number;
-  decisionTraceHash?: string;
-}
-
-export type ProofVerificationResult = "PASS" | "FAIL" | "MANUAL_REVIEW";
-
-export interface ProofVerificationResponse {
-  proofId: string;
-  result: ProofVerificationResult;
-  requiredDifficulty: number;
-  achievedDifficulty: number;
-  reasonCodes?: string[];
-  verifiedAt?: string;
 }

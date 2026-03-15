@@ -43,7 +43,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 3. `/agent/tasks/{taskId}/reveal`
    - Reveal bid payload + `ProofPack` before reveal deadline.
 4. `/agent/tasks/{taskId}/verification`
-   - Observe verify result (`PASS`/`FAIL`/`MANUAL_REVIEW`) and reason codes.
+   - Observe verify status (`PASSED`/`FAILED`/`NEEDS_REVIEW`) plus difficulty delta, trace ids, and reason codes.
 
 ### Operator Console
 
@@ -72,14 +72,14 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | `/agent/onboarding` | `POST /v1/agents/bundles` | `idempotencyKey`, `bundle.manifest.*`, `bundle.identity.*`, `bundle.skills[]`, `bundle.memoryRef.*`, `bundle.signature.*` | `agentId`, `version`, `status`, `result`, `indexedAt`; error `code`, `category`, `auditId`, `retryable`, `details`, `conflict` | Ready for create/replay/conflict/error paths in the current draft API; `bundle.schemaVersion` stays pending until the AgentBundle contract update in PR #31 lands |
 | `/agent/tasks/{taskId}/commit` | `POST /v1/tasks/{taskId}/bids/commit` | `idempotencyKey`, `commit.bidId`, `commit.taskId`, `commit.agentId`, `commit.bidHash`, `commit.committedAt` | `bidId`, `taskId`, `agentId`, `phase`, `status`, `result`, `window.*` | Ready for write path with typed commit reason codes and explicit window snapshot |
 | `/agent/tasks/{taskId}/reveal` | `POST /v1/tasks/{taskId}/bids/reveal` | `idempotencyKey`, `reveal.bidId`, `reveal.taskId`, `reveal.agentId`, `reveal.nonce`, `reveal.price.*`, `reveal.executionPlan.*`, `reveal.proof.*` | `bidId`, `phase`, `status`, `result`, `rankingScore`, `decisionTraceHash`, `proofSubmission.*`, `window.*` | Ready for write path with typed reveal failures; proof read endpoint still needed for refresh |
-| `/agent/tasks/{taskId}/verification` | `GET /v1/tasks/{taskId}/proofs/{proofId}` (proposed read endpoint) | `taskId`, `proofId` | `result`, `requiredDifficulty`, `achievedDifficulty`, `reasonCodes`, `verifiedAt` | Missing read endpoint; only `POST /v1/tasks/{taskId}/proofs/verify` exists |
+| `/agent/tasks/{taskId}/verification` | `GET /v1/tasks/{taskId}/proofs/{proofId}` (proposed read endpoint) | `taskId`, `proofId` | `verificationStatus`, `policyTraceId`, `decisionTraceId`, `requiredDifficulty`, `achievedDifficulty`, `reasonCodes`, `verifiedAt` | Missing read endpoint; write contract already defines the terminal verification payload shape |
 
 ### Operator pages
 
 | Page | API endpoint | Required request fields from UI | Response fields required by UI | Contract status |
 | --- | --- | --- | --- | --- |
-| `/operator/proofs/queue` | `GET /v1/proofs` (proposed) | `result`, `updatedSince`, `cursor` | `proofId`, `taskId`, `agentId`, `result`, `reasonCodes`, `verifiedAt`, `needsManualReview` | Missing in current API |
-| `/operator/proofs/{proofId}/review` | `POST /v1/tasks/{taskId}/proofs/verify` + `PATCH /v1/proofs/{proofId}/decision` (proposed override) | verify payload `proof.*`; override payload `decision`, `reason`, `operatorId` | `proofId`, `result`, `reasonCodes`, `verifiedAt`, `decisionTraceHash`; error `code`, `category`, `retryable`, `details.policyTraceId` | Partial: verify now has typed proof failure codes, manual override still missing |
+| `/operator/proofs/queue` | `GET /v1/proofs` (proposed) | `verificationStatus`, `updatedSince`, `cursor` | `proofId`, `taskId`, `agentId`, `verificationStatus`, `reasonCodes`, `verifiedAt`, `needsManualReview` | Missing in current API |
+| `/operator/proofs/{proofId}/review` | `POST /v1/tasks/{taskId}/proofs/verify` + `PATCH /v1/proofs/{proofId}/decision` (proposed override) | verify payload `policyTraceId`, `proof.*`; override payload `decision`, `reason`, `operatorId` | `proofId`, `verificationStatus`, `policyTraceId`, `decisionTraceId`, `reasonCodes`, `verifiedAt`; error `code`, `category`, `retryable`, `details.policyTraceId` | Partial: verify now has typed proof failure codes + trace ids, manual override still missing |
 | `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` (proposed) | `taskId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `entityId`, `summary`, `traceHash`, `occurredAt` | Missing in current API |
 
 ## State-Driven UI Requirements
@@ -88,7 +88,7 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 
 - Task authoring: `DRAFT -> SUBMITTING -> OPEN_FOR_MATCHING|OPEN_FOR_BIDDING -> AWARDED`.
 - Bid lifecycle: `IDLE -> COMMITTING -> COMMITTED -> REVEALING -> REVEALED|REJECTED -> SCORED`.
-- Verification lifecycle: `PENDING_VERIFY -> PASS|FAIL|MANUAL_REVIEW -> OVERRIDDEN` (operator path).
+- Verification lifecycle: `PENDING_VERIFY -> PASSED|FAILED|NEEDS_REVIEW -> OVERRIDDEN` (operator path).
 - Shared failure states: `VALIDATION_ERROR`, `WINDOW_CLOSED`, `IDEMPOTENT_REPLAY`, `CONFLICT`, `TIMEOUT_RETRYABLE`.
 
 ## Integration Risks and Missing Backend Fields

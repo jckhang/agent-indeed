@@ -39,6 +39,8 @@ All MVP error responses should follow this shape:
 | Reveal bid | `BID_REVEAL_COMMIT_NOT_FOUND` | `PRECONDITION` | No valid commit exists for reveal | Do not retry until commit exists |
 | Reveal bid | `BID_REVEAL_HASH_MISMATCH` | `PRECONDITION` | Reveal content does not match committed hash | Correct reveal payload using `expectedBidHash`; no blind retry |
 | Reveal bid | `BID_REVEAL_WINDOW_CLOSED` | `WINDOW` | Reveal after reveal deadline | Do not retry; submit is permanently rejected |
+| Verify proof | `PROOF_POLICY_TRACE_MISSING` | `PRECONDITION` | Verify request omitted the persisted policy trace reference | Reload policy decision first; do not blind retry |
+| Verify proof | `PROOF_POLICY_TRACE_NOT_FOUND` | `PRECONDITION` | Referenced policy trace cannot be found for this task/proof | Re-resolve policy or repair task linkage before retry |
 | Verify proof | `PROOF_VERIFY_PAYLOAD_INVALID` | `VALIDATION` | Invalid or incomplete `ProofPack` | Fix proof payload and retry |
 | Verify proof | `PROOF_VERIFY_POLICY_INVALID` | `POLICY` | Policy input incompatible with task/identity tier | Correct policy inputs and retry |
 | Verify proof | `PROOF_VERIFY_FAILED` | `VERIFICATION` | Proof does not satisfy required difficulty | Do not blind retry; improve proof first |
