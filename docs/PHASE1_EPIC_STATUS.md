@@ -16,7 +16,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | Epic acceptance area | Current status | Source of truth | Next gate |
 | --- | --- | --- | --- |
 | OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts` | Keep open PRs #55, #66, #68, #77 aligned with current spec/contracts. |
-| End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, issue #11 | Needs remaining M2-M4 backend/UI contracts plus QA smoke matrix #79 and E2E issue #11. |
+| End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, issue #11 | Needs remaining M2-M4 backend/UI contracts plus active QA smoke follow-through in issue #87 / PR #84 before E2E issue #11 can be closed. |
 | Core negative scenarios are covered | Blocked | issue #11, issue #72, `docs/SECURITY_COMPLIANCE_BASELINE.md` | Convert merged security/readiness guidance into executable QA coverage after verifier and award flows settle. |
 | Audit events cover key state transitions | In progress | issue #10, `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md` | Land award/audit trace work after shortlist, status polling, and verifier outputs are stable. |
 
@@ -29,6 +29,8 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 - #5 TaskSpec publish behavior defined.
 - #7 Commit-reveal bidding APIs landed.
 - #8 PoMW policy contract landed.
+- #62 Award-readiness UI slice merged.
+- #63 Agent bid commit/reveal workspace UI merged.
 
 ### Active implementation slices
 
@@ -37,12 +39,10 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | Match | issue #6 / PR #55 | Matching shortlist contract is still the backend gate before publish -> match is stable. |
 | Verify status reads | issue #59 / PR #66 | Async status polling is required so verification remains durable beyond synchronous responses. |
 | Verify UX | issue #64 / PR #73 | Timeline UX is the first consumer-facing proof that verification results are understandable. |
-| Agent commit/reveal UX | issue #63 / PR #76 | Agent workflow durability still depends on the status read contract landing. |
 | Award reads | issue #58 / PR #68 | Manager shortlist and award-read contracts are still the main backend dependency before award review is trustworthy. |
-| Award readiness UX | issue #62 / PR #78 | Manager award-readiness UI is the visible proof that shortlist -> award can be reviewed end to end. |
 | Security gate | issue #72 / PR #77 | Closed-beta auth, secrets, and redaction guidance must merge before epic sign-off. |
 | Planning sync | issue #80 / PR #82 | Planning docs must stay aligned so epic status is not tracking already-merged work as active. |
-| QA smoke coverage | issue #79 / PR #84 | Smoke validation is the bridge between merged slices and final E2E confidence. |
+| QA smoke coverage | issue #87 / PR #84 | Smoke validation is the bridge between the merged UI slices and final E2E confidence. |
 
 ### Remaining blocked slices
 
