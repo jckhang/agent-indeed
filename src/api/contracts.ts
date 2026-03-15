@@ -509,15 +509,13 @@ export type BidStatusReasonCode =
   | BidCommitErrorCode
   | BidRevealErrorCode
   | "PROOF_VERIFY_FAILED"
-  | "PROOF_VERIFY_NEEDS_REVIEW"
-  | BidStatusErrorCode;
+  | "PROOF_VERIFY_NEEDS_REVIEW";
 
 export type ProofStatusReasonCode =
   | "PROOF_VERIFY_FAILED"
   | "PROOF_VERIFY_NEEDS_REVIEW"
   | "PROOF_VERIFY_PAYLOAD_INVALID"
-  | "PROOF_VERIFY_POLICY_INVALID"
-  | "PROOF_STATUS_NOT_FOUND";
+  | "PROOF_VERIFY_POLICY_INVALID";
 
 export interface BidResponse {
   bidId: string;
@@ -583,7 +581,7 @@ export interface BidStatusResponse {
   revealState: BidRevealState;
   proofState: ProofState;
   awardState: AwardState;
-  deadlines: BidStatusDeadlines;
+  deadlines?: BidStatusDeadlines;
   proof?: BidStatusProofSummary;
   failureReasonCodes?: BidStatusReasonCode[];
   auditRefs?: BidStatusAuditRefs;

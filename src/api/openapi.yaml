@@ -1085,7 +1085,6 @@ components:
         - BID_REVEAL_WINDOW_CLOSED
         - PROOF_VERIFY_FAILED
         - PROOF_VERIFY_NEEDS_REVIEW
-        - BID_STATUS_NOT_FOUND
 
     ProofStatusReasonCode:
       type: string
@@ -1094,7 +1093,6 @@ components:
         - PROOF_VERIFY_NEEDS_REVIEW
         - PROOF_VERIFY_PAYLOAD_INVALID
         - PROOF_VERIFY_POLICY_INVALID
-        - PROOF_STATUS_NOT_FOUND
 
     BidStatusResponse:
       type: object
