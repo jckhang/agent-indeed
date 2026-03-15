@@ -71,6 +71,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - End-to-end happy path + key negative paths are covered by automated tests.
 - GitHub issues for Phase 1 epics/tasks are created and linked to this plan.
 - Every active P1 issue/PR is mapped to an M1-M4 checkpoint in `docs/PHASE1_CHECKPOINT_BOARD.md` with an owner and target date.
+- Merge-train coordination follows `docs/MERGE_TRAIN_PLAYBOOK.md` so clean LGTM PRs merge promptly and dirty follow-on PRs keep an explicit owner/blocker note.
 - P0 baseline issues that block collaboration quality are closed or explicitly waived.
 - FE/BE execution ownership and MVP hiring-critical roles are assigned or explicitly risk-accepted.
 - Closed-beta auth, auditability, and sensitive-data guardrails are documented or explicitly risk-accepted.
