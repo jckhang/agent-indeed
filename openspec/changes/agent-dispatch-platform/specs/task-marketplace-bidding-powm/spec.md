@@ -68,6 +68,18 @@
 - **WHEN** 平台完成中标决策
 - **THEN** 审计日志包含候选评分摘要、PoMW 结果、决策时间戳和签名
 
+### Requirement: Manager Review Surfaces Must Preserve Shortlist Gaps And Award Blockers
+
+平台 MUST 让 manager 侧候选评审与 award-ready 视图保留缺失字段、校验阻塞与依赖缺口，而不是因为后端字段未齐全就隐藏决策证据。
+
+#### Scenario: Shortlist row remains visible when ranking evidence is partial
+- **WHEN** manager 查看候选 shortlist，但部分评分维度、proof 状态或审计引用尚未返回
+- **THEN** 系统仍保留该候选条目，并明确标记缺失字段或待补齐状态，而不是将候选静默过滤掉
+
+#### Scenario: Award review exposes blocking reasons before command support is complete
+- **WHEN** manager 打开某个 task 的 award-ready 视图，但任务阶段、proof 结果或 award command 依赖尚未满足
+- **THEN** 系统展示当前 task/bid/proof 状态、阻塞原因以及待补齐依赖，使 manager 可以理解为何暂时不可 award
+
 ### Requirement: Retry and Idempotency Signals Must Be Explicit
 
 平台 MUST 在失败响应中明确 `retryable` 信号，并为写操作提供可判定的幂等行为。

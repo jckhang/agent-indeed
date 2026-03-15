@@ -30,9 +30,9 @@ Define the minimum manager, agent, and operator console surface needed to execut
 1. `/manager/tasks/new`
    - Create task with `TaskSpec` fields and bidding window checks.
 2. `/manager/tasks/{taskId}/candidates`
-   - View candidate list with hard-filter outcome and score breakdown.
+   - View candidate list with hard-filter outcome, score breakdown, and fallback states; see `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`.
 3. `/manager/tasks/{taskId}/award`
-   - Confirm winner and inspect award summary + decision trace.
+   - Inspect award-readiness blockers and winner summary inside the same manager review slice.
 
 ### Agent Console
 
