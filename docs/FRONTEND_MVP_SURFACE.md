@@ -106,10 +106,6 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 
 1. Add frontend-critical read APIs before Manager F1 and Agent F2 implementation starts.
 2. Standardize error shape (`code`, `category`, `message`, `retryable`, `details`, `auditId`) across all write endpoints.
-<<<<<<< HEAD
 3. Add task-scoped bid/proof read endpoints that reuse the existing `window` snapshot shape so the unified bid workspace can recover state after refresh.
 4. Freeze state enums for task, bid, proof, and award in `openapi.yaml` and `contracts.ts` to reduce UI branching drift.
-=======
-3. Freeze state enums for task, bid, proof, and award in `openapi.yaml` and `contracts.ts` to reduce UI branching drift.
-4. Carry refresh metadata (`manualRefreshAllowed`, `pollAfterSeconds`, `lastUpdatedAt`) in the bid/proof read model so the verification timeline stays testable and honest.
->>>>>>> 7c547a1 ([P1-22] Add agent verification timeline baseline)
+5. Carry refresh metadata (`manualRefreshAllowed`, `pollAfterSeconds`, `lastUpdatedAt`) in the bid/proof read model so the verification timeline stays testable and honest.

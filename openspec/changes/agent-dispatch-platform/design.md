@@ -55,7 +55,7 @@
    - 事件记录调用方身份、时间戳、摘要哈希。
 
 7. 前端验证状态可见性必须显式建模
-   - agent 侧验证时间线至少区分 queued、verifying、passed、failed、needs_review 五类状态。
+   - agent 侧验证时间线至少区分 queued、verifying、PASS、FAIL、MANUAL_REVIEW 五类状态。
    - 在 bid/proof read contract 合入前，前端不得把 queued/verifying 当作已可查询事实，只能作为受限 pending UX 呈现。
    - MVP 的刷新策略以显式轮询 contract 为目标；若 read endpoint 尚未合入，必须展示依赖说明而不是伪造实时刷新。
 

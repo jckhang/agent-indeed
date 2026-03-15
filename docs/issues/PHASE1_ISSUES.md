@@ -228,7 +228,7 @@ Implementation notes:
 ### P1-07 Implement ProofPack verifier + result codes
 
 Acceptance criteria:
-- Verification status is explicit (`passed`, `failed`, `needs_review`).
+- Verification status is explicit (`PASS`, `FAIL`, `MANUAL_REVIEW`).
 - Failure reason codes are stable and documented.
 
 ### P1-08 Implement audit events + award decision trace
@@ -461,7 +461,7 @@ References:
 - `src/api/contracts.ts`
 
 Acceptance criteria:
-- Verification timeline covers queued, verifying, passed, failed, and needs-review states with operator-friendly copy.
+- Verification timeline covers queued, verifying, `PASS`, `FAIL`, and `MANUAL_REVIEW` states with operator-friendly copy.
 - Refresh strategy assumptions are explicit and bounded by the current backend contract.
 - UI does not treat unavailable bid/proof read fields as existing contract reality.
 - Any missing async status contract is linked back to backend issue `#59` / PR `#66` or a new follow-up issue.
