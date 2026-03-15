@@ -379,6 +379,11 @@ paths:
       tags: [proofs]
       summary: Verify proof pack against task PoMW policy
       operationId: verifyProofPack
+      description: |
+        Verifies a proof pack against a previously persisted PoMW policy
+        snapshot. Clients MUST supply the exact `policyTraceId` returned by
+        `POST /v1/tasks/{taskId}/proof-policy` so audit and award flows can
+        replay the same decision basis.
       parameters:
         - $ref: '#/components/parameters/TaskIdParam'
       requestBody:
@@ -394,18 +399,136 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProofVerificationResponse'
+              examples:
+                passAgainstResolvedPolicy:
+                  summary: Proof verification reuses the persisted policy trace
+                  value:
+                    proofId: proof_ops_triage_001
+                    result: PASS
+                    policyTraceId: policytrace_ops_triage_001
+                    requiredPolicy:
+                      policyTraceId: policytrace_ops_triage_001
+                      requiredProofStrength: MEDIUM
+                      challengeProfile: SAMPLE_EXECUTION
+                      verifierParams:
+                        minSampleCount: 2
+                        minQualityScore: 0.82
+                        maxRuntimeMs: 180000
+                      inputSnapshot:
+                        taskRiskLevel: MEDIUM
+                        taskValueScore: 0.72
+                        identityTier: T1
+                        trustScore: 0.84
+                      rationale:
+                        - task risk requires more than T0 baseline
+                        - trust score allows sample execution without stake
+                      persistedAt: '2026-03-14T05:20:00Z'
+                    requiredDifficulty: 0.82
+                    achievedDifficulty: 0.91
+                    verifiedAt: '2026-03-14T05:24:00Z'
         '400':
-          description: Invalid proof payload or policy mapping input
+          description: Invalid proof payload or policy trace reference
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProofVerifyErrorResponse'
+              examples:
+                invalidPayload:
+                  summary: Request omits required proof fields
+                  value:
+                    code: PROOF_VERIFY_PAYLOAD_INVALID
+                    category: VALIDATION
+                    message: proof.sampleWork.outputDigest is required
+                    auditId: audit_proof_verify_payload_invalid
+                    retryable: false
+        '404':
+          description: Referenced policy snapshot was not found for this task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProofVerifyErrorResponse'
+              examples:
+                missingPolicyTrace:
+                  summary: Verification cannot proceed without a persisted policy decision
+                  value:
+                    code: PROOF_POLICY_TRACE_NOT_FOUND
+                    category: POLICY
+                    message: policyTraceId policytrace_missing_001 was not found for task task_ops_triage_001
+                    auditId: audit_proof_policy_trace_not_found
+                    retryable: false
         '422':
           description: Proof verification failed against required policy strength
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProofVerifyErrorResponse'
+              examples:
+                policyThresholdFailed:
+                  summary: Proof does not satisfy the resolved difficulty threshold
+                  value:
+                    code: PROOF_VERIFY_FAILED
+                    category: POLICY
+                    message: proof difficulty 0.51 is below required threshold 0.82
+                    auditId: audit_proof_verify_failed
+                    retryable: false
+
+  /v1/tasks/{taskId}/proof-policy:
+    post:
+      tags: [proofs]
+      summary: Resolve and persist the PoMW policy snapshot for a candidate
+      operationId: resolveProofPolicy
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveProofPolicyRequest'
+      responses:
+        '200':
+          description: Policy decision persisted for subsequent verification and audit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProofPolicyDecisionResponse'
+              examples:
+                tieredPolicyDecision:
+                  summary: T1 candidate gets medium-strength proof requirements
+                  value:
+                    taskId: task_ops_triage_001
+                    agentId: agent_supporttriage001
+                    policyTraceId: policytrace_ops_triage_001
+                    requiredProofStrength: MEDIUM
+                    challengeProfile: SAMPLE_EXECUTION
+                    verifierParams:
+                      minSampleCount: 2
+                      minQualityScore: 0.82
+                      maxRuntimeMs: 180000
+                    inputSnapshot:
+                      taskRiskLevel: MEDIUM
+                      taskValueScore: 0.72
+                      identityTier: T1
+                      trustScore: 0.84
+                    rationale:
+                      - task risk requires more than T0 baseline
+                      - trust score allows sample execution without stake
+                    persistedAt: '2026-03-14T05:20:00Z'
+        '400':
+          description: Candidate snapshot is invalid for policy resolution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidPolicyInput:
+                  summary: trust score is outside accepted range
+                  value:
+                    code: PROOF_POLICY_INPUT_INVALID
+                    category: POLICY
+                    message: trustScore must be between 0 and 1
+                    auditId: audit_proof_policy_input_invalid
+                    retryable: false
 
 components:
   parameters:
@@ -933,15 +1056,20 @@ components:
     VerifyProofPackRequest:
       type: object
       additionalProperties: false
-      required: [proof]
+      required: [policyTraceId, proof]
       properties:
+        policyTraceId:
+          type: string
+          pattern: '^policytrace_[a-zA-Z0-9_-]{8,64}$'
+          description: Exact persisted PoMW policy snapshot reference used for verification and audit replay.
         proof:
           $ref: '#/components/schemas/ProofPack'
 
     ProofVerificationResponse:
       type: object
       additionalProperties: false
-      required: [proofId, result, requiredDifficulty, achievedDifficulty]
+      required:
+        [proofId, result, policyTraceId, requiredPolicy, requiredDifficulty, achievedDifficulty]
       properties:
         proofId:
           type: string
@@ -949,6 +1077,11 @@ components:
         result:
           type: string
           enum: [PASS, FAIL, MANUAL_REVIEW]
+        policyTraceId:
+          type: string
+          pattern: '^policytrace_[a-zA-Z0-9_-]{8,64}$'
+        requiredPolicy:
+          $ref: '#/components/schemas/ProofPolicyDecision'
         requiredDifficulty:
           type: number
           minimum: 0
@@ -966,6 +1099,8 @@ components:
     ProofVerifyErrorCode:
       type: string
       enum:
+        - PROOF_POLICY_INPUT_INVALID
+        - PROOF_POLICY_TRACE_NOT_FOUND
         - PROOF_VERIFY_PAYLOAD_INVALID
         - PROOF_VERIFY_POLICY_INVALID
         - PROOF_VERIFY_FAILED
@@ -995,6 +1130,112 @@ components:
                 achievedDifficulty:
                   type: number
                   minimum: 0
+
+    ResolveProofPolicyRequest:
+      type: object
+      additionalProperties: false
+      required: [agentId, identityTier]
+      properties:
+        agentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        identityTier:
+          type: string
+          enum: [T0, T1, T2]
+        trustScore:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    ProofPolicyDecisionResponse:
+      allOf:
+        - type: object
+          additionalProperties: false
+          required: [taskId, agentId]
+          properties:
+            taskId:
+              type: string
+              pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+            agentId:
+              type: string
+              pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        - $ref: '#/components/schemas/ProofPolicyDecision'
+
+    ProofPolicyDecision:
+      type: object
+      additionalProperties: false
+      required:
+        - policyTraceId
+        - requiredProofStrength
+        - challengeProfile
+        - verifierParams
+        - inputSnapshot
+        - rationale
+        - persistedAt
+      properties:
+        policyTraceId:
+          type: string
+          pattern: '^policytrace_[a-zA-Z0-9_-]{8,64}$'
+        requiredProofStrength:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, VERY_HIGH]
+        challengeProfile:
+          type: string
+          enum: [SAMPLE_EXECUTION, HASHCASH, STAKE, HYBRID]
+        verifierParams:
+          $ref: '#/components/schemas/ProofVerifierParams'
+        inputSnapshot:
+          $ref: '#/components/schemas/ProofPolicyInputSnapshot'
+        rationale:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        persistedAt:
+          type: string
+          format: date-time
+
+    ProofVerifierParams:
+      type: object
+      additionalProperties: false
+      required: [minSampleCount]
+      properties:
+        minSampleCount:
+          type: integer
+          minimum: 1
+        minQualityScore:
+          type: number
+          minimum: 0
+          maximum: 1
+        maxRuntimeMs:
+          type: integer
+          minimum: 1
+        hashcashBits:
+          type: integer
+          minimum: 1
+        stakeMinAmount:
+          type: number
+          minimum: 0
+
+    ProofPolicyInputSnapshot:
+      type: object
+      additionalProperties: false
+      required: [taskRiskLevel, taskValueScore, identityTier]
+      properties:
+        taskRiskLevel:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+        taskValueScore:
+          type: number
+          minimum: 0
+          maximum: 1
+        identityTier:
+          type: string
+          enum: [T0, T1, T2]
+        trustScore:
+          type: number
+          minimum: 0
+          maximum: 1
 
     AgentBundle:
       type: object
@@ -1415,6 +1656,8 @@ components:
         - BID_REVEAL_COMMIT_NOT_FOUND
         - BID_REVEAL_HASH_MISMATCH
         - BID_REVEAL_WINDOW_CLOSED
+        - PROOF_POLICY_INPUT_INVALID
+        - PROOF_POLICY_TRACE_NOT_FOUND
         - PROOF_VERIFY_PAYLOAD_INVALID
         - PROOF_VERIFY_POLICY_INVALID
         - PROOF_VERIFY_FAILED

@@ -227,6 +227,8 @@ export type BidRevealErrorCode =
   | "BID_REVEAL_WINDOW_CLOSED";
 
 export type ProofVerifyErrorCode =
+  | "PROOF_POLICY_INPUT_INVALID"
+  | "PROOF_POLICY_TRACE_NOT_FOUND"
   | "PROOF_VERIFY_PAYLOAD_INVALID"
   | "PROOF_VERIFY_POLICY_INVALID"
   | "PROOF_VERIFY_FAILED"
@@ -254,6 +256,50 @@ export interface ApiErrorResponse {
   retryable: boolean;
   retryAfterSeconds?: number;
   details?: Record<string, unknown>;
+}
+
+export type ProofStrength = "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+
+export type ProofChallengeProfile =
+  | "SAMPLE_EXECUTION"
+  | "HASHCASH"
+  | "STAKE"
+  | "HYBRID";
+
+export interface ProofPolicyInputSnapshot {
+  taskRiskLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  taskValueScore: number;
+  identityTier: IdentityTier;
+  trustScore?: number;
+}
+
+export interface ProofVerifierParams {
+  minSampleCount: number;
+  minQualityScore?: number;
+  maxRuntimeMs?: number;
+  hashcashBits?: number;
+  stakeMinAmount?: number;
+}
+
+export interface ProofPolicyDecision {
+  policyTraceId: string;
+  requiredProofStrength: ProofStrength;
+  challengeProfile: ProofChallengeProfile;
+  verifierParams: ProofVerifierParams;
+  inputSnapshot: ProofPolicyInputSnapshot;
+  rationale: string[];
+  persistedAt: string;
+}
+
+export interface ResolveProofPolicyRequest {
+  agentId: string;
+  identityTier: IdentityTier;
+  trustScore?: number;
+}
+
+export interface ProofPolicyDecisionResponse extends ProofPolicyDecision {
+  taskId: string;
+  agentId: string;
 }
 
 export interface TaskSpec {
@@ -477,23 +523,18 @@ export interface BidResponse {
   decisionTraceHash?: string;
 }
 
-export type BidStatus = "COMMITTED" | "REVEALED" | "REJECTED" | "SCORED";
-
-export interface BidResponse {
-  bidId: string;
-  taskId: string;
-  agentId: string;
-  phase: "COMMIT" | "REVEAL";
-  status: BidStatus;
-  rankingScore?: number;
-  decisionTraceHash?: string;
-}
-
 export type ProofVerificationResult = "PASS" | "FAIL" | "MANUAL_REVIEW";
+
+export interface VerifyProofPackRequest {
+  policyTraceId: string;
+  proof: ProofPack;
+}
 
 export interface ProofVerificationResponse {
   proofId: string;
   result: ProofVerificationResult;
+  policyTraceId: string;
+  requiredPolicy: ProofPolicyDecision;
   requiredDifficulty: number;
   achievedDifficulty: number;
   reasonCodes?: string[];
