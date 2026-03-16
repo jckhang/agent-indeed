@@ -975,6 +975,114 @@ paths:
                     auditId: audit_proof_policy_input_invalid
                     retryable: false
 
+  /v1/tasks/{taskId}/award:
+    post:
+      tags: [tasks]
+      summary: Award a verified bid for the task
+      operationId: awardTask
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskAwardRequest'
+      responses:
+        '200':
+          description: Bid awarded after proof verification passes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskAwardResponse'
+              examples:
+                awardedBid:
+                  summary: Highest-ranked verified bid is awarded
+                  value:
+                    awardId: award_00000001
+                    taskId: task_ops_triage_001
+                    status: AWARDED
+                    awardedBidId: bid_alpha_commit_01
+                    awardedAgentId: agent_kestrel_alpha
+                    awardedAt: '2026-03-14T14:06:30Z'
+                    decisionTraceHash: sha256:6666666666666666666666666666666666666666666666666666666666666666
+                    awardReason: Highest score among fully verified candidates.
+                    scoreSummary:
+                      rankingScore: 0.91
+                      budgetFitScore: 0.86
+                      latencyScore: 0.89
+                    proofSummary:
+                      proofId: proof_ops_triage_001
+                      result: PASS
+                      decisionTraceHash: sha256:7777777777777777777777777777777777777777777777777777777777777777
+                      reasonCodes: []
+                      policyTraceId: policytrace_ops_triage_001
+        '400':
+          description: Award payload is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingBidId:
+                  summary: Bid identifier is required
+                  value:
+                    code: TASK_AWARD_PRECONDITION_FAILED
+                    category: PRECONDITION
+                    message: bidId is required to award a task
+                    auditId: audit_task_award_invalid_payload
+                    retryable: false
+                    details:
+                      field: bidId
+        '404':
+          description: Task or bid was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                bidMissing:
+                  summary: Requested bid does not exist for the task
+                  value:
+                    code: AUDIT_QUERY_NOT_FOUND
+                    category: AUDIT
+                    message: bid bid_missing_001 was not found for task task_ops_triage_001
+                    auditId: audit_task_award_bid_not_found
+                    retryable: false
+        '409':
+          description: Award blocked until verification reaches a terminal PASS result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                proofNotVerified:
+                  summary: Verify step has not completed yet
+                  value:
+                    code: TASK_AWARD_PROOF_NOT_VERIFIED
+                    category: PRECONDITION
+                    message: award is blocked until proof verification reaches a terminal result for bid bid_alpha_commit_01
+                    auditId: audit_task_award_proof_not_verified
+                    retryable: true
+                    retryAfterSeconds: 1
+                    details:
+                      bidId: bid_alpha_commit_01
+                      taskId: task_ops_triage_001
+                      proofId: proof_ops_triage_001
+                proofFailed:
+                  summary: Verification finished but the bid is not awardable
+                  value:
+                    code: TASK_AWARD_PRECONDITION_FAILED
+                    category: PRECONDITION
+                    message: bid bid_alpha_commit_01 is not awardable because proof result is FAIL
+                    auditId: audit_task_award_precondition_failed
+                    retryable: false
+                    details:
+                      bidId: bid_alpha_commit_01
+                      taskId: task_ops_triage_001
+                      proofId: proof_ops_triage_001
+                      proofResult: FAIL
+
 
   /v1/tasks/{taskId}/events:
     get:
@@ -2708,6 +2816,53 @@ components:
           format: date-time
         refresh:
           $ref: '#/components/schemas/RefreshPolicy'
+
+    TaskAwardRequest:
+      type: object
+      additionalProperties: false
+      required: [bidId]
+      properties:
+        bidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        awardReason:
+          type: string
+          minLength: 3
+          maxLength: 512
+
+    TaskAwardResponse:
+      type: object
+      additionalProperties: false
+      required:
+        [awardId, taskId, status, awardedBidId, awardedAgentId, awardedAt, decisionTraceHash, scoreSummary, proofSummary]
+      properties:
+        awardId:
+          type: string
+          pattern: '^award_[a-zA-Z0-9_-]{8,64}$'
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        status:
+          type: string
+          enum: [AWARDED]
+        awardedBidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        awardedAgentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        awardedAt:
+          type: string
+          format: date-time
+        decisionTraceHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+        scoreSummary:
+          $ref: '#/components/schemas/TaskAwardScoreSummary'
+        proofSummary:
+          $ref: '#/components/schemas/TaskAwardProofSummary'
+        awardReason:
+          type: string
 
     AgentBundle:
       type: object

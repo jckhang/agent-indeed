@@ -295,11 +295,67 @@ function buildTaskDetailResponse(record) {
   };
 }
 
+function toLegacyAuditEventRecord(event, store) {
+  if (event.eventType === "TASK_CREATED") {
+    return {
+      auditId: event.auditId,
+      eventType: event.eventType,
+      entityType: "task",
+      entityId: event.taskId,
+      taskId: event.taskId,
+      summary: event.summary,
+      recordedAt: event.occurredAt
+    };
+  }
+
+  if (event.eventType === "TASK_AWARDED") {
+    const award = event.bidId ? store.findAwardForTaskBid(event.taskId, event.bidId) : null;
+    return {
+      auditId: event.auditId,
+      eventType: event.eventType,
+      entityType: "award",
+      entityId: award?.awardId ?? event.bidId ?? event.taskId,
+      taskId: event.taskId,
+      summary: event.summary,
+      recordedAt: event.occurredAt
+    };
+  }
+
+  if (event.eventType === "POMW_VERIFIED") {
+    return {
+      auditId: event.auditId,
+      eventType: event.eventType,
+      entityType: "proof",
+      entityId: event.proofId ?? event.bidId ?? event.taskId,
+      taskId: event.taskId,
+      summary: event.summary,
+      recordedAt: event.occurredAt
+    };
+  }
+
+  return {
+    auditId: event.auditId,
+    eventType: event.eventType,
+    entityType: "bid",
+    entityId: event.bidId ?? event.taskId,
+    taskId: event.taskId,
+    summary: event.summary,
+    recordedAt: event.occurredAt
+  };
+}
+
+function buildLegacyTaskAuditEventListResponse({ taskId, events, store }) {
+  return {
+    taskId,
+    count: events.length,
+    events: events.map((event) => toLegacyAuditEventRecord(event, store))
+  };
+}
+
 function buildAuditEventListResponse({ taskId, bidId, events }) {
   return {
     taskId,
     ...(bidId ? { bidId } : {}),
-    count: events.length,
     hasMore: false,
     events
   };
@@ -1126,7 +1182,7 @@ export function createApp({
       );
     }
 
-    const taskEventsMatch = requestUrl.pathname.match(TASK_EVENTS_PATTERN) ?? requestUrl.pathname.match(TASK_AUDIT_EVENTS_PATTERN);
+    const taskEventsMatch = requestUrl.pathname.match(TASK_EVENTS_PATTERN);
     if (req.method === "GET" && taskEventsMatch) {
       const taskId = taskEventsMatch[1];
       const task = store.getTask(taskId);
@@ -1144,6 +1200,25 @@ export function createApp({
       const bidId = requestUrl.searchParams.get("bidId") ?? undefined;
       const events = store.listAuditEventsForTask(taskId, { bidId });
       return reply(200, buildAuditEventListResponse({ taskId, bidId, events }));
+    }
+
+    const taskAuditEventsMatch = requestUrl.pathname.match(TASK_AUDIT_EVENTS_PATTERN);
+    if (req.method === "GET" && taskAuditEventsMatch) {
+      const taskId = taskAuditEventsMatch[1];
+      const task = store.getTask(taskId);
+      if (!task) {
+        return reply(
+          404,
+          buildError("AUDIT_QUERY_NOT_FOUND", "AUDIT", `no audit timeline exists for task ${taskId}`, {
+            auditId: "audit_query_not_found_001",
+            retryable: true,
+            retryAfterSeconds: 1
+          })
+        );
+      }
+
+      const events = store.listAuditEventsForTask(taskId);
+      return reply(200, buildLegacyTaskAuditEventListResponse({ taskId, events, store }));
     }
 
     const bidEventsMatch = requestUrl.pathname.match(BID_EVENTS_PATTERN);

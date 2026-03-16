@@ -149,6 +149,12 @@
 - **WHEN** 平台完成中标决策
 - **THEN** 审计日志中的 `TASK_AWARDED` 事件包含候选评分摘要、PoMW 结果摘要、`decisionTraceHash` 与决策时间戳
 
+#### Scenario: Award command only succeeds after terminal PASS verification
+- **WHEN** manager 对某个 task 提交 award command
+- **THEN** 请求必须显式指定目标 `bid_id`
+- **AND** 平台仅在该 bid 的 proof verification 已持久化为终态 `PASS` 时返回 `AWARDED`
+- **AND** 若 verification 尚未完成或结果不是 `PASS`，平台返回稳定的 precondition error code 与审计引用，避免 award 与 verify 语义漂移
+
 ### Requirement: Audit Event Stream Must Be Queryable By Task And Bid
 
 平台 MUST 暴露 append-only 审计事件流，支持按 `task_id` 和 `bid_id` 查询关键生命周期事件。

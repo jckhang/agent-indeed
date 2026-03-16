@@ -785,6 +785,24 @@ export interface CreateTaskAwardRequest {
     proofAuditId: string;
   };
 }
+
+export interface TaskAwardRequest {
+  bidId: string;
+  awardReason?: string;
+}
+
+export interface TaskAwardResponse {
+  awardId: string;
+  taskId: string;
+  status: "AWARDED";
+  awardedBidId: string;
+  awardedAgentId: string;
+  awardedAt: string;
+  decisionTraceHash: string;
+  scoreSummary: TaskAwardScoreSummary;
+  proofSummary: TaskAwardProofSummary;
+  awardReason?: string;
+}
 export type BidStatus = "COMMITTED" | "REVEALED" | "REJECTED" | "SCORED";
 
 export interface BidResponse {

@@ -414,7 +414,7 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
     const eventsResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/events`);
     assert.equal(eventsResponse.status, 200);
     const eventsBody = await eventsResponse.json();
-    assert.equal(eventsBody.count, 5);
+    assert.equal(eventsBody.hasMore, false);
     assert.deepEqual(
       eventsBody.events.map((event) => event.eventType),
       [
@@ -429,10 +429,18 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
     assert.match(eventsBody.events[0].eventId, /^aev_/);
     assert.equal(eventsBody.events.at(-1).payload.awardedBidId, reveal.bidId);
 
+    const legacyEventsResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/audit-events`);
+    assert.equal(legacyEventsResponse.status, 200);
+    const legacyEventsBody = await legacyEventsResponse.json();
+    assert.equal(legacyEventsBody.count, 5);
+    assert.equal(legacyEventsBody.events.at(-1).entityType, "award");
+    assert.match(legacyEventsBody.events.at(-1).entityId, /^award_/);
+
     const bidEventsResponse = await fetch(`${baseUrl}/v1/bids/${reveal.bidId}/events`);
     assert.equal(bidEventsResponse.status, 200);
     const bidEventsBody = await bidEventsResponse.json();
     assert.equal(bidEventsBody.bidId, reveal.bidId);
+    assert.equal(bidEventsBody.hasMore, false);
     assert.deepEqual(
       bidEventsBody.events.map((event) => event.eventType),
       ["BID_COMMITTED", "BID_REVEALED", "POMW_VERIFIED", "TASK_AWARDED"]

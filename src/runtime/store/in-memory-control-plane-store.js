@@ -420,6 +420,16 @@ export class InMemoryControlPlaneStore {
       .map((event) => clone(event));
   }
 
+  findAwardForTaskBid(taskId, bidId) {
+    for (const award of this.awards.values()) {
+      if (award.taskId === taskId && award.bidId === bidId) {
+        return clone(award);
+      }
+    }
+
+    return null;
+  }
+
   appendAuditEvent({ eventType, taskId, bidId = null, proofId = null, actorRole, actorId, summary, payload }) {
     const auditId = this.auditIds.next();
     const eventId = this.eventIds.next();
