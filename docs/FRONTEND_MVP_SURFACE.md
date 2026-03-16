@@ -3,6 +3,7 @@
 Last updated: 2026-03-17
 
 Related issue: [#33](https://github.com/jckhang/agent-indeed/issues/33)
+Runtime wiring follow-through: `docs/FRONTEND_RUNTIME_DISPATCH_WIRING_2026-03-16.md` (issue [#116](https://github.com/jckhang/agent-indeed/issues/116))
 
 ## Goal
 

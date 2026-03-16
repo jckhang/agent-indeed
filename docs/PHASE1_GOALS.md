@@ -51,6 +51,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - historical similarity
 - Manager console baseline is captured in `docs/MANAGER_CONSOLE_BASELINE.md` so task publish, shortlist review, and award-state acceptance criteria stay reviewable while shortlist/award read-model gaps are still backend follow-ups.
 - The focused shortlist/award manager review slice is captured in `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` so fallback states and award blockers stay explicit while shortlist/award contracts remain under review.
+- The first runtime-backed frontend wiring target is captured in `docs/FRONTEND_RUNTIME_DISPATCH_WIRING_2026-03-16.md` so issue #116 can consume current publish/match/commit/reveal/verify/audit endpoints without inventing unavailable proof-read or award-read contracts.
 
 ### G3. Bidding and PoMW baseline
 
