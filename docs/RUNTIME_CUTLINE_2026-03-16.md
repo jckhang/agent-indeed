@@ -1,6 +1,6 @@
 # Runtime Cutline - 2026-03-16
 
-This cutline defines which open contract-convergence deltas block runtime work now versus which ones are additive-safe follow-ups for the current execution pivot.
+This cutline defines which current contract-convergence deltas block runtime work now versus which ones are additive-safe follow-ups for the current execution pivot.
 
 Primary runtime threads:
 
@@ -12,18 +12,18 @@ Reference contract threads:
 - PR #66 `Define bid/proof status polling contract`
 - PR #68 `[P1-17] Define manager shortlist and award read-model contracts`
 - PR #83 `[P1-07] Define ProofPack verifier contract`
-- PR #90 `[P1-10] Finalize onboarding kickoff contract examples`
-- PR #92 `[P1-08] Define audit event stream and award trace contracts`
+- merged PR #90 `[P1-10] Finalize onboarding kickoff contract examples`
+- merged PR #92 `[P1-08] Define audit event stream and award trace contracts`
 
 ## Decision table
 
 | Contract thread | Runtime surface touched | Must-have now for #109 | Must-have now for #110 | Additive-safe later | Current owner / true blocker |
 | --- | --- | --- | --- | --- | --- |
-| PR #90 | onboarding examples + negative-path examples | no | no | Example matrix, payload-hash clarifications, and richer onboarding examples can merge after the service skeleton exists as long as upload behavior keeps the current contract shape. | `kestrel-dev-agent`; not a runtime start blocker |
+| PR #90 (merged 2026-03-16 04:11Z) | onboarding examples + negative-path examples | no | no | Already merged. Runtime work can consume the examples as settled contract guidance rather than waiting on an open blocker. | `kestrel-dev-agent`; landed, no open blocker remains |
 | PR #66 | bid/proof status read endpoints and polling semantics | no | no | `GET` status-read endpoints, refresh hints, and queued/verifying poll UX can land after the first vertical slice. #110 may persist bid/proof state internally without exposing the polling read APIs in the first runtime merge. | `albatross-dev-agent`; additive follow-up unless #110 chooses to ship status reads in the same PR |
 | PR #68 | shortlist read model + award read/detail payloads | no | no for runtime start | Rich shortlist score breakdowns, award detail views, handoff metadata, and manager read surfaces can land after the first runnable flow. #110 only needs enough persisted award state to complete the write path and later backfill richer read models. | `albatross-dev-agent`; blocking only if award write-required fields change before #110 wires the award handler |
 | PR #83 | proof verify request/response contract | no | yes | None of the verifier request/result vocabulary is safe to guess in #110. `policyTraceId`, terminal result values, `decisionTraceHash`, and stable proof verify error codes must match the merged contract before the runtime verify handler merges. | `albatross-dev-agent` + verifier lane; this is the primary contract blocker for the verify/award segment of #110 |
-| PR #92 | audit event names + award decision trace | no | partial | Query endpoints and richer timeline reads are additive-safe later, but #110 should emit the canonical event names and award/proof trace fields from this PR so later audit reads do not require a runtime data rewrite. | `kestrel-dev-agent`; block only on event payload naming, not on read endpoints |
+| PR #92 (merged 2026-03-16 04:10Z) | audit event names + award decision trace | no | partial | Already merged. #110 should consume the canonical event names and award/proof trace fields now; only later audit query endpoints remain additive follow-ups. | `kestrel-dev-agent`; landed, use the merged payload names |
 
 ## Go / No-Go notes
 

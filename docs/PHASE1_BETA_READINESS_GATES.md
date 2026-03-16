@@ -14,10 +14,10 @@ reviewable release gates for closed-beta readiness. It complements:
 
 | Gate | Status | Ready when | Active dependencies | Evidence to collect |
 | --- | --- | --- | --- | --- |
-| Contract convergence | In progress | Remaining backend contract PRs are merged and shared enum/error vocabulary is stable across OpenSpec, OpenAPI, and TypeScript contracts. | PR #66, PR #68, PR #83, PR #90, PR #92 | `openspec validate --all`, contract diff review, synced `src/api/openapi.yaml` + `src/api/contracts.ts` |
+| Contract convergence | In progress | Remaining backend contract PRs are merged and shared enum/error vocabulary is stable across OpenSpec, OpenAPI, and TypeScript contracts. | PR #66, PR #68, PR #83, merged PR #90, merged PR #92 | `openspec validate --all`, contract diff review, synced `src/api/openapi.yaml` + `src/api/contracts.ts` |
 | Runtime happy-path execution | Blocked | One runnable `publish -> match -> commit -> reveal -> verify -> award` flow can be executed against a local service without manual interpretation. | Issue #109, issue #110, issue #111, issue #11, plus contract convergence gate | Service run command, executable smoke/E2E output, linked request/response evidence |
-| Negative-scenario coverage | Blocked | QA can execute core failures (`invalid signature`, `reveal without commit`, `proof FAIL`, `award blocked`) with stable expected outcomes. | Issue #111, issue #11, PR #83, PR #92, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/CLOSED_BETA_SECURITY_READINESS.md` | Runnable assertions, expected error/result matrix, regression evidence |
-| Audit evidence trail | In progress | Audit outputs expose key lifecycle transitions and award/proof context for operator review and beta sign-off. | Issue #110, PR #92, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/OBSERVABILITY_BASELINE.md` | Audit event names, award trace fields, telemetry handoff checklist |
+| Negative-scenario coverage | Blocked | QA can execute core failures (`invalid signature`, `reveal without commit`, `proof FAIL`, `award blocked`) with stable expected outcomes. | Issue #111, issue #11, PR #83, merged PR #92, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/CLOSED_BETA_SECURITY_READINESS.md` | Runnable assertions, expected error/result matrix, regression evidence |
+| Audit evidence trail | In progress | Audit outputs expose key lifecycle transitions and award/proof context for operator review and beta sign-off. | Issue #110, merged PR #92, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/OBSERVABILITY_BASELINE.md` | Audit event names, award trace fields, telemetry handoff checklist |
 | Execution + handoff hygiene | In progress | Roadmap/goals/epic/checkpoint docs and active runtime issues all describe the same blockers and next actions. | Issue #109, issue #110, issue #111, issue #11 | `docs/PHASE1_CHECKPOINT_BOARD.md`, `docs/PHASE1_EPIC_STATUS.md`, milestone/label queries stay aligned |
 
 ## Gate Details
@@ -29,8 +29,8 @@ This remains the prerequisite for durable runtime behavior and executable QA che
 - Verification status durability depends on PR #66.
 - Manager shortlist and award reads depend on PR #68.
 - Verifier terminal vocabulary and reason-code behavior depend on PR #83.
-- Onboarding kickoff examples depend on PR #90.
-- Audit event and award-trace surface depends on PR #92.
+- Onboarding kickoff examples now come from merged PR #90.
+- Audit event and award-trace surface now comes from merged PR #92.
 
 Release note: if any of these contracts change enum names, required fields, or error-code wording,
 the same update must land in OpenSpec plus both API drafts before the gate can be marked ready.
