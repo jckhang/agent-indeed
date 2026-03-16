@@ -12,18 +12,18 @@
 
 ## 1. OpenSpec 基础落地
 
-- [ ] 1.1 完成 proposal/design/specs/tasks 四类工件并通过 `openspec validate`。
-- [ ] 1.2 建立 capability 命名约定与目录规范（kebab-case + 单能力单 spec）。
+- [x] 1.1 完成 proposal/design/specs/tasks 四类工件并通过 `openspec validate`。
+- [x] 1.2 建立 capability 命名约定与目录规范（kebab-case + 单能力单 spec）。
 
 ## 2. Agent 上传与同步 API 设计
 
-- [ ] 2.1 定义 `AgentBundle` schema（manifest/identity/skills/memoryRef）。
+- [x] 2.1 定义 `AgentBundle` schema（manifest/identity/skills/memoryRef）。
 - [x] 2.2 设计上传校验流水线（签名、schema、能力索引、版本冲突处理）。
 - [x] 2.3 定义上传失败错误码与可重试策略（见 `docs/ERROR_CODE_RETRY_POLICY.md`）。
 
 ## 3. 任务匹配与竞标流程设计
 
-- [ ] 3.1 定义 `TaskSpec` schema（预算、SLA、门槛、PoMW policy）。
+- [x] 3.1 定义 `TaskSpec` schema（预算、SLA、门槛、PoMW policy）。
 - [x] 3.2 实现候选筛选策略（硬过滤 + 软排序）与评分字段。
 - [x] 3.3 设计 commit-reveal 竞标接口与时序约束。
 
@@ -34,3 +34,9 @@
 - [ ] 4.3 规范审计事件模型并预留信誉回写接口。
 - [x] 4.4 定义 MVP 生命周期可观测性基线（事件/trace/log/metric/retention/alerts）。
 - [x] 4.5 输出闭测安全就绪清单，明确 auth/authz、secret handling、redaction 与 M4 go/no-go 门槛。
+
+## 5. Runtime 落地冲刺（2026-03-16 起）
+
+- [ ] 5.1 落地可运行 control-plane service skeleton（issue #109），包含健康检查、基础配置与最小持久化抽象。
+- [ ] 5.2 打通可执行的 MVP 垂直路径（issue #110）：`publish -> match -> commit -> reveal -> verify -> award`，并持久化关键状态转移。
+- [ ] 5.3 将 smoke/E2E 文档矩阵转为可执行校验（issue #111），并把验证证据回写 issue #11。

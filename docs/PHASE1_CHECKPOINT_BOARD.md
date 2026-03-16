@@ -7,15 +7,24 @@ This document keeps only the stable checkpoint structure and links to the live m
 
 | Checkpoint | Target date | Owners | Live issues | Live PRs | Review focus |
 | --- | --- | --- | --- | --- | --- |
-| M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | Upload contract freeze, observability baseline, onboarding kickoff |
-| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | Matching contract, commit-reveal flow, manager task composition |
-| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | PoMW policy/verifier, async bid-proof status, agent UX durability |
-| M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | Audit trail, award read models, telemetry/security follow-through, QA sign-off |
+| M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | Contract convergence kickoff + runnable service bootstrap gate (#109, PR #90). |
+| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | Runnable publish/match/commit/reveal path and shortlist/award read contracts (#110, PR #66, PR #68). |
+| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | Verify/audit runtime durability plus executable QA conversion (#111, PR #83, PR #92). |
+| M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | Final E2E evidence, audit trail sign-off, and security readiness closure (issue #11). |
+
+## Runtime pivot anchors
+
+Sprint pivot dated 2026-03-16 keeps these issue anchors as the default execution path:
+
+- `#109`: runnable backend skeleton
+- `#110`: runnable dispatch vertical slice
+- `#111`: executable smoke/E2E conversion
+- `#11`: blocked final E2E sign-off thread
 
 ## Review routine
 
-1. Open the milestone issue and PR links instead of editing status snapshots in-repo.
-2. Use labels such as `status/ready-next`, `status/in-review`, and owner labels to decide the next merge or rebase action.
+1. Open milestone issue and PR links instead of editing status snapshots in-repo.
+2. Use labels such as `status/ready-next`, `status/in-review`, and owner labels to decide next merge or rebase action.
 3. Capture only durable planning changes in repo docs; keep comments, review notes, and volatile state in GitHub threads.
 
 ## When to edit this file

@@ -6,6 +6,7 @@
 3) 按身份模型差异化的最小工作量证明（PoMW）
 
 缺少规格会导致后续实现偏差：上传对象不统一、匹配规则不可复现、竞标与防刷策略不可审计。需要先固化能力边界与验收场景，再进入代码实现。
+在 2026-03-16 的执行复盘后，当前变更也明确要求推进可运行实现，避免冲刺周期仅停留在规格层。
 
 ## What Changes
 
@@ -17,6 +18,7 @@
 - 补充 merge-train 协作手册，统一 clean LGTM PR 合并、dirty queue 回写与 rebase 流程。
 - 明确身份分层（T0/T1/T2）下的 PoMW 强度策略。
 - 定义从任务发布到中标执行的关键状态流转与审计要求。
+- 新增 runtime 落地冲刺任务（issue #109/#110/#111），要求将核心流程转为可运行服务与可执行 QA 校验。
 
 ## Capabilities
 
@@ -34,4 +36,4 @@
 - 规划类 repo 文档改为稳定索引与 GitHub 查询入口，避免在仓库内复制高频变化的 issue / PR 状态。
 - 新增 `docs/MERGE_TRAIN_PLAYBOOK.md`，作为规划负责人推进 clean merge queue 与 dirty queue follow-up 的操作基线。
 - 将影响后续模块：Registry、Matching、Bidding、PoMW Verifier、Audit/Reputation、Settlement。
-- 该变更当前不直接引入运行时代码，但会约束后续实现与测试。
+- 该变更现阶段除了规格定义，也显式承接运行时落地任务，并要求以可执行实现和测试证据作为关闭实现 issue 的依据。

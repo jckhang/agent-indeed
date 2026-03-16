@@ -78,6 +78,11 @@
    - clean tranche 合并后，必须在脏 PR 线程写回 owner、blocker、rebase-next-step，并要求重新执行验证命令。
    - 例行流程写入 `docs/MERGE_TRAIN_PLAYBOOK.md` 并在 `CONTRIBUTING.md` 链接，减少多 agent 并行时的重复沟通和冲突。
 
+11. Phase 1 当前冲刺采用 runtime-first 交付
+   - 2026-03-16 起，交付节奏从“持续追加规划文档”切换为“优先交付可运行实现”。
+   - 当前冲刺以 issue #109（服务骨架）、#110（端到端垂直切片）、#111（可执行 QA 校验）为主线。
+   - `Implement` 类 issue 的关闭标准必须包含运行时代码或可执行测试证据，spec/docs-only PR 不再作为单独关闭依据。
+
 ## Backend Module Boundaries
 
 MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立即拆成独立微服务。每个模块拥有清晰写入边界，并通过共享 contract layer（OpenSpec + OpenAPI + `contracts.ts`）交互。
