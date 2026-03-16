@@ -16,6 +16,7 @@ Ship the first usable agent dispatch loop for closed beta:
 ## 2026-03-16 Execution Pivot
 
 - Current sprint focus moves from planning-doc expansion to runnable implementation slices.
+- Runtime cutline decisions for open contract PRs live in `docs/RUNTIME_CUTLINE_2026-03-16.md`; use that table to decide which deltas block runtime merge versus which are additive-safe follow-ups.
 - Active implementation issues for this pivot:
   - #109 backend runtime skeleton
   - #110 runnable dispatch vertical slice
@@ -56,6 +57,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Reveal rejected when no valid commit exists.
 - `ProofPack` accepted and verified with T0/T1/T2 policy mapping.
 - Commit/reveal/verify/award transitions must persist and be queryable in runtime flow checks (issue #110).
+- Runtime implementers should treat `docs/RUNTIME_CUTLINE_2026-03-16.md` as the current go/no-go rule for open contract PR dependencies while the contract stack finishes converging.
 - Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, with focused follow-through in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` and `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`, so commit/reveal and verification acceptance criteria stay reviewable while bid/proof status reads remain backend follow-ups through issue #59.
 - Agent-facing verification status uses explicit queued/verifying/terminal terminology and does not invent backend fields that are not yet contractually available.
 

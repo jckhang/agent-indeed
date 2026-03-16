@@ -8,6 +8,7 @@ reviewable release gates for closed-beta readiness. It complements:
 - `docs/PHASE1_GOALS.md` for the MVP definition of done
 - `docs/ROADMAP.md` for phase checkpoints and milestone dates
 - `docs/PHASE1_EPIC_STATUS.md` for the current issue/PR rollup
+- `docs/RUNTIME_CUTLINE_2026-03-16.md` for the runtime-start cutline on open contract deltas
 
 ## Gate Summary
 
@@ -37,6 +38,8 @@ the same update must land in OpenSpec plus both API drafts before the gate can b
 ### 2. Runtime happy-path execution
 
 Happy-path readiness is now runtime-first, not docs-first.
+
+While this gate remains blocked until the runnable flow exists, the runtime threads do not have to wait for every open contract PR. Use `docs/RUNTIME_CUTLINE_2026-03-16.md` to separate true blockers from additive-safe follow-ups.
 
 Required outcome:
 
