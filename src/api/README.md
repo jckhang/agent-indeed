@@ -3,6 +3,7 @@
 - `openapi.yaml`: REST API draft for onboarding, task marketplace, bidding, and PoMW verification.
 - `contracts.ts`: TypeScript contract draft for AgentBundle, TaskSpec, Bid, and ProofPack.
 - Agent bundle upload now includes explicit validation and version-conflict error contracts for auditability.
-- Candidate shortlist retrieval now includes hard-filter outcomes, ranking breakdowns, and retryable matching error codes.
+- Candidate shortlist retrieval now requires manager auth, returns hard-filter outcomes, and exposes retryable matching error codes.
 - `GET /v1/tasks/{taskId}/candidates` is the canonical shortlist read path; downstream manager-review work should extend that response additively, keep `limit` as the shared query parameter, and use additive toggles such as `includeScoreBreakdown` instead of a parallel shortlist path/shape.
+- Ranked candidates always carry `rank`; filtered-out candidates stay visible with `eligible=false` and no synthetic rank. `scoreBreakdown` remains optional behind `includeScoreBreakdown`.
 - `docs/ONBOARDING_PIPELINE.md`: deterministic onboarding pipeline, skill indexing contract, and retry guidance for bundle upload.

@@ -405,18 +405,31 @@ export interface CandidateRankingBreakdown {
   factors: CandidateRankingFactor[];
 }
 
-export interface CandidateMatch {
+interface CandidateMatchBase {
   agentId: string;
-  rank?: number;
-  eligible: boolean;
   matchingTraceId: string;
   identityTier: IdentityTier;
   matchedSkills: string[];
   missingRequiredSkills?: string[];
   complianceStatus: "PASSED" | "FAILED" | "NOT_REQUESTED";
   eligibilityChecks: CandidateEligibilityCheck[];
+}
+
+export interface EligibleCandidateMatch extends CandidateMatchBase {
+  eligible: true;
+  rank: number;
   scoreBreakdown?: CandidateRankingBreakdown;
 }
+
+export interface IneligibleCandidateMatch extends CandidateMatchBase {
+  eligible: false;
+  rank?: never;
+  scoreBreakdown?: never;
+}
+
+export type CandidateMatch =
+  | EligibleCandidateMatch
+  | IneligibleCandidateMatch;
 
 export interface CandidateMatchListResponse {
   taskId: string;

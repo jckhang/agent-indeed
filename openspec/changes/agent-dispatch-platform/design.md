@@ -37,7 +37,8 @@
 3. 任务匹配采用“硬过滤 + 软排序”
    - 硬过滤：身份门槛、必需技能、合规约束。
    - 软排序：历史成功率、延迟、预算拟合度、相似任务表现。
-   - 匹配结果对外暴露 `matching_trace_id`、硬过滤检查项、以及评分因子拆解，便于审计与后续中标复核。
+   - 匹配结果对外暴露 `matching_trace_id` 与硬过滤检查项；对 `eligible=true` 且实际参与排序的候选，结果必须提供稳定 `rank`。
+   - 当查询启用 `includeScoreBreakdown` 时，排序候选额外暴露总分与评分因子拆解，便于审计与后续中标复核；未启用时可省略该对象以控制评审负载。
    - 候选查询允许返回“快照尚未就绪”的稳定读侧信号；MVP 使用 `TASK_MATCH_NOT_READY` + `retryAfterSeconds` 提示前端轮询，而不是返回空 shortlist 伪装为最终结果。
 
 4. 竞标采用 commit-reveal
@@ -130,6 +131,7 @@ MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立�
 - 所有 manager / operator 人员账号必须采用企业 SSO + MFA，且禁止共享账号。
 - `AgentBundle` 上传与后续 write API 必须绑定 agent 身份凭证，禁止跨 agent 代操作。
 - 所有 write API 必须在 contract draft 中声明 actor 类型、最小 scope，以及需要的 workspace / audit 头信息，避免实现阶段默认鉴权漂移。
+- manager shortlist 等敏感读 API 同样必须声明 `ManagerSession` 与最小 workspace scope，避免候选排序与合规信号在 contract 层变成匿名公开数据。
 - `memoryRef` 仅允许索引或加密引用，不允许平台存储原始 memory 文本。
 - proof、bid、audit 等敏感载荷默认按最小必要原则暴露；调试日志只保留 trace id、摘要哈希与稳定错误码。
 - 未 reveal 的商业字段、proof 原文与 break-glass 导出默认对 manager/operator 视图做脱敏；任何人工 override / export 必须记录 actor、reason 与 ticket/reference。

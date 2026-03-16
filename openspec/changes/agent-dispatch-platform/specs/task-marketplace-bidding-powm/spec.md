@@ -20,7 +20,9 @@
 #### Scenario: Matching result exposes filter checks and ranking breakdown
 - **WHEN** manager 查询任务的候选匹配结果
 - **THEN** 平台返回 Top-N 候选列表
-- **AND** 每个候选都包含硬过滤检查结果、总分、评分因子拆解与 `matching_trace_id`
+- **AND** 每个候选都包含硬过滤检查结果与 `matching_trace_id`
+- **AND** `eligible=true` 的候选 MUST 携带排名名次，`eligible=false` 的候选不得伪造排名
+- **AND** 如请求启用 `includeScoreBreakdown`，平台为已参与排序的候选返回总分与评分因子拆解；未启用时平台 MAY 省略该评分拆解对象
 
 #### Scenario: Matching snapshot is still materializing
 - **WHEN** manager 在任务刚发布后立即查询候选匹配结果

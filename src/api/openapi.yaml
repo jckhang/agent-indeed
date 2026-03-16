@@ -243,6 +243,9 @@ paths:
       tags: [tasks]
       summary: Retrieve the ranked candidate shortlist for a task
       operationId: listTaskCandidates
+      security:
+        - ManagerSession: []
+      x-required-scopes: [task.write]
       description: |
         Returns the latest matching snapshot for a task. The platform MUST
         apply identity, skill, and compliance hard filters before ranking
@@ -1016,11 +1019,17 @@ components:
             $ref: '#/components/schemas/CandidateMatch'
 
     CandidateMatch:
+      oneOf:
+        - $ref: '#/components/schemas/EligibleCandidateMatch'
+        - $ref: '#/components/schemas/IneligibleCandidateMatch'
+
+    EligibleCandidateMatch:
       type: object
       additionalProperties: false
       required:
         - agentId
         - eligible
+        - rank
         - matchingTraceId
         - identityTier
         - matchedSkills
@@ -1030,11 +1039,12 @@ components:
         agentId:
           type: string
           pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        eligible:
+          type: boolean
+          enum: [true]
         rank:
           type: integer
           minimum: 1
-        eligible:
-          type: boolean
         matchingTraceId:
           type: string
           pattern: '^matchtrace_[a-zA-Z0-9_-]{8,64}$'
@@ -1059,6 +1069,47 @@ components:
             $ref: '#/components/schemas/CandidateEligibilityCheck'
         scoreBreakdown:
           $ref: '#/components/schemas/CandidateRankingBreakdown'
+
+    IneligibleCandidateMatch:
+      type: object
+      additionalProperties: false
+      required:
+        - agentId
+        - eligible
+        - matchingTraceId
+        - identityTier
+        - matchedSkills
+        - complianceStatus
+        - eligibilityChecks
+      properties:
+        agentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        eligible:
+          type: boolean
+          enum: [false]
+        matchingTraceId:
+          type: string
+          pattern: '^matchtrace_[a-zA-Z0-9_-]{8,64}$'
+        identityTier:
+          type: string
+          enum: [T0, T1, T2]
+        matchedSkills:
+          type: array
+          items:
+            type: string
+        missingRequiredSkills:
+          type: array
+          items:
+            type: string
+        complianceStatus:
+          type: string
+          enum: [PASSED, FAILED, NOT_REQUESTED]
+        eligibilityChecks:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CandidateEligibilityCheck'
 
     CandidateEligibilityCheck:
       type: object
