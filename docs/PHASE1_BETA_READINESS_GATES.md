@@ -27,10 +27,12 @@ reviewable release gates for closed-beta readiness. It complements:
 
 This remains the prerequisite for durable runtime behavior and executable QA checks.
 
-- Verifier terminal vocabulary and award-trace expectations now come from merged PR #83 and merged PR #92.
-- The merged runtime/frontend baseline is on `main` through PR #126 and PR #139; PR #127 merged on 2026-03-17 at 13:54:46Z and PRs #129, #140, and #141 all merged later that day, so the active convergence risk is now keeping the live review queue (`#159`, `#133`, `#152`, `#153`, `#154`, `#161`, `#164`, `#165`, `#166`) synced to the published contract vocabulary.
-- The dated QA sweep in `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` now records which runtime routes are actually published on `main`, so reviewers can distinguish proof-enum drift from still-pending read-model routes.
-- Merged PR #140 is the planning guardrail for the dated blocker ledger; the current doc queue should reuse that merged baseline instead of reopening stale snapshots across long-lived docs.
+- Verification status durability now comes from merged PR #66 and manager shortlist/award reads now come from merged PR #68.
+- Verifier terminal vocabulary, reason-code behavior, and award-trace expectations come from merged PR #83 and merged PR #92, while onboarding kickoff examples now come from merged PR #90.
+- The merged runtime/frontend baseline is on `main` through PR #126, PR #127 (merged on 2026-03-17 at 13:54:46Z), and PR #139; the active convergence risk is now keeping the live review queue (`#159`, `#133`, `#152`, `#153`, `#154`, `#161`, `#164`, `#165`, `#166`) synced to the published contract vocabulary.
+- The dated QA sweep in `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` records which runtime routes are actually published on `main`, so reviewers can distinguish proof-enum drift from still-pending read-model routes.
+- `docs/VERIFY_AWARD_CONTRACT_ADOPTION_CHECKLIST.md` is the runtime/QA handoff note for which verify and award-adjacent fields are already frozen on `main`.
+- PR #140 is the planning guardrail that keeps those threads tied to one dated blocker ledger instead of duplicating stale snapshots across long-lived docs.
 
 Release note: if any active runtime branch changes enum names, required fields, route shapes, or error-code wording, the same update must land in OpenSpec plus both API drafts before the gate can be marked ready.
 
@@ -60,6 +62,8 @@ Minimum scenarios to keep visible:
 - award attempt blocked before prerequisite verification is complete
 
 Expected output for each scenario must cite a stable error code or terminal status/result from the merged contract vocabulary. Use `npm run check:contract-drift` when a PR claims a route or proof-verification enum is already on `main`.
+
+Use `docs/VERIFY_AWARD_CONTRACT_ADOPTION_CHECKLIST.md` as the first-pass vocabulary source before widening into queued/verifying polling or manager read-model assertions.
 
 ### 4. Audit evidence trail
 
