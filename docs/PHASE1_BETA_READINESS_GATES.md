@@ -14,10 +14,10 @@ reviewable release gates for closed-beta readiness. It complements:
 | Gate | Status | Ready when | Active dependencies | Evidence to collect |
 | --- | --- | --- | --- | --- |
 | Contract convergence | In progress | The remaining backend contract PRs are merged and the shared enum/error vocabulary is stable across OpenSpec, OpenAPI, and TypeScript contracts. | PR #55, PR #66, PR #68, PR #83, PR #90, PR #92 | `openspec validate --all`, contract diff review, synced `src/api/openapi.yaml` + `src/api/contracts.ts` |
-| Happy-path execution | Blocked | The team can trace one publish -> match -> commit -> reveal -> verify -> award flow without relying on undocumented fields or manual interpretation. | Issue #11, PR #84, PR #95, PR #96, plus the contract gate above | QA smoke checklist, API examples, merged frontend data-gap notes |
-| Negative-scenario coverage | Blocked | QA can exercise no-commit-reveal, signature-invalid, proof-fail, and manual-review/award-block paths with stable expected outcomes. | Issue #11, PR #83, PR #92, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/CLOSED_BETA_SECURITY_READINESS.md` | Smoke/E2E assertions, expected error/result matrix, rollback notes |
+| Happy-path execution | Blocked | The team can trace one publish -> match -> commit -> reveal -> verify -> award flow without relying on undocumented fields or manual interpretation. | Issue #11, issue #101, PR #84, PR #95, PR #96, plus the contract gate above | QA smoke checklist, merged assertion matrix, API examples, merged frontend data-gap notes |
+| Negative-scenario coverage | Blocked | QA can exercise no-commit-reveal, signature-invalid, proof-fail, and manual-review/award-block paths with stable expected outcomes. | Issue #11, issue #101, PR #83, PR #92, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/CLOSED_BETA_SECURITY_READINESS.md` | Smoke/E2E assertions, expected error/result matrix, rollback notes |
 | Audit evidence trail | In progress | Audit outputs show key lifecycle transitions plus enough proof/award context for operator review and beta sign-off. | Issue #10, PR #92, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/OBSERVABILITY_BASELINE.md` | Audit event names, award trace fields, telemetry handoff checklist |
-| Planning + handoff hygiene | In progress | The planning docs, epic rollup, smoke matrix, and QA handoff docs all describe the same open blockers and merged work. | PR #82, PR #84, PR #95, PR #96, PR #97 | `docs/PHASE1_CHECKPOINT_BOARD.md`, `docs/PHASE1_EPIC_STATUS.md`, QA handoff docs stay in sync |
+| Planning + handoff hygiene | In progress | The planning docs, epic rollup, smoke matrix, and QA handoff docs all describe the same open blockers and merged work. | PR #82, issue #87, issue #101, PR #95, PR #96 | `docs/PHASE1_CHECKPOINT_BOARD.md`, `docs/PHASE1_EPIC_STATUS.md`, `docs/MVP_E2E_ASSERTION_MATRIX.md`, QA handoff docs stay in sync |
 
 ## Gate Details
 
@@ -39,13 +39,14 @@ the same update must land in OpenSpec plus both API drafts before the gate can b
 
 The beta happy path is not just one demo; it needs one repeatable handoff pack:
 
+- prewritten assertion matrix in issue #101 / `docs/MVP_E2E_ASSERTION_MATRIX.md`
 - QA smoke matrix in PR #84
 - frontend data-gap notes in PR #95
 - API example outline in PR #96
 - final executable E2E issue #11 after the contract gates settle
 
 The gate is ready only when a reviewer can follow one single source bundle from docs to API examples
-to smoke assertions without guessing missing fields.
+to smoke assertions without guessing missing fields or relying on an open-PR-only document on `main`.
 
 ### 3. Negative-scenario coverage
 
@@ -60,7 +61,8 @@ Minimum scenarios to keep visible:
 - award attempt blocked before prerequisite verification is complete
 
 The expected output for each scenario should cite either a stable error code or a stable terminal
-status/result so QA is not validating prose-only behavior.
+status/result so QA is not validating prose-only behavior. Issue #101 is the prewritten matrix that
+should carry these scenarios forward into issue #87 smoke coverage and later issue #11 automation.
 
 ### 4. Audit evidence trail
 
@@ -83,6 +85,7 @@ At minimum, these docs must agree on which threads are still open:
 
 - `docs/PHASE1_CHECKPOINT_BOARD.md`
 - `docs/PHASE1_EPIC_STATUS.md`
+- `docs/MVP_E2E_ASSERTION_MATRIX.md`
 - `docs/PHASE1_GOALS.md`
 - `docs/ROADMAP.md`
 - the active QA handoff docs attached to issue #11 follow-through

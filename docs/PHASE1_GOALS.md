@@ -58,6 +58,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Audit visibility console baseline is captured in `docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md` so timeline, failure-translation, and missing-field acceptance criteria stay reviewable while audit query and award-read contracts are still backend follow-ups.
 - Operator audit timeline baseline is captured in `docs/OPERATOR_AUDIT_TIMELINE_BASELINE.md` so chronological event rendering, failure translation, and missing-field alerts are reviewed as explicit Phase 1 audit acceptance criteria.
 - Downstream implementation handoff for telemetry owners, contract gaps, and M4 checks is tracked in `docs/MVP_TELEMETRY_HANDOFF.md`.
+- QA-ready M4 handoff also depends on `docs/MVP_E2E_ASSERTION_MATRIX.md` so smoke and E2E coverage reuse one ordered set of ready-now versus blocked assertions.
 
 ## Out of Scope (Phase 1)
 

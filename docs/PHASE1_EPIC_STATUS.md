@@ -16,8 +16,8 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | Epic acceptance area | Current status | Source of truth | Next gate |
 | --- | --- | --- | --- |
 | OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts` | Keep open PRs #55, #66, #68, #83, #90, and #92 aligned with the current spec/contracts surface. |
-| End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, issue #11 | Needs the remaining M2-M4 contract PRs plus QA handoff docs (#84, #95, #96) before issue #11 can turn into executable coverage. |
-| Core negative scenarios are covered | Blocked | issue #11, `docs/CLOSED_BETA_SECURITY_READINESS.md`, `docs/ERROR_CODE_RETRY_POLICY.md` | Security-readiness guidance is merged; the next gate is converting it into smoke/E2E assertions once verifier and award traces stabilize. |
+| End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, issue #11, `docs/MVP_E2E_ASSERTION_MATRIX.md` | Needs the remaining M2-M4 contract PRs plus the QA handoff chain in issue #87, issue #101, PR #95, and PR #96 before issue #11 can turn into executable coverage. |
+| Core negative scenarios are covered | Blocked | issue #11, `docs/CLOSED_BETA_SECURITY_READINESS.md`, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/MVP_E2E_ASSERTION_MATRIX.md` | Security-readiness guidance is merged; the next gate is converting it into smoke/E2E assertions once verifier and award traces stabilize. |
 | Audit events cover key state transitions | In progress | issue #10, PR #92, `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md` | Land audit-event stream and award-trace contracts, then fold them into the QA example and smoke-pack work. |
 
 ## Delivery Slice Status
@@ -48,6 +48,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | Planning sync | issue #80 / PR #82 | Planning docs must stay aligned so epic status is not tracking already-merged work as active. |
 | QA smoke coverage | issue #87 / PR #84 | Smoke validation is the bridge between the merged UI slices and final E2E confidence. |
 | QA handoff pack | issue #11, PR #95, PR #96 | The QA-facing API outline and frontend data-gap docs still need to merge so smoke and E2E work use one current handoff set. |
+| QA assertion prewrite | issue #101 | The assertion matrix now holds the ready-now vs blocked checkpoints that smoke and E2E should reuse verbatim while the handoff pack is still landing. |
 
 ### Remaining blocked slices
 
@@ -61,7 +62,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | M1 | Upload baseline | Issue #30 is closed; PR #90 is the only remaining M1 example/kickoff thread. |
 | M2 | Publish, shortlist, and bid foundation | Still gated by PR #55 even though manager task-composer and shortlist UI slices are merged. |
 | M3 | Verify and agent flow | Agent UX slices are merged; status reads (#66) and verifier contract finalization (#83) remain the active gate. |
-| M4 | Award, audit, and beta readiness | Security is merged, but award-read, audit-trace, smoke coverage, QA handoff docs, and planning sync still need to close. |
+| M4 | Award, audit, and beta readiness | Security is merged, but award-read, audit-trace, smoke coverage, QA handoff docs, QA assertion prewrite, and planning sync still need to close. |
 
 ## Epic Exit Checklist
 
@@ -70,7 +71,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 - [ ] Proof verification result codes and async status reads are merged.
 - [ ] Award-read contracts and award-readiness UI are merged.
 - [ ] Audit trace outputs are defined for beta review.
-- [ ] QA smoke matrix and MVP E2E coverage are ready to run.
+- [ ] QA smoke matrix, prewritten assertion matrix, and MVP E2E coverage are ready to run.
 - [x] Security/compliance readiness checklist is merged and linked to QA validation.
 
 ## Review Routine

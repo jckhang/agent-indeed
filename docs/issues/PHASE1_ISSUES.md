@@ -63,6 +63,8 @@ review history, and linked PRs, open the GitHub issue directly.
 - P1-25 Operationalize closed-beta security readiness checklist: [#72](https://github.com/jckhang/agent-indeed/issues/72)
 - P1-26 Draft MVP smoke matrix for merged manager/agent flows: [#79](https://github.com/jckhang/agent-indeed/issues/79)
 - P1-27 Refresh checkpoint board and roadmap mappings after M2/M3 merges: [#80](https://github.com/jckhang/agent-indeed/issues/80)
+- P1-28 Run QA smoke pass on next merged tranche: [#87](https://github.com/jckhang/agent-indeed/issues/87)
+- P1-33 Prewrite MVP E2E assertion matrix from merged docs: [#101](https://github.com/jckhang/agent-indeed/issues/101)
 
 ## Working rule
 
