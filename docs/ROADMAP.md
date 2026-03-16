@@ -54,8 +54,7 @@ Scope:
 - Commit-reveal bidding workflow.
 - Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps the broader commit/reveal + verification journey visible.
 - Dedicated bid workspace slice (`docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, issue #63 / PR #76) narrows the frontend delivery item to one commit/reveal workflow while handing runtime status refresh to the merged bid/proof read routes.
-- Frontend runtime integration tranche (`docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md`, issue #136) defines the first manager + agent runtime-backed smoke path and the local evidence runbook tied to #110 and #115.
-- Audit visibility console baseline (`docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`, issue #47) keeps task/bid timeline review, failure translation, and missing-field alert requirements visible while audit query and award-read contracts are still pending.
+- Frontend runtime integration tranche (`docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md`, issue #136) defines the first manager + agent runtime-backed smoke path and the local evidence runbook tied to #110 and #115.- Audit visibility console baseline (`docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`, issue #47) keeps task/bid timeline review, failure translation, and missing-field alert requirements visible while audit query and award-read contracts are still pending.
 - PoMW verification baseline with identity-tier policy.
 - Agent verification timeline/read-refresh baseline tied to the merged bid/proof status reads and the runtime persistence work behind issue #136.
 - Auditable award events and minimal reputation writeback hook.
