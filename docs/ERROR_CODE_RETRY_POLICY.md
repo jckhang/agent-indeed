@@ -51,6 +51,7 @@ All MVP error responses should follow this shape:
 | Award/audit | `TASK_AWARD_PRECONDITION_FAILED` | `PRECONDITION` | Award attempted before verify-ready state | Retry only after lifecycle preconditions pass |
 | Award/audit | `TASK_AWARD_PROOF_NOT_VERIFIED` | `PRECONDITION` | Candidate proof not in pass state | Do not retry without proof status change |
 | Award/audit | `TASK_AWARD_CANDIDATE_NOT_ELIGIBLE` | `POLICY` | Candidate fails hard filters/policy gate | Pick another candidate or update constraints |
+| Award/audit | `TASK_AWARD_IDEMPOTENCY_CONFLICT` | `IDEMPOTENCY` | Same `idempotencyKey` reused with a different award payload | Replay the exact payload or mint a fresh key after operator review |
 | Award/audit | `AUDIT_QUERY_NOT_FOUND` | `AUDIT` | Task/bid trace record missing | Retry once for eventual consistency, then escalate |
 
 ## Retry and idempotency rules by operation
@@ -63,9 +64,10 @@ All MVP error responses should follow this shape:
 | `POST /v1/tasks/{taskId}/bids/commit` | `bid.bidId` + `bid.bidHash` | Retry same payload on transient failures; treat duplicate commit as already submitted |
 | `POST /v1/tasks/{taskId}/bids/reveal` | `bid.bidId` + reveal nonce/hash | Retry only for transport failures; never mutate reveal payload under same `bidId` |
 | `POST /v1/tasks/{taskId}/proofs/verify` | `proof.proofId` + proof digest | Retry only when server indicates `retryable=true` |
+| `GET /v1/tasks/{taskId}/award` | `taskId` | Safe to retry idempotently; treat missing award detail as a state/readiness check rather than a write failure |
+| `POST /v1/tasks/{taskId}/award` | `idempotencyKey` + `taskId` + selected `award.bidId` | Retry the exact same payload on transport failures; if `TASK_AWARD_IDEMPOTENCY_CONFLICT` returns, stop and inspect the prior award attempt |
 | `GET /v1/tasks/{taskId}/events` | `taskId` + optional `bidId` + `cursor` | Safe to retry idempotently; reuse `nextCursor` from the prior page when continuing |
 | `GET /v1/bids/{bidId}/events` | `bidId` + `cursor` | Safe to retry idempotently; treat `AUDIT_QUERY_NOT_FOUND` as eventual-consistency sensitive before escalating |
-| Award command/query (P1-08 scope) | `taskId` + selected `bidId` | Retry reads for eventual consistency; writes require lifecycle precondition checks |
 
 ## Canonical source mapping
 

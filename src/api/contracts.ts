@@ -274,6 +274,7 @@ export type AwardAuditErrorCode =
   | "TASK_AWARD_PRECONDITION_FAILED"
   | "TASK_AWARD_PROOF_NOT_VERIFIED"
   | "TASK_AWARD_CANDIDATE_NOT_ELIGIBLE"
+  | "TASK_AWARD_IDEMPOTENCY_CONFLICT"
   | "AUDIT_QUERY_NOT_FOUND";
 
 export type ApiErrorCode =
@@ -406,6 +407,36 @@ export interface CandidateRankingBreakdown {
   factors: CandidateRankingFactor[];
 }
 
+export type CandidateMissingDataStatus = "BLOCKING" | "WARNING";
+
+export type CandidateMissingDataCode =
+  | "NO_ACTIVE_BID"
+  | "PROOF_PENDING"
+  | "PROOF_MANUAL_REVIEW"
+  | "PROFILE_STALE"
+  | "AUDIT_GAP";
+
+export interface CandidateMissingDataState {
+  code: CandidateMissingDataCode;
+  status: CandidateMissingDataStatus;
+  message: string;
+  auditId?: string;
+}
+
+export type CandidateProofReadinessStatus =
+  | "READY"
+  | "PENDING"
+  | "FAILED"
+  | "NEEDS_REVIEW";
+
+export interface CandidateProofReadiness {
+  status: CandidateProofReadinessStatus;
+  proofId?: string;
+  result?: ProofVerificationStatus;
+  reasonCodes?: ProofVerificationReasonCode[];
+  auditId?: string;
+}
+
 interface CandidateMatchBase {
   agentId: string;
   matchingTraceId: string;
@@ -414,6 +445,11 @@ interface CandidateMatchBase {
   missingRequiredSkills?: string[];
   complianceStatus: "PASSED" | "FAILED" | "NOT_REQUESTED";
   eligibilityChecks: CandidateEligibilityCheck[];
+  bidId?: string;
+  missingDataStates?: CandidateMissingDataState[];
+  proofReadiness?: CandidateProofReadiness;
+  shortlistAuditId?: string;
+  decisionTraceHash?: string;
 }
 
 export interface EligibleCandidateMatch extends CandidateMatchBase {
@@ -628,6 +664,57 @@ export interface ProofVerifyErrorResponse extends ApiErrorResponse {
     achievedDifficulty?: number;
     decisionTraceHash?: string;
     reasonCodes?: ProofVerificationReasonCode[];
+  };
+}
+
+export type AwardStatus = "PENDING_REVIEW" | "READY_TO_AWARD" | "AWARDED" | "BLOCKED";
+
+export type AwardHandoffStatus = "PENDING" | "READY" | "SENT";
+
+export interface AwardProofSummary {
+  proofId: string;
+  result: ProofVerificationStatus;
+  reasonCodes?: ProofVerificationReasonCode[];
+  requiredDifficulty?: number;
+  achievedDifficulty?: number;
+  verifiedAt?: string;
+  auditId: string;
+}
+
+export interface AwardHandoffSummary {
+  status: AwardHandoffStatus;
+  handoffChannel?: "API" | "WEBHOOK" | "MANUAL_EXPORT";
+  destinationRef?: string;
+  checklist?: string[];
+}
+
+export interface AwardDecisionDetail {
+  taskId: string;
+  status: AwardStatus;
+  statusMessage: string;
+  shortlistedBidId?: string;
+  awardedBidId?: string;
+  awardedAgentId?: string;
+  awardReason?: string;
+  managerDecisionNote?: string;
+  shortlistAuditId?: string;
+  proofAuditId?: string;
+  proofSummary?: AwardProofSummary;
+  decisionTraceHash?: string;
+  auditEventId?: string;
+  handoff: AwardHandoffSummary;
+  reviewedAt?: string;
+  awardedAt?: string;
+}
+
+export interface CreateTaskAwardRequest {
+  idempotencyKey: string;
+  award: {
+    bidId: string;
+    awardReason: string;
+    managerDecisionNote?: string;
+    shortlistAuditId: string;
+    proofAuditId: string;
   };
 }
 export type BidStatus = "COMMITTED" | "REVEALED" | "REJECTED" | "SCORED";

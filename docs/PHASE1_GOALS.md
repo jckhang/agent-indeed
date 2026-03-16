@@ -41,6 +41,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - identity threshold
   - required skills
   - compliance flags
+- Candidate shortlist read model also exposes additive review context (`missingDataStates`, `proofReadiness`, `shortlistAuditId`) so manager review does not hide partial evidence.
 - Candidate retrieval exposes a retryable "snapshot pending" state instead of returning an ambiguous empty shortlist during matching materialization.
 - Candidate shortlist behavior must be backed by runtime state, not docs-only assumptions (issue #110).
 - Soft ranking baseline:
@@ -70,6 +71,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - `POMW_VERIFIED`
   - `TASK_AWARDED`
 - Award decision includes score summary + proof result trace.
+- Award read/write contract carries manager-facing `statusMessage`, proof summary, and handoff readiness details.
 - Lifecycle observability contract is documented in `docs/OBSERVABILITY_BASELINE.md`.
 - Audit visibility console baseline is captured in `docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md` so timeline, failure-translation, and missing-field acceptance criteria stay reviewable while audit query and award-read contracts are still backend follow-ups.
 - Operator audit timeline baseline is captured in `docs/OPERATOR_AUDIT_TIMELINE_BASELINE.md` so chronological event rendering, failure translation, and missing-field alerts are reviewed as explicit Phase 1 audit acceptance criteria.
