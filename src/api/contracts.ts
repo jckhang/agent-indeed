@@ -121,6 +121,69 @@ export interface CreateTaskResponse {
   revealDeadline?: string;
 }
 
+export interface TaskRecordResponse {
+  taskId: string;
+  workspaceId: string;
+  status: "OPEN_FOR_MATCHING" | "OPEN_FOR_BIDDING";
+  createdAt: string;
+  commitDeadline: string;
+  revealDeadline: string;
+  task: TaskSpec;
+}
+
+export type AuditEntityType = "task" | "bid" | "proof" | "award" | "audit";
+
+export interface AuditEventRecord {
+  auditId: string;
+  eventType: string;
+  entityType: AuditEntityType;
+  entityId: string;
+  taskId: string | null;
+  summary: string;
+  recordedAt: string;
+}
+
+export interface TaskAuditEventListResponse {
+  taskId: string;
+  count: number;
+  events: AuditEventRecord[];
+}
+
+export interface RuntimeHealthResponse {
+  status: "ok";
+  service: string;
+  now: string;
+  uptimeSeconds: number;
+}
+
+export interface RuntimeReadinessCheck {
+  name: "config" | "storage";
+  status: "ok";
+}
+
+export interface RuntimeStorageSummary {
+  tasks: number;
+  bids: number;
+  proofs: number;
+  awards: number;
+  auditEvents: number;
+  latestTaskId: string | null;
+  latestAuditId: string | null;
+}
+
+export interface RuntimeReadinessResponse {
+  status: "ready";
+  service: string;
+  checks: RuntimeReadinessCheck[];
+  storage: RuntimeStorageSummary;
+}
+
+export interface RuntimeSummaryResponse {
+  service: string;
+  generatedAt: string;
+  storage: RuntimeStorageSummary;
+}
+
 export interface UploadAgentBundleCreatedResponse {
   agentId: string;
   version: string;

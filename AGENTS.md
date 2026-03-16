@@ -38,6 +38,8 @@
 - Validate OpenSpec changes for active work with `openspec validate --changes`.
 - Run full OpenSpec validation with `openspec validate --all` when needed.
 - Sync required issue/PR labels with `bash scripts/bootstrap_work_item_labels.sh`.
+- Run the local control-plane service with `npm start`.
+- Run the runtime test suite with `npm test`.
 
 ## Repo layout
 
@@ -65,4 +67,4 @@
 
 ## TODO
 
-- No repo-local build, lint, or test command is defined yet; add verified commands here once they exist in the workspace.
+- Add a standardized lint command once the runtime/tooling stack is finalized.

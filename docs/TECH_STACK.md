@@ -1,10 +1,10 @@
 # Agent Indeed Tech Stack Baseline
 
-Last updated: 2026-03-13
+Last updated: 2026-03-16
 
 ## Repository Maturity Snapshot
 
-Current repository focus is specification and API contract design. Runtime service modules, build pipelines, and automated test suites are not introduced yet.
+Current repository focus is still specification-led delivery, but the first runnable Node.js control-plane skeleton now lives in `src/runtime/` with built-in local tests.
 
 ## Stack Inventory
 
@@ -15,6 +15,7 @@ Current repository focus is specification and API contract design. Runtime servi
 | Typed domain contract | TypeScript interfaces | `src/api/contracts.ts` | Mirrors OpenAPI key objects: `AgentBundle`, `TaskSpec`, `Bid`, `ProofPack`. |
 | Collaboration workflow | Git + GitHub Issues + AGENTS guidance | `AGENTS.md`, `docs/issues/PHASE1_ISSUES.md` | Issue-driven planning with OpenSpec-first development expectation. |
 | Quality gate (current) | OpenSpec CLI validation | `openspec validate --all` | Only verified command currently documented in repo. |
+| Runtime service baseline | Node.js built-in HTTP server + `node:test` | `src/runtime/`, `package.json` | Provides `/healthz`, `/readyz`, `/v1/runtime/summary`, `POST /v1/tasks`, task/audit readback routes, structured request logging, and deterministic in-memory IDs. |
 
 ## API/Domain Model Stack (Current)
 
@@ -27,10 +28,10 @@ Current repository focus is specification and API contract design. Runtime servi
 
 ## Gaps To Fill In Next Iterations
 
-1. Runtime service framework and language/toolchain are not finalized.
-2. Storage/index technology choices (task/bid/audit/proof) are not finalized.
+1. The bootstrap runtime is intentionally in-memory and still needs a durable storage decision.
+2. Matching, bid, proof, and award write flows are only scaffolded in storage; HTTP handlers beyond task create/read + audit readback still need the vertical slice work.
 3. CI quality gates (lint/unit/e2e/security) are not configured.
-4. Local developer commands (build/test/lint) are not standardized.
+4. The repo now has local runtime commands in `package.json`, but lint/build conventions are still not standardized.
 
 ## Decision Policy (Until Runtime Stack Is Introduced)
 

@@ -220,3 +220,20 @@
 - **WHEN** operator 使用人工 override 处理 proof 校验结果
 - **THEN** 请求必须携带特权 actor 身份与 review reason
 - **AND** 审计事件记录 actor、reason、ticket/reference 与时间戳
+
+
+### Requirement: Runtime Control Plane Must Be Bootstrappable Locally
+
+平台 MUST 提供一个可本地运行的 control-plane 基线，作为 Phase 1 从 contract 走向可执行 vertical slice 的起点。
+
+#### Scenario: Local runtime exposes health, readiness, and namespaced API routes
+- **WHEN** 开发者按仓库文档启动本地服务
+- **THEN** 服务暴露 `/healthz` 与 `/readyz` 探针
+- **AND** 服务至少暴露一个 `/v1/*` namespaced 路由用于 contract 对齐验证
+- **AND** 至少一个 runtime route 支持把已持久化实体重新读回，便于 smoke check 与后续 vertical slice 接续
+- **AND** runtime 提供 task 级别 audit readback，便于本地验证状态写入与事件时间线
+
+#### Scenario: Runtime storage abstractions cover core lifecycle entities
+- **WHEN** 本地 control-plane 初始化存储层
+- **THEN** 平台为 `task`、`bid`、`proof`、`award` 与 `audit` 建立明确的存储抽象
+- **AND** 这些实体的基线 ID 生成规则保持确定性，便于测试与回放

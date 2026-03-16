@@ -17,6 +17,45 @@ tags:
   - name: audit
 
 paths:
+  /healthz:
+    get:
+      tags: [tasks]
+      summary: Runtime liveness probe
+      operationId: getRuntimeHealth
+      responses:
+        '200':
+          description: Control-plane process is alive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeHealthResponse'
+
+  /readyz:
+    get:
+      tags: [tasks]
+      summary: Runtime readiness probe
+      operationId: getRuntimeReadiness
+      responses:
+        '200':
+          description: Control-plane dependencies are ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeReadinessResponse'
+
+  /v1/runtime/summary:
+    get:
+      tags: [tasks]
+      summary: Inspect runtime storage bootstrap state
+      operationId: getRuntimeSummary
+      responses:
+        '200':
+          description: In-memory runtime store counts and latest ids
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeSummaryResponse'
+
   /v1/agents/bundles:
     post:
       tags: [agents]
@@ -260,6 +299,54 @@ paths:
                 $ref: '#/components/schemas/CreateTaskResponse'
         '400':
           description: Missing constraints or invalid policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/tasks/{taskId}:
+    get:
+      tags: [tasks]
+      summary: Inspect one persisted task record
+      operationId: getTask
+      security:
+        - ManagerSession: []
+      x-required-scopes: [task.write]
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      responses:
+        '200':
+          description: Stored task record for runtime bootstrap inspection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRecordResponse'
+        '404':
+          description: Task id is unknown
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/tasks/{taskId}/audit-events:
+    get:
+      tags: [tasks, audit]
+      summary: Inspect runtime audit events for one task
+      operationId: listTaskAuditEvents
+      security:
+        - ManagerSession: []
+      x-required-scopes: [task.write]
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      responses:
+        '200':
+          description: Runtime audit trail for the requested task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskAuditEventListResponse'
+        '404':
+          description: Task id is unknown
           content:
             application/json:
               schema:
@@ -1201,6 +1288,91 @@ components:
         pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
 
   schemas:
+    RuntimeHealthResponse:
+      type: object
+      additionalProperties: false
+      required: [status, service, now, uptimeSeconds]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        service:
+          type: string
+        now:
+          type: string
+          format: date-time
+        uptimeSeconds:
+          type: integer
+          minimum: 0
+
+    RuntimeReadinessCheck:
+      type: object
+      additionalProperties: false
+      required: [name, status]
+      properties:
+        name:
+          type: string
+          enum: [config, storage]
+        status:
+          type: string
+          enum: [ok]
+
+    RuntimeStorageSummary:
+      type: object
+      additionalProperties: false
+      required: [tasks, bids, proofs, awards, auditEvents, latestTaskId, latestAuditId]
+      properties:
+        tasks:
+          type: integer
+          minimum: 0
+        bids:
+          type: integer
+          minimum: 0
+        proofs:
+          type: integer
+          minimum: 0
+        awards:
+          type: integer
+          minimum: 0
+        auditEvents:
+          type: integer
+          minimum: 0
+        latestTaskId:
+          type: [string, null]
+        latestAuditId:
+          type: [string, null]
+
+    RuntimeReadinessResponse:
+      type: object
+      additionalProperties: false
+      required: [status, service, checks, storage]
+      properties:
+        status:
+          type: string
+          enum: [ready]
+        service:
+          type: string
+        checks:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/RuntimeReadinessCheck'
+        storage:
+          $ref: '#/components/schemas/RuntimeStorageSummary'
+
+    RuntimeSummaryResponse:
+      type: object
+      additionalProperties: false
+      required: [service, generatedAt, storage]
+      properties:
+        service:
+          type: string
+        generatedAt:
+          type: string
+          format: date-time
+        storage:
+          $ref: '#/components/schemas/RuntimeStorageSummary'
+
     UploadAgentBundleRequest:
       type: object
       additionalProperties: false
@@ -1444,6 +1616,87 @@ components:
         revealDeadline:
           type: string
           format: date-time
+
+    TaskRecordResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - taskId
+        - workspaceId
+        - status
+        - createdAt
+        - commitDeadline
+        - revealDeadline
+        - task
+      properties:
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        workspaceId:
+          type: string
+          minLength: 3
+          maxLength: 128
+        status:
+          type: string
+          enum: [OPEN_FOR_MATCHING, OPEN_FOR_BIDDING]
+        createdAt:
+          type: string
+          format: date-time
+        commitDeadline:
+          type: string
+          format: date-time
+        revealDeadline:
+          type: string
+          format: date-time
+        task:
+          $ref: '#/components/schemas/TaskSpec'
+
+    AuditEventRecord:
+      type: object
+      additionalProperties: false
+      required: [auditId, eventType, entityType, entityId, taskId, summary, recordedAt]
+      properties:
+        auditId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+        eventType:
+          type: string
+          minLength: 3
+          maxLength: 128
+        entityType:
+          type: string
+          enum: [task, bid, proof, award, audit]
+        entityId:
+          type: string
+          minLength: 3
+          maxLength: 128
+        taskId:
+          type: string
+          nullable: true
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        summary:
+          type: string
+          minLength: 3
+          maxLength: 512
+        recordedAt:
+          type: string
+          format: date-time
+
+    TaskAuditEventListResponse:
+      type: object
+      additionalProperties: false
+      required: [taskId, count, events]
+      properties:
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        count:
+          type: integer
+          minimum: 0
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEventRecord'
 
     CandidateMatchListResponse:
       type: object

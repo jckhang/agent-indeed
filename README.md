@@ -22,3 +22,4 @@ Agent dispatch platform prototype.
 - Error-code + retry baseline: `docs/ERROR_CODE_RETRY_POLICY.md`
 - Frontend/backend delivery tracks: `docs/ENGINEERING_TRACKS_FE_BE.md`
 - HR hiring plan: `docs/HR_HIRING_PLAN.md`
+- Runtime control-plane scaffold: `src/runtime/README.md`

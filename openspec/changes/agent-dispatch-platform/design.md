@@ -163,3 +163,10 @@ MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立�
 - 若没有统一 telemetry 契约，后续服务可能各自埋点，导致 beta 期问题无法跨服务定位。
 - commit-reveal 提升公平性，但增加流程复杂度和等待时间。
 - 信誉系统若反馈延迟，会影响匹配准确性和平台激励一致性。
+
+
+11. Phase 1 runtime bootstrap uses a single-process local control plane first
+   - 在 contract-only 阶段之后，先交付单进程本地 control plane 骨架，而不是等待完整微服务拆分。
+   - 首个可运行基线暴露 `/healthz`、`/readyz` 与至少一个 `/v1/*` namespaced route，并为 task/bid/proof/award/audit 建立确定性 ID 的存储抽象。
+   - 本地 readback 路径至少覆盖 persisted task 与 task 级 audit timeline，确保 smoke check 可以直接观察状态写入结果。
+   - Phase 1 早期允许以内存存储启动，只要 contract、OpenSpec 与后续 vertical slice 可以在相同边界上继续演进。
