@@ -44,6 +44,10 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | Backend smoke formatter | issue #177 / PR #175 | QA needs one canonical backend-owned evidence block before the final smoke pass can be repeated consistently. |
 | QA packet and smoke evidence | PR #172, issue #178, issue #11 | The remaining QA work is to reuse the canonical formatter output, run the bounded smoke pass, and post the exact result on issue #11. |
 
+Supporting alignment doc:
+
+- `docs/VERIFY_AWARD_CONTRACT_ADOPTION_CHECKLIST.md` captures the merged verify/award vocabulary that issue #110 and issue #111 should consume before they widen into polling/read-surface follow-ups.
+
 ### Remaining blocked slices
 
 - Issue #11 remains the only live end-to-end evidence gate; closed issue #120 is historical context, not active work.
