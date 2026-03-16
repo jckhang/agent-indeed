@@ -27,7 +27,7 @@ This fixture pack is intentionally limited to:
 | 3 | Agent commit | `POST /v1/tasks/{taskId}/bids/commit` | `COMMITTING -> COMMITTED` | Ready |
 | 4 | Agent reveal | `POST /v1/tasks/{taskId}/bids/reveal` | `REVEALING -> REVEALED` with proof handoff | Ready |
 | 5 | Agent verify-status handoff | No merged read endpoint on `main` | `PENDING_VERIFY` or dependency-blocked refresh | Blocked on #59 / PR #66 |
-| 6 | Manager or operator award-read evidence | `GET /v1/tasks/{taskId}/events` | audit-derived summary or explicit award-read blocked note | Partial on `main`; direct award read still blocked on #58 / PR #68 |
+| 6 | Manager award-read state | No merged endpoint on `main` | explicit award-read blocked note | Blocked on #58 / PR #68 |
 
 ## Step 1 - Publish task
 
@@ -357,96 +357,34 @@ Required UI behavior until issue #59 / PR #66 lands:
 - Explain that detailed proof-status polling is blocked on the bid or proof status read contract.
 - Allow a manual refresh of the surrounding task or bid workspace only if the page already has another canonical endpoint to re-read.
 
-## Step 6 - Award-read blocked, audit timeline available
+## Step 6 - Award-read stays blocked on `main`
 
-Direct award read is still blocked on issue #58 / PR #68, but the merged audit stream already provides the minimal evidence surface for manager or operator review.
+No merged award-read endpoint is available on `main` yet for the manager runtime flow.
 
-Frontend request fixture:
-
-```http
-GET /v1/tasks/task_ops_triage_001/events?limit=20
-Authorization: Bearer <manager-or-operator-session>
-```
-
-Canonical audit-derived award evidence fixture:
+Canonical blocked-state fixture:
 
 ```json
 {
-  "taskId": "task_ops_triage_001",
-  "hasMore": false,
-  "events": [
-    {
-      "eventId": "aev_proof_verified_001",
-      "eventType": "POMW_VERIFIED",
-      "taskId": "task_ops_triage_001",
-      "bidId": "bid_alpha_commit_01",
-      "proofId": "proof_ops_triage_001",
-      "actorRole": "VERIFIER_SERVICE",
-      "actorId": "verifier_policy_engine",
-      "occurredAt": "2026-03-14T14:04:00Z",
-      "auditId": "audit_proof_verified_001",
-      "traceHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
-      "payloadVersion": "1.0",
-      "summary": "Proof verification passed against the persisted policy snapshot.",
-      "completeness": "COMPLETE",
-      "payload": {
-        "result": "PASS",
-        "policyTraceId": "policytrace_ops_triage_001",
-        "requiredDifficulty": 0.82,
-        "achievedDifficulty": 0.91,
-        "reasonCodes": [],
-        "manualReviewRequired": false
-      }
-    },
-    {
-      "eventId": "aev_task_awarded_001",
-      "eventType": "TASK_AWARDED",
-      "taskId": "task_ops_triage_001",
-      "bidId": "bid_alpha_commit_01",
-      "proofId": "proof_ops_triage_001",
-      "actorRole": "MANAGER",
-      "actorId": "mgr_ops_console",
-      "occurredAt": "2026-03-14T14:06:30Z",
-      "auditId": "audit_task_awarded_001",
-      "traceHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
-      "payloadVersion": "1.0",
-      "summary": "Winning bid selected with score and proof summary attached.",
-      "completeness": "COMPLETE",
-      "payload": {
-        "awardedBidId": "bid_alpha_commit_01",
-        "awardedAgentId": "agent_kestrel_alpha",
-        "taskStatus": "AWARDED",
-        "awardReason": "Highest score among fully verified candidates.",
-        "decisionTraceHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
-        "scoreSummary": {
-          "rankingScore": 0.91,
-          "budgetFitScore": 0.88,
-          "latencyScore": 0.94
-        },
-        "proofSummary": {
-          "proofId": "proof_ops_triage_001",
-          "result": "PASS",
-          "reasonCodes": [],
-          "policyTraceId": "policytrace_ops_triage_001"
-        }
-      }
-    }
-  ]
+  "awardRead": {
+    "status": "BLOCKED",
+    "reason": "AWARD_READ_MODEL_PENDING",
+    "followUp": "issue #58 / PR #68"
+  }
 }
 ```
 
 Required UI behavior until issue #58 / PR #68 lands:
 
-- Treat audit events as the temporary award-read evidence source, not as a permanent substitute for a dedicated award read model.
-- If no `TASK_AWARDED` event is present yet, show an explicit "award read blocked or not yet written" state instead of assuming a winner summary exists.
-- Keep shortlist and award blocker copy aligned with the audit payload rather than inventing extra manager-only fields.
+- Do not call or document `GET /v1/tasks/{taskId}/events` as a merged manager award-read dependency.
+- Keep award surfaces explicitly blocked even if shortlist, reveal, or proof verification data is present in the current session.
+- Explain that winner summary and award history remain unavailable until the dedicated shortlist/award read model lands.
 
 ## Gap ledger
 
 | Gap | What frontend can do now | Follow-up owner |
 | --- | --- | --- |
 | Bid or proof status read model is not merged on `main` | Use reveal handoff state (`PENDING_VERIFY`) and show dependency-blocked refresh copy | issue #59 / PR #66 |
-| Dedicated award read endpoint is not merged on `main` | Derive temporary evidence from `GET /v1/tasks/{taskId}/events` | issue #58 / PR #68 |
+| Dedicated award read endpoint is not merged on `main` | Keep award surfaces blocked and link the owning read-model follow-up | issue #58 / PR #68 |
 | Runtime wiring narrative in PR #122 is still under review | Keep this fixture pack contract-first and refer to PR #122 only as supporting frontend sequencing context | issue #116 / PR #122 |
 
 ## Validation checklist for future frontend wiring
@@ -455,4 +393,4 @@ Required UI behavior until issue #58 / PR #68 lands:
 - Shortlist page distinguishes `TASK_MATCH_NOT_READY` from a true empty result.
 - Commit and reveal pages recover countdowns from `window.serverTime`, `commitDeadline`, and `revealDeadline`.
 - Verification page does not claim more than `PENDING_VERIFY` until #59 lands.
-- Award or review surfaces explain when data is audit-derived versus blocked on the award read model.
+- Award or review surfaces keep award-read explicitly blocked until a merged read endpoint exists.
