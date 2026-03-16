@@ -8,6 +8,7 @@ This directory holds the first runnable backend control-plane scaffold for Agent
 - Start with file watching: `npm run dev`
 - Run the end-to-end dispatch smoke path: `npm run smoke:dispatch`
 - Run the built-in runtime tests: `npm test`
+- Run the bootstrap smoke flow: `npm run smoke:bootstrap`
 
 ## Boot and probe
 
@@ -23,10 +24,7 @@ Then verify the bootstrap probes and one namespaced task route from another term
 curl -s http://127.0.0.1:3000/healthz
 curl -s http://127.0.0.1:3000/readyz
 curl -s http://127.0.0.1:3000/v1/runtime/summary
-curl -s -X POST http://127.0.0.1:3000/v1/tasks \
-  -H 'content-type: application/json' \
-  -H 'x-workspace-id: workspace-kestrel' \
-  -d '{
+curl -s -X POST http://127.0.0.1:3000/v1/tasks   -H 'content-type: application/json'   -H 'x-workspace-id: workspace-kestrel'   -d '{
     "task": {
       "title": "Bootstrap runtime smoke",
       "description": "Persist one task through the local control plane",
@@ -54,6 +52,14 @@ npm run smoke:dispatch
 ```
 
 The smoke command boots the runtime on an ephemeral port, publishes a task, materializes candidates, commits and reveals a bid, resolves proof policy, checks award readiness, awards the task with the contract-shaped idempotent payload, and confirms the task/bid audit timelines before printing the resulting ids as JSON.
+
+Or run the bootstrap path end-to-end with one command:
+
+```bash
+npm run smoke:bootstrap
+```
+
+That command starts the runtime on an ephemeral port, checks `/healthz`, `/readyz`, `/v1/runtime/summary`, `POST /v1/tasks`, `GET /v1/tasks/{taskId}`, and `GET /v1/tasks/{taskId}/audit-events`, then prints a final JSON summary.
 
 ## Current endpoints
 
