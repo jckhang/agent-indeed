@@ -17,14 +17,14 @@ This target keeps the UI honest in the current repo state:
 ## Runtime-backed vertical slice
 
 The runtime slice for this week is:
-`publish -> match -> commit -> reveal -> verify-status -> award-read`
+`publish -> match -> commit -> reveal -> pending-verify -> award-read`
 
 Bounded interpretation for the current contract stack:
 - `publish`: `POST /v1/tasks`
 - `match`: `GET /v1/tasks/{taskId}/candidates`
 - `commit`: `POST /v1/tasks/{taskId}/bids/commit`
 - `reveal`: `POST /v1/tasks/{taskId}/bids/reveal`
-- `verify-status`: immediate verifier result from `POST /v1/tasks/{taskId}/proofs/verify`, plus explicit pending fallback when no read model exists yet
+- `pending-verify`: stay on the reveal response's `proofSubmission.verificationStatus` and keep the UI at `PENDING_VERIFY` until issue [#59](https://github.com/jckhang/agent-indeed/issues/59) / PR [#66](https://github.com/jckhang/agent-indeed/pull/66) lands a frontend-readable status model
 - `award-read`: keep the manager award surface explicitly blocked until issue [#58](https://github.com/jckhang/agent-indeed/issues/58) / PR [#68](https://github.com/jckhang/agent-indeed/pull/68) lands a dedicated read model
 
 ## Flow contract map
@@ -35,7 +35,7 @@ Bounded interpretation for the current contract stack:
 | Match candidates | `/manager/tasks/{taskId}/review` | `GET /v1/tasks/{taskId}/candidates` | Render ranked and ineligible rows from the live shortlist response, including `matchingTraceId`, eligibility gates, and optional `scoreBreakdown`. |
 | Commit bid | `/agent/tasks/{taskId}/bid-workspace` | `POST /v1/tasks/{taskId}/bids/commit` | Use the server-authored `window` snapshot to drive next-step copy and disable local deadline guessing. |
 | Reveal bid | `/agent/tasks/{taskId}/bid-workspace` | `POST /v1/tasks/{taskId}/bids/reveal` | Keep `proofSubmission.proofId`, `verificationStatus`, `rankingScore`, and `decisionTraceHash` as the only durable post-reveal fields. |
-| Verification status | `/agent/tasks/{taskId}/verification` | `POST /v1/tasks/{taskId}/proofs/verify` today; dedicated read still missing | Show terminal verifier output when the current session owns it; otherwise keep a pending state with a contract-gap note instead of fabricating queued or refreshed status. |
+| Verification status | `/agent/tasks/{taskId}/verification` | No merged frontend-readable endpoint on `main`; use reveal response only | Keep `proofSubmission.verificationStatus=PENDING_VERIFY` as the durable UI state and explain that verifier-owned terminal results are not yet queryable from the manager/agent frontend flow. |
 | Award read | `/manager/tasks/{taskId}/award` | No merged endpoint on `main` | Keep the rail visible with explicit blocked copy, and link issue [#58](https://github.com/jckhang/agent-indeed/issues/58) until a winner-focused read model lands. |
 
 ## Required UI state handling
@@ -54,14 +54,15 @@ Manager copy baseline:
 
 ### 2. Verification pending
 
-When reveal succeeds but the frontend does not yet own a terminal proof result:
+When reveal succeeds:
 - treat `proofSubmission.verificationStatus=PENDING_VERIFY` as the only durable pending state on `main`
+- do not call `POST /v1/tasks/{taskId}/proofs/verify` from the manager or agent UI flow; that endpoint is verifier/operator scope only on the current contract baseline
 - do not imply that a browser refresh can recover live status until issue [#59](https://github.com/jckhang/agent-indeed/issues/59) lands
 - keep the verification route visible, but annotate it as pending runtime follow-through
 
 Agent copy baseline:
 - Primary: `Proof submitted. Verification is pending.`
-- Supporting: `Live status refresh still depends on the bid/proof read contract.`
+- Supporting: `Live status refresh still depends on the bid/proof read contract; verifier-only checks do not unblock the frontend flow yet.`
 
 ### 3. Blocked award actions
 
@@ -91,7 +92,7 @@ Issue #116 should not invent new payloads when these gaps are already tracked el
 
 1. Proof status read and refresh durability still belong to issue [#59](https://github.com/jckhang/agent-indeed/issues/59) / PR [#66](https://github.com/jckhang/agent-indeed/pull/66).
 2. Manager winner and award summary reads still belong to issue [#58](https://github.com/jckhang/agent-indeed/issues/58) / PR [#68](https://github.com/jckhang/agent-indeed/pull/68).
-3. Verifier result-code and proof-policy convergence still depend on PR [#83](https://github.com/jckhang/agent-indeed/pull/83).
+3. Verifier result-code and proof-policy convergence still depend on PR [#83](https://github.com/jckhang/agent-indeed/pull/83), but that verifier surface remains operator/verifier-only until a frontend read model exists.
 
 ## Delivery guardrails for the next frontend implementation pass
 
@@ -99,7 +100,7 @@ When a runnable frontend app lands, the first runtime integration pass for issue
 1. replace fixture-only task publish confirmation with `POST /v1/tasks`
 2. switch shortlist review to `GET /v1/tasks/{taskId}/candidates` and branch on `TASK_MATCH_NOT_READY`
 3. preserve server-authored bid window state from commit/reveal responses
-4. show `PENDING_VERIFY` and terminal verifier results without promising refresh-safe recovery that the backend cannot yet support
+4. show only the reveal response's `PENDING_VERIFY` state and avoid calling verifier-only endpoints from the manager/agent UI
 5. keep award-read explicitly blocked until issue #58 merges a dedicated read model
 
 ## Acceptance criteria mapping
