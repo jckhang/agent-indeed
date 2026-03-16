@@ -15,8 +15,8 @@ This fixture pack is intentionally limited to:
 - Runtime cutline: `docs/RUNTIME_CUTLINE_2026-03-16.md`
 - Frontend runtime target under review: issue #116 / PR #122
 - Open follow-ups for blocked reads:
-  - issue #59 / PR #66 for bid or proof status polling
-  - issue #58 / PR #68 for shortlist and award read models
+  - open PR #66 for bid or proof status polling
+  - open PR #68 for shortlist and award read models
 
 ## Flow checklist
 
@@ -26,8 +26,8 @@ This fixture pack is intentionally limited to:
 | 2 | Manager shortlist fetch | `GET /v1/tasks/{taskId}/candidates` | `LOADING -> MATCHED` or retryable pending | Ready |
 | 3 | Agent commit | `POST /v1/tasks/{taskId}/bids/commit` | `COMMITTING -> COMMITTED` | Ready |
 | 4 | Agent reveal | `POST /v1/tasks/{taskId}/bids/reveal` | `REVEALING -> REVEALED` with proof handoff | Ready |
-| 5 | Agent verify-status handoff | No merged read endpoint on `main` | `PENDING_VERIFY` or dependency-blocked refresh | Blocked on #59 / PR #66 |
-| 6 | Manager award-read state | No merged manager award-read endpoint on `main` | explicit award-read blocked note; do not substitute operator audit events | Blocked on #58 / PR #68 |
+| 5 | Agent verify-status handoff | No merged read endpoint on `main` | `PENDING_VERIFY` or dependency-blocked refresh | Blocked on open PR #66 |
+| 6 | Manager award-read state | No merged manager award-read endpoint on `main` | explicit award-read blocked note; do not substitute operator audit events | Blocked on open PR #68 |
 
 ## Step 1 - Publish task
 
@@ -350,7 +350,7 @@ No proof-status read endpoint is merged on `main` yet. Frontend should use the r
 }
 ```
 
-Required UI behavior until issue #59 / PR #66 lands:
+Required UI behavior until open PR #66 lands:
 
 - Show `PENDING_VERIFY` as a non-terminal waiting state.
 - Do not fake queued/verifying timestamps, result enums, or refresh metadata.
@@ -368,12 +368,12 @@ Canonical blocked-state fixture:
   "awardRead": {
     "status": "BLOCKED",
     "reason": "AWARD_READ_MODEL_PENDING",
-    "followUp": "issue #58 / PR #68"
+    "followUp": "PR #68"
   }
 }
 ```
 
-Required UI behavior until issue #58 / PR #68 lands:
+Required UI behavior until open PR #68 lands:
 
 - Do not call or document `GET /v1/tasks/{taskId}/events` as a merged manager award-read dependency.
 - Treat `GET /v1/tasks/{taskId}/events` as operator-audit-only context, not as winner-summary or award-read evidence for manager flows.
@@ -384,8 +384,8 @@ Required UI behavior until issue #58 / PR #68 lands:
 
 | Gap | What frontend can do now | Follow-up owner |
 | --- | --- | --- |
-| Bid or proof status read model is not merged on `main` | Use reveal handoff state (`PENDING_VERIFY`) and show dependency-blocked refresh copy | issue #59 / PR #66 |
-| Dedicated award read endpoint is not merged on `main` | Keep award surfaces blocked and link the owning read-model follow-up | issue #58 / PR #68 |
+| Bid or proof status read model is not merged on `main` | Use reveal handoff state (`PENDING_VERIFY`) and show dependency-blocked refresh copy | open PR #66 |
+| Dedicated award read endpoint is not merged on `main` | Keep award surfaces blocked and link the owning read-model follow-up | open PR #68 |
 | Runtime wiring narrative in PR #122 is still under review | Keep this fixture pack contract-first and refer to PR #122 only as supporting frontend sequencing context | issue #116 / PR #122 |
 
 ## Validation checklist for future frontend wiring
@@ -393,5 +393,5 @@ Required UI behavior until issue #58 / PR #68 lands:
 - Publish flow uses only `POST /v1/tasks` fields present on `main`.
 - Shortlist page distinguishes `TASK_MATCH_NOT_READY` from a true empty result.
 - Commit and reveal pages recover countdowns from `window.serverTime`, `commitDeadline`, and `revealDeadline`.
-- Verification page does not claim more than `PENDING_VERIFY` until #59 lands.
+- Verification page does not claim more than `PENDING_VERIFY` until PR #66 lands.
 - Award or review surfaces keep award-read explicitly blocked until a merged read endpoint exists.
