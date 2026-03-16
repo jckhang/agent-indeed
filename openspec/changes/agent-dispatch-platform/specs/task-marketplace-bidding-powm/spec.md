@@ -44,9 +44,33 @@
 - **WHEN** 候选身份为 T2 且任务风险等级高
 - **THEN** 平台要求高强度 PoMW（样本执行 + 更高挑战或质押要求）
 
+#### Scenario: Policy decision returns auditable verifier parameters
+- **WHEN** 平台根据任务 `risk.level`、`risk.valueScore`、候选 `identityTier` 与 `trustScore` 解析 PoMW 策略
+- **THEN** 平台返回 `requiredProofStrength`、挑战配置、最低样本质量阈值等 verifier 参数
+- **AND** 平台为该决策持久化唯一 `policy_trace_id`
+- **AND** 后续 proof 校验结果必须引用同一个 `policy_trace_id`
+
+#### Scenario: Proof verification rejects unknown policy snapshot references
+- **WHEN** agent 提交 proof 校验请求但未提供已持久化的 `policy_trace_id`
+- **OR** 提供的 `policy_trace_id` 不属于当前 task 的策略快照
+- **THEN** 平台拒绝校验请求并返回稳定错误
+- **AND** 平台不得在 verify 阶段隐式重新解析 PoMW 策略
+
 #### Scenario: Proof verification failure returns stable code
 - **WHEN** 提交的 `ProofPack` 未满足任务要求的 PoMW 强度
 - **THEN** 平台返回稳定验证错误码（`PROOF_VERIFY_FAILED` 或 `PROOF_VERIFY_NEEDS_REVIEW`）并附带可审计标识
+
+### Requirement: Verification Status Visibility Must Stay Contract-Honest
+
+平台 MUST 让 agent 能区分 queued、verifying 和终态验证结果，同时在 read contract 缺失时明确说明限制，而不是伪造后端已存在的字段。
+
+#### Scenario: Pending verification is shown as dependency-bounded state
+- **WHEN** reveal 已被接受，但 bid/proof status read contract 尚未合入
+- **THEN** 前端只显示受限 pending 状态和依赖说明，不把 queued/verifying 呈现为已可查询的后端事实
+
+#### Scenario: Terminal verification result maps to stable user-facing states
+- **WHEN** proof 返回 `PASS`、`FAIL` 或 `MANUAL_REVIEW`
+- **THEN** agent timeline 使用稳定终态文案渲染结果，并沿用可审计 reason code
 
 ### Requirement: Award Decision Must Be Auditable
 
@@ -55,6 +79,18 @@
 #### Scenario: Award event contains decision trace
 - **WHEN** 平台完成中标决策
 - **THEN** 审计日志包含候选评分摘要、PoMW 结果、决策时间戳和签名
+
+### Requirement: Manager Review Surfaces Must Preserve Shortlist Gaps And Award Blockers
+
+平台 MUST 让 manager 侧候选评审与 award-ready 视图保留缺失字段、校验阻塞与依赖缺口，而不是因为后端字段未齐全就隐藏决策证据。
+
+#### Scenario: Shortlist row remains visible when ranking evidence is partial
+- **WHEN** manager 查看候选 shortlist，但部分评分维度、proof 状态或审计引用尚未返回
+- **THEN** 系统仍保留该候选条目，并明确标记缺失字段或待补齐状态，而不是将候选静默过滤掉
+
+#### Scenario: Award review exposes blocking reasons before command support is complete
+- **WHEN** manager 打开某个 task 的 award-ready 视图，但任务阶段、proof 结果或 award command 依赖尚未满足
+- **THEN** 系统展示当前 task/bid/proof 状态、阻塞原因以及待补齐依赖，使 manager 可以理解为何暂时不可 award
 
 ### Requirement: Retry and Idempotency Signals Must Be Explicit
 
@@ -79,3 +115,16 @@
 #### Scenario: Downstream implementation work is mapped to telemetry obligations
 - **WHEN** 团队推进匹配、竞标、校验或审计等后续 issue / PR
 - **THEN** 平台维护一份可审阅的 handoff 清单，明确每个活跃工作项必须补齐的事件、指标、trace 字段，以及仍阻塞观测接入的 `job_id` / async read / `audit_id` 等合同缺口
+
+### Requirement: Sensitive Marketplace And Proof Data Must Respect Role And Phase Boundaries
+
+平台 MUST 对竞标、proof 与审计读写面实施显式 actor scope 与脱敏边界，避免在闭测期泄露商业或敏感验证数据。
+
+#### Scenario: Unrevealed bid content is redacted before reveal gate opens
+- **WHEN** manager 或 operator 在 reveal deadline 之前查看 shortlist / bid 读模型
+- **THEN** 平台只返回允许披露的状态摘要，不暴露价格、执行计划原文或 proof 引用
+
+#### Scenario: Manual proof override requires privileged actor and rationale
+- **WHEN** operator 使用人工 override 处理 proof 校验结果
+- **THEN** 请求必须携带特权 actor 身份与 review reason
+- **AND** 审计事件记录 actor、reason、ticket/reference 与时间戳

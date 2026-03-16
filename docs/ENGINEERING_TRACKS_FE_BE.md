@@ -1,6 +1,6 @@
 # Frontend/Backend Delivery Tracks (MVP)
 
-Last updated: 2026-03-13
+Last updated: 2026-03-15
 
 ## Objective
 
@@ -74,12 +74,13 @@ Exit criteria:
 ### F2. Agent Bidding Console Baseline (Week 2-3)
 
 Deliverables:
-- Bid commit form and deadline feedback.
-- Reveal form with proof pack upload/entry.
-- Verification and bid status timeline.
+- Unified bid workspace with commit-stage deadline feedback.
+- Reveal stage with `ProofPack` entry/upload guidance and required-section validation.
+- Verification timeline with queued/verifying/pass/fail/manual-review states.
+- Refresh fallback bounded by the current status-read contract (manual today, polling once the read model lands).
 
 Exit criteria:
-- Agent can complete commit/reveal and view verification outcome.
+- Agent can complete commit/reveal from one workflow and understand whether verification is pending, in progress, or terminal without relying on hidden backend fields.
 
 ### F3. Audit Visibility Baseline (Week 4)
 

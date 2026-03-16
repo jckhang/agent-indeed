@@ -24,6 +24,18 @@
 - **WHEN** `schemaVersion` 不在平台支持列表内
 - **THEN** 平台拒绝入库并返回稳定错误码 `AGENT_BUNDLE_SCHEMA_UNSUPPORTED_VERSION` 与字段路径 `bundle.schemaVersion`
 
+### Requirement: Upload Authorization Must Bind To Declared Agent Identity
+
+平台 MUST 要求上传调用方提供 agent write 凭证，并将认证主体绑定到 bundle 中声明的 agent 身份。
+
+#### Scenario: Authenticated upload actor matches declared identity
+- **WHEN** 上传请求携带 agent write 凭证，且认证主体与 `bundle.identity.did` 一致
+- **THEN** 平台允许继续执行签名、schema、版本冲突与索引流程
+
+#### Scenario: Authenticated upload actor does not match declared identity
+- **WHEN** 上传请求的认证主体与 `bundle.identity.did` 不一致
+- **THEN** 平台拒绝请求并返回稳定鉴权错误，且审计记录包含 actor 标识与 `audit_id`
+
 ### Requirement: Bundle Version Conflict Must Follow Deterministic Strategy
 
 平台 MUST 对 `(agent_id, manifest.version)` 冲突采用确定性策略，避免重复上传产生不一致状态。

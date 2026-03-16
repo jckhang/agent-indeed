@@ -8,6 +8,7 @@
 - [x] 0.6 输出 `docs/BACKEND_SERVICE_BOUNDARIES.md`，定义后端模块边界与所有权映射。
 - [x] 0.7 收敛 `docs/issues/PHASE1_ISSUES.md` 与 `docs/PHASE1_CHECKPOINT_BOARD.md` 为稳定索引，改用 GitHub 查询承载高频 issue / PR 状态。
 - [x] 0.8 输出 `docs/MVP_STATE_MODEL.md`，冻结 MVP 状态机与关键写入时序约束。
+- [x] 0.9 输出 `docs/MERGE_TRAIN_PLAYBOOK.md`，统一 clean LGTM merge train、dirty queue 回写与 rebase 协作流程。
 
 ## 1. OpenSpec 基础落地
 
@@ -28,7 +29,8 @@
 
 ## 4. PoMW 与审计闭环
 
-- [ ] 4.1 定义身份层级（T0/T1/T2）和 PoMW 强度映射规则。
+- [x] 4.1 定义身份层级（T0/T1/T2）和 PoMW 强度映射规则。
 - [ ] 4.2 定义 `ProofPack` 结构与验证结果状态码。
 - [ ] 4.3 规范审计事件模型并预留信誉回写接口。
 - [x] 4.4 定义 MVP 生命周期可观测性基线（事件/trace/log/metric/retention/alerts）。
+- [x] 4.5 输出闭测安全就绪清单，明确 auth/authz、secret handling、redaction 与 M4 go/no-go 门槛。

@@ -35,13 +35,15 @@ Ship the first usable agent dispatch loop for closed beta:
   - budget fit
   - historical similarity
 - Manager console baseline is captured in `docs/MANAGER_CONSOLE_BASELINE.md` so task publish, shortlist review, and award-state acceptance criteria stay reviewable while shortlist/award read-model gaps are still backend follow-ups.
+- The focused shortlist/award manager review slice is captured in `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` so fallback states and award blockers stay explicit while shortlist/award contracts remain under review.
 
 ### G3. Bidding and PoMW baseline
 
 - Commit-reveal bidding APIs available.
 - Reveal rejected when no valid commit exists.
 - `ProofPack` accepted and verified with T0/T1/T2 policy mapping.
-- Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md` so commit/reveal, proof entry, and verification timeline acceptance criteria stay reviewable while bid/proof status reads are still backend follow-ups.
+- Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, with focused follow-through in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` and `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`, so commit/reveal and verification acceptance criteria stay reviewable while bid/proof status reads remain backend follow-ups through issue #59.
+- Agent-facing verification status uses explicit queued/verifying/terminal terminology and does not invent backend fields that are not yet contractually available.
 
 ### G4. Audit and observability baseline
 
