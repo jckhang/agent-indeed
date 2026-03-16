@@ -10,7 +10,7 @@ Define the MVP audit-visibility slice so managers, operators, and reviewers can:
 2. understand why proof, commit, reveal, or award decisions failed, and
 3. spot which missing backend fields still block trustworthy review.
 
-This baseline stays aligned to the current repository reality: lifecycle state and observability expectations are documented, but audit-event query and award-read surfaces are still backend follow-through work.
+This baseline stays aligned to the current repository reality: task/bid audit-event query contracts now exist, while richer award-read and failure-aggregation surfaces remain backend follow-through work.
 
 ## Scope
 
@@ -28,7 +28,7 @@ Out of scope:
 
 | Step | Goal | Primary UI surface | Current backend status |
 | --- | --- | --- | --- |
-| 1 | Review chronological task + bid history | `Audit timeline` | Partial: event expectations exist in `docs/MVP_STATE_MODEL.md` and `docs/OBSERVABILITY_BASELINE.md`, but no `GET /v1/tasks/{taskId}/events` contract exists |
+| 1 | Review chronological task + bid history | `Audit timeline` | Ready: `GET /v1/tasks/{taskId}/events` and `GET /v1/bids/{bidId}/events` now define ordered timeline payloads with completeness flags |
 | 2 | Translate rejection and verification outcomes | `Failure reason panels` | Partial: stable proof/result codes are documented, but no task-scoped read model aggregates them for operator review |
 | 3 | Decide whether evidence is complete enough for stakeholder review | `Missing-field alerts` | Pending: award trace, proof summary, and audit query surfaces still depend on backend issues `#10` and `#58` |
 
@@ -55,7 +55,7 @@ Rendering rules:
 Current contract reality:
 - `docs/MVP_STATE_MODEL.md` freezes the minimum event set: `TASK_CREATED`, `BID_COMMITTED`, `BID_REVEALED`, `POMW_VERIFIED`, `TASK_AWARDED`.
 - `docs/OBSERVABILITY_BASELINE.md` already requires correlated `task_id`, `bid_id`, `proof_id`, `audit_id`, and `trace_id`.
-- The current API draft does not yet expose a task-scoped audit timeline endpoint or a normalized event payload for UI consumption.
+- The current API draft now exposes `GET /v1/tasks/{taskId}/events` and `GET /v1/bids/{bidId}/events` with normalized event payloads, timeline summaries, and completeness markers.
 
 ### 2. Failure reason panels
 
@@ -109,8 +109,8 @@ Alert behavior:
 
 | UI surface | Contract/input | Current source | Status | Notes |
 | --- | --- | --- | --- | --- |
-| Audit timeline list | task-scoped event stream | Proposed `GET /v1/tasks/{taskId}/events` | Pending backend contract | Needs event ordering, pagination, actor metadata, and lifecycle summaries |
-| Timeline event detail | event payload with task/bid/proof linkage | Proposed audit read model | Pending backend contract | Must expose `taskId`, `bidId`, `proofId`, `auditId`, `traceHash`, `occurredAt`, and summary fields |
+| Audit timeline list | task-scoped or bid-scoped event stream | `GET /v1/tasks/{taskId}/events`, `GET /v1/bids/{bidId}/events` | Ready for timeline integration | Provides event ordering, pagination, actor metadata, lifecycle summaries, and completeness fields |
+| Timeline event detail | event payload with task/bid/proof linkage | `AuditEvent` read model in `src/api/openapi.yaml` | Ready for timeline integration | Exposes `taskId`, `bidId`, `proofId`, `auditId`, `traceHash`, `occurredAt`, summary fields, and typed payload blocks |
 | Failure reason panels | stable code + reviewer-safe explanation | `docs/ERROR_CODE_RETRY_POLICY.md`, verify response draft | Partial | Codes exist, but read-time aggregation for task review is still missing |
 | Award review summary | award state, winning bid, blockers, trace refs | Proposed award summary read model | Pending backend contract | Depends on issue `#58` for manager-facing award/read semantics |
 | Missing-field alerts | null/missing contract fields plus dependency metadata | Proposed audit read model | Pending backend contract | UI must distinguish between intentionally absent fields and unresolved backend gaps |
@@ -119,16 +119,14 @@ Alert behavior:
 
 P1-16 uncovers four concrete contract gaps that should stay visible while audit work is planned:
 
-1. A task-scoped audit event query surface is missing.
-   - Suggested payload: paginated event list with `eventType`, `occurredAt`, `actorRole`, `actorId`, `taskId`, optional `bidId`, optional `proofId`, `auditId`, `traceHash`, and reviewer-safe summary text.
-2. Failure reason aggregation is missing for read-time review.
+1. Failure reason aggregation is still missing for read-time review.
    - Suggested payload: normalized failure block that joins commit/reveal/proof/award blockers without forcing the UI to infer state from raw write responses.
 3. Award trace read fields remain incomplete.
    - Suggested payload: selected bid, task state, `decisionTraceHash`, `auditEventId`, proof summary, and unresolved blocker list.
-4. Missing-field semantics need to be explicit in read contracts.
+3. Missing-field semantics must stay explicit in all future read contracts.
    - The UI must know whether a field is absent because it is pending ingestion, intentionally redacted, or not defined by the current backend scope.
 
-These gaps should be treated as dependencies on issue `#10` and issue `#58`, not as frontend-only assumptions.
+These remaining gaps should be treated as dependencies on issue `#58` and later audit follow-ons, not as frontend-only assumptions.
 
 ## Acceptance criteria mapping
 

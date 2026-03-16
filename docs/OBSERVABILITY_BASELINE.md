@@ -181,9 +181,13 @@ Alert-worthy failures:
 Required events:
 - `POWM_VERIFICATION_REQUESTED`
 - `POWM_POLICY_EVALUATED`
-- `POWM_VERIFIED`
+- `POMW_VERIFIED`
 - `POWM_REJECTED`
 - `POWM_VERIFICATION_FAILED`
+
+Notes:
+- `POMW_VERIFIED` is the externally queryable audit-timeline event defined in the API contract.
+- The surrounding `POWM_*` names remain service-internal verification telemetry for policy evaluation and retry analysis.
 
 Required trace/log attributes:
 - `proof.id`

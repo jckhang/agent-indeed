@@ -61,7 +61,16 @@ Required events (minimum):
 - `TASK_AWARDED`
 
 Each event must include:
-- `eventId`, `taskId`, `occurredAt`, `actorId/system`, `traceHash`, `payloadVersion`.
+- `eventId`, `taskId`, `occurredAt`, `actorId/system`, `traceHash`, `auditId`, `payloadVersion`.
+- `bidId` / `proofId` when the event belongs to one candidate path.
+- completeness metadata so audit consumers can distinguish missing writes from intentionally absent fields.
+
+Minimum payload expectations by event:
+- `TASK_CREATED`: task state, risk level, proof-policy mode.
+- `BID_COMMITTED`: committed bid hash and commit-window snapshot.
+- `BID_REVEALED`: price summary, `proofId`, and optional ranking trace.
+- `POMW_VERIFIED`: result, `policyTraceId`, difficulty fields, reason codes, manual-review flag.
+- `TASK_AWARDED`: selected bid/agent, `decisionTraceHash`, candidate score summary, proof summary.
 
 ## 2) Invalid Transition Rejection Rules
 
@@ -138,7 +147,7 @@ Use stable lock order to avoid deadlocks:
 - #7 (commit/reveal APIs): must implement rejection behavior above using the authoritative P1-11 error-code catalog.
 - #8 (PoMW policy engine): must output verifier parameters consumed by `PENDING_VERIFY -> terminal` transitions.
 - #9 (Proof verifier): must return stable reason codes aligned to `PASS/FAIL/MANUAL_REVIEW`.
-- #10 (audit + award trace): must persist ordered lifecycle events and decision trace hash.
+- #10 (audit + award trace): must persist ordered lifecycle events, expose queryable task/bid timelines, and carry award decision trace fields.
 
 ## Out of Scope
 

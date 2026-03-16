@@ -128,6 +128,8 @@ MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立�
 ### Audit Ledger
 
 - 负责接收所有关键状态变更事件并提供按 `task_id` / `bid_id` 的可追溯查询视图。
+- 查询面向 MVP 暴露 `GET /v1/tasks/{taskId}/events` 与 `GET /v1/bids/{bidId}/events`，支持 cursor/limit 分页与 task-scope 内的 bid 过滤。
+- `TASK_AWARDED` 事件必须携带 `decisionTraceHash`、候选评分摘要、proof 结果摘要，以及 payload completeness 信号，便于 operator 和 manager 在缺字段时区分“尚未写入”与“有意省略”。
 - 拥有审计事件 append-only 写入权和 award trace 聚合权。
 - 任何模块都不能直接回写或删除已发布事件；补偿只能通过新增事件完成。
 
