@@ -43,7 +43,7 @@ Scope:
   - #109 bootstrap runnable backend skeleton
   - #110 implement runnable dispatch vertical slice (`publish -> match -> commit -> reveal -> verify -> award`)
   - #111 convert QA smoke/E2E matrices into executable checks
-- Keep remaining contract convergence PRs (#66, #68, #83, #90, #92) aligned as unblockers for runtime delivery, not as the sprint end state.
+- Keep the remaining runtime contract review queue focused on PRs #66 and #68, with PR #122 held to the merged `main` baseline, rather than treating every historical contract PR as a current blocker.
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
 - Manager shortlist and award review contracts with audit-linked status context.
@@ -103,8 +103,8 @@ Scope:
 
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
-- M1 (2026-03-20): finish remaining contract convergence and land runnable backend skeleton (#109).
-- Runtime work may proceed ahead of full contract convergence when the cutline marks a delta additive-safe; verifier payload/result vocabulary remains the main blocking contract for the verify/award merge path.
+- M1 (2026-03-20): close the remaining contract review queue (#66, #68) and land runnable backend skeleton (#109).
+- Runtime work may proceed ahead of full contract convergence when the cutline marks a delta additive-safe; verifier payload/result vocabulary is now merged, so the remaining near-term review risk is contract drift on the additive read surfaces and frontend wiring handoff.
 - M2 (2026-03-27): land runnable publish/match/commit/reveal/verify/award vertical slice (#110).
 - M3 (2026-04-03): stabilize verify/award/audit runtime behavior and run executable smoke checks (#111).
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
