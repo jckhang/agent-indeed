@@ -88,6 +88,7 @@ Scope:
 - M3 (2026-04-03): PoMW policy + verifier baseline + bid/proof status-read visibility for agent UX.
 - M4 (2026-04-10): audit/reputation hook + E2E test pack + security/compliance readiness review.
 - M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, and `docs/CLOSED_BETA_SECURITY_READINESS.md` so telemetry owners plus auth, secret-handling, and redaction follow-ons stay reviewable.
+- Review `docs/PHASE1_BETA_READINESS_GATES.md` as the compact release-gate checklist for the remaining Phase 1 contract, QA, audit, and planning blockers.
 
 Checkpoint status board:
 - Review `docs/PHASE1_CHECKPOINT_BOARD.md` for the one-screen issue/PR map, target owners, and drift callouts.
