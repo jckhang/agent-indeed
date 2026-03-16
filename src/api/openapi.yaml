@@ -238,6 +238,152 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /v1/tasks/{taskId}/candidates:
+    get:
+      tags: [tasks]
+      summary: Retrieve the ranked candidate shortlist for a task
+      operationId: listTaskCandidates
+      security:
+        - ManagerSession: []
+      x-required-scopes: [task.write]
+      description: |
+        Returns the latest matching snapshot for a task. The platform MUST
+        apply identity, skill, and compliance hard filters before ranking
+        eligible candidates by the baseline soft-scoring factors.
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+        - name: limit
+          in: query
+          required: false
+          description: Canonical shortlist size limit for the matching snapshot.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+        - name: includeScoreBreakdown
+          in: query
+          required: false
+          description: >
+            When false, the server MAY omit per-candidate `scoreBreakdown`
+            details while preserving the rest of the shortlist shape.
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Ranked candidates generated from hard filters plus soft scoring
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidateMatchListResponse'
+              examples:
+                matchedShortlist:
+                  summary: Task returns ranked and filtered candidates
+                  value:
+                    taskId: task_ops_triage_001
+                    status: MATCHED
+                    generatedAt: '2026-03-14T03:05:00Z'
+                    candidates:
+                      - agentId: agent_supporttriage001
+                        rank: 1
+                        eligible: true
+                        matchingTraceId: matchtrace_ops_triage_001
+                        identityTier: T1
+                        matchedSkills: [support, routing]
+                        complianceStatus: PASSED
+                        eligibilityChecks:
+                          - gate: IDENTITY_TIER
+                            status: PASSED
+                          - gate: REQUIRED_SKILL
+                            status: PASSED
+                            detail: matched support,routing
+                          - gate: COMPLIANCE
+                            status: PASSED
+                        scoreBreakdown:
+                          totalScore: 0.87
+                          factors:
+                            - factor: SUCCESS_RATE
+                              weight: 0.35
+                              rawScore: 0.92
+                              weightedScore: 0.322
+                              rationale: strong completion history for similar tasks
+                            - factor: LATENCY
+                              weight: 0.2
+                              rawScore: 0.81
+                              weightedScore: 0.162
+                            - factor: BUDGET_FIT
+                              weight: 0.2
+                              rawScore: 0.78
+                              weightedScore: 0.156
+                            - factor: HISTORICAL_SIMILARITY
+                              weight: 0.25
+                              rawScore: 0.92
+                              weightedScore: 0.23
+                      - agentId: agent_supporttriage021
+                        eligible: false
+                        matchingTraceId: matchtrace_ops_triage_001
+                        identityTier: T0
+                        matchedSkills: [support]
+                        missingRequiredSkills: [routing]
+                        complianceStatus: FAILED
+                        eligibilityChecks:
+                          - gate: IDENTITY_TIER
+                            status: FAILED
+                            detail: requires minimum T1
+                          - gate: REQUIRED_SKILL
+                            status: FAILED
+                            detail: missing routing
+                          - gate: COMPLIANCE
+                            status: FAILED
+                            detail: gdpr-eu tag missing
+        '400':
+          description: Invalid match query input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidLimit:
+                  summary: Limit exceeds supported shortlist cap
+                  value:
+                    code: TASK_MATCH_LIMIT_INVALID
+                    category: MATCHING
+                    message: limit must be between 1 and 50
+                    auditId: audit_task_match_limit_invalid
+                    retryable: false
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                taskNotFound:
+                  summary: Requested task id does not exist
+                  value:
+                    code: TASK_MATCH_TASK_NOT_FOUND
+                    category: MATCHING
+                    message: task_id task_missing_001 was not found
+                    auditId: audit_task_match_not_found
+                    retryable: false
+        '409':
+          description: Matching snapshot is not ready yet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                snapshotPending:
+                  summary: Candidate shortlist has not been generated yet
+                  value:
+                    code: TASK_MATCH_NOT_READY
+                    category: MATCHING
+                    message: candidate matching snapshot is not ready for task task_ops_triage_001
+                    auditId: audit_task_match_not_ready
+                    retryable: true
+                    retryAfterSeconds: 15
+
   /v1/tasks/{taskId}/bids/commit:
     post:
       tags: [bids]
@@ -852,6 +998,168 @@ components:
         revealDeadline:
           type: string
           format: date-time
+
+    CandidateMatchListResponse:
+      type: object
+      additionalProperties: false
+      required: [taskId, status, generatedAt, candidates]
+      properties:
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        status:
+          type: string
+          enum: [MATCHED, NO_ELIGIBLE_CANDIDATES]
+        generatedAt:
+          type: string
+          format: date-time
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/CandidateMatch'
+
+    CandidateMatch:
+      oneOf:
+        - $ref: '#/components/schemas/EligibleCandidateMatch'
+        - $ref: '#/components/schemas/IneligibleCandidateMatch'
+
+    EligibleCandidateMatch:
+      type: object
+      additionalProperties: false
+      required:
+        - agentId
+        - eligible
+        - rank
+        - matchingTraceId
+        - identityTier
+        - matchedSkills
+        - complianceStatus
+        - eligibilityChecks
+      properties:
+        agentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        eligible:
+          type: boolean
+          enum: [true]
+        rank:
+          type: integer
+          minimum: 1
+        matchingTraceId:
+          type: string
+          pattern: '^matchtrace_[a-zA-Z0-9_-]{8,64}$'
+        identityTier:
+          type: string
+          enum: [T0, T1, T2]
+        matchedSkills:
+          type: array
+          items:
+            type: string
+        missingRequiredSkills:
+          type: array
+          items:
+            type: string
+        complianceStatus:
+          type: string
+          enum: [PASSED, FAILED, NOT_REQUESTED]
+        eligibilityChecks:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CandidateEligibilityCheck'
+        scoreBreakdown:
+          $ref: '#/components/schemas/CandidateRankingBreakdown'
+
+    IneligibleCandidateMatch:
+      type: object
+      additionalProperties: false
+      required:
+        - agentId
+        - eligible
+        - matchingTraceId
+        - identityTier
+        - matchedSkills
+        - complianceStatus
+        - eligibilityChecks
+      properties:
+        agentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        eligible:
+          type: boolean
+          enum: [false]
+        matchingTraceId:
+          type: string
+          pattern: '^matchtrace_[a-zA-Z0-9_-]{8,64}$'
+        identityTier:
+          type: string
+          enum: [T0, T1, T2]
+        matchedSkills:
+          type: array
+          items:
+            type: string
+        missingRequiredSkills:
+          type: array
+          items:
+            type: string
+        complianceStatus:
+          type: string
+          enum: [PASSED, FAILED, NOT_REQUESTED]
+        eligibilityChecks:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CandidateEligibilityCheck'
+
+    CandidateEligibilityCheck:
+      type: object
+      additionalProperties: false
+      required: [gate, status]
+      properties:
+        gate:
+          type: string
+          enum: [IDENTITY_TIER, REQUIRED_SKILL, COMPLIANCE]
+        status:
+          type: string
+          enum: [PASSED, FAILED, NOT_REQUESTED]
+        detail:
+          type: string
+
+    CandidateRankingBreakdown:
+      type: object
+      additionalProperties: false
+      required: [totalScore, factors]
+      properties:
+        totalScore:
+          type: number
+          minimum: 0
+        factors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CandidateRankingFactor'
+
+    CandidateRankingFactor:
+      type: object
+      additionalProperties: false
+      required: [factor, weight, rawScore, weightedScore]
+      properties:
+        factor:
+          type: string
+          enum: [SUCCESS_RATE, LATENCY, BUDGET_FIT, HISTORICAL_SIMILARITY]
+        weight:
+          type: number
+          minimum: 0
+          maximum: 1
+        rawScore:
+          type: number
+          minimum: 0
+          maximum: 1
+        weightedScore:
+          type: number
+          minimum: 0
+        rationale:
+          type: string
 
     CommitBidRequest:
       type: object
@@ -1716,6 +2024,9 @@ components:
         - TASK_SPEC_CONSTRAINTS_MISSING
         - TASK_SPEC_POLICY_INVALID
         - TASK_CREATE_IDEMPOTENCY_CONFLICT
+        - TASK_MATCH_TASK_NOT_FOUND
+        - TASK_MATCH_NOT_READY
+        - TASK_MATCH_LIMIT_INVALID
         - BID_COMMIT_PAYLOAD_INVALID
         - BID_COMMIT_TASK_MISMATCH
         - BID_COMMIT_WINDOW_CLOSED
@@ -1743,6 +2054,7 @@ components:
         - VERSION
         - VALIDATION
         - IDEMPOTENCY
+        - MATCHING
         - WINDOW
         - PRECONDITION
         - POLICY

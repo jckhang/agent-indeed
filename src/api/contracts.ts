@@ -232,6 +232,7 @@ export type ApiErrorCategory =
   | AgentBundleErrorCategory
   | "VALIDATION"
   | "IDEMPOTENCY"
+  | "MATCHING"
   | "WINDOW"
   | "PRECONDITION"
   | "POLICY"
@@ -242,6 +243,11 @@ export type TaskCreateErrorCode =
   | "TASK_SPEC_CONSTRAINTS_MISSING"
   | "TASK_SPEC_POLICY_INVALID"
   | "TASK_CREATE_IDEMPOTENCY_CONFLICT";
+
+export type CandidateMatchErrorCode =
+  | "TASK_MATCH_TASK_NOT_FOUND"
+  | "TASK_MATCH_NOT_READY"
+  | "TASK_MATCH_LIMIT_INVALID";
 
 export type BidCommitErrorCode =
   | "BID_COMMIT_PAYLOAD_INVALID"
@@ -272,6 +278,7 @@ export type AwardAuditErrorCode =
 export type ApiErrorCode =
   | AgentBundleErrorCode
   | TaskCreateErrorCode
+  | CandidateMatchErrorCode
   | BidCommitErrorCode
   | BidRevealErrorCode
   | ProofVerifyErrorCode
@@ -368,20 +375,67 @@ export interface TaskSpec {
   };
 }
 
-export interface CreateTaskRequest {
-  task: TaskSpec;
+export type CandidateEligibilityGate =
+  | "IDENTITY_TIER"
+  | "REQUIRED_SKILL"
+  | "COMPLIANCE";
+
+export interface CandidateEligibilityCheck {
+  gate: CandidateEligibilityGate;
+  status: "PASSED" | "FAILED" | "NOT_REQUESTED";
+  detail?: string;
 }
 
-export interface CreateTaskHttpRequest {
-  headers: TaskWriteContextHeaders;
-  body: CreateTaskRequest;
+export type CandidateRankingFactorType =
+  | "SUCCESS_RATE"
+  | "LATENCY"
+  | "BUDGET_FIT"
+  | "HISTORICAL_SIMILARITY";
+
+export interface CandidateRankingFactor {
+  factor: CandidateRankingFactorType;
+  weight: number;
+  rawScore: number;
+  weightedScore: number;
+  rationale?: string;
 }
 
-export interface CreateTaskResponse {
+export interface CandidateRankingBreakdown {
+  totalScore: number;
+  factors: CandidateRankingFactor[];
+}
+
+interface CandidateMatchBase {
+  agentId: string;
+  matchingTraceId: string;
+  identityTier: IdentityTier;
+  matchedSkills: string[];
+  missingRequiredSkills?: string[];
+  complianceStatus: "PASSED" | "FAILED" | "NOT_REQUESTED";
+  eligibilityChecks: CandidateEligibilityCheck[];
+}
+
+export interface EligibleCandidateMatch extends CandidateMatchBase {
+  eligible: true;
+  rank: number;
+  scoreBreakdown?: CandidateRankingBreakdown;
+}
+
+export interface IneligibleCandidateMatch extends CandidateMatchBase {
+  eligible: false;
+  rank?: never;
+  scoreBreakdown?: never;
+}
+
+export type CandidateMatch =
+  | EligibleCandidateMatch
+  | IneligibleCandidateMatch;
+
+export interface CandidateMatchListResponse {
   taskId: string;
-  status: "OPEN_FOR_MATCHING" | "OPEN_FOR_BIDDING";
-  commitDeadline?: string;
-  revealDeadline?: string;
+  status: "MATCHED" | "NO_ELIGIBLE_CANDIDATES";
+  generatedAt: string;
+  candidates: CandidateMatch[];
 }
 
 export interface ProofPack {
