@@ -83,7 +83,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | --- | --- | --- | --- | --- |
 | `/operator/proofs/queue` | `GET /v1/proofs` (proposed) | `result`, `updatedSince`, `cursor` | `proofId`, `taskId`, `agentId`, `result`, `reasonCodes`, `verifiedAt`, `needsManualReview` | Missing in current API |
 | `/operator/proofs/{proofId}/review` | `POST /v1/tasks/{taskId}/proofs/verify` + `PATCH /v1/proofs/{proofId}/decision` (proposed override) | verify payload `proof.*`; override payload `decision`, `reason`, `operatorId` | `proofId`, `result`, `reasonCodes`, `verifiedAt`, `decisionTraceHash`; error `code`, `category`, `retryable`, `details.policyTraceId` | Partial: verify now has typed proof failure codes, manual override still missing |
-| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` | `taskId`, optional `bidId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `taskId`, `bidId`, `proofId`, `summary`, `traceHash`, `auditId`, `occurredAt`, completeness flags or equivalent missing-field signal | Ready for timeline rendering; award summary/read CTA still depends on issue `#58` |
+| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` | `taskId`, optional `bidId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `taskId`, `bidId`, `proofId`, `summary`, `traceHash`, `auditId`, `occurredAt`, completeness flags or equivalent missing-field signal | Ready for operator timeline rendering only; manager award summary/read CTA still depends on issue `#58` |
 
 ## State-Driven UI Requirements
 

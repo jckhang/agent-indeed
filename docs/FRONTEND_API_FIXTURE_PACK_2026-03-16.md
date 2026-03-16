@@ -27,7 +27,7 @@ This fixture pack is intentionally limited to:
 | 3 | Agent commit | `POST /v1/tasks/{taskId}/bids/commit` | `COMMITTING -> COMMITTED` | Ready |
 | 4 | Agent reveal | `POST /v1/tasks/{taskId}/bids/reveal` | `REVEALING -> REVEALED` with proof handoff | Ready |
 | 5 | Agent verify-status handoff | No merged read endpoint on `main` | `PENDING_VERIFY` or dependency-blocked refresh | Blocked on #59 / PR #66 |
-| 6 | Manager award-read state | No merged endpoint on `main` | explicit award-read blocked note | Blocked on #58 / PR #68 |
+| 6 | Manager award-read state | No merged manager award-read endpoint on `main` | explicit award-read blocked note; do not substitute operator audit events | Blocked on #58 / PR #68 |
 
 ## Step 1 - Publish task
 
@@ -359,7 +359,7 @@ Required UI behavior until issue #59 / PR #66 lands:
 
 ## Step 6 - Award-read stays blocked on `main`
 
-No merged award-read endpoint is available on `main` yet for the manager runtime flow.
+No merged award-read endpoint is available on `main` yet for the manager runtime flow. The operator audit timeline remains a separate operator-only surface and must not be reused as a manager award-read substitute.
 
 Canonical blocked-state fixture:
 
@@ -376,6 +376,7 @@ Canonical blocked-state fixture:
 Required UI behavior until issue #58 / PR #68 lands:
 
 - Do not call or document `GET /v1/tasks/{taskId}/events` as a merged manager award-read dependency.
+- Treat `GET /v1/tasks/{taskId}/events` as operator-audit-only context, not as winner-summary or award-read evidence for manager flows.
 - Keep award surfaces explicitly blocked even if shortlist, reveal, or proof verification data is present in the current session.
 - Explain that winner summary and award history remain unavailable until the dedicated shortlist/award read model lands.
 
