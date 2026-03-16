@@ -19,7 +19,7 @@ Start with one profile and keep extending as new members onboard.
 ### avery-chen
 
 Role:
-- AI code-review assistant (software quality gate)
+- Code reviewer + QA owner (software quality gate)
 
 Personal statement:
 - I protect contract integrity by catching OpenAPI/TypeScript/OpenSpec drift and enum mismatches early.
@@ -102,6 +102,44 @@ Working style:
 - Confirm acceptance criteria first, then ship small, reviewable PRs with clear rollback boundaries.
 - Design UI as an explicit state machine (happy path + negative path + retries + idempotency hints).
 - Standardize reason-code rendering into user language plus actionable next steps.
+
+## Issue owner and PR review relation map
+
+This map defines who PM Lan assigns as issue owner and who is requested as PR reviewer.
+
+### Assignment principles
+
+- PM Lan is the dispatcher for issue owners and PR reviewer requests.
+- Every issue has exactly one `owner:*` label (single accountable owner).
+- Every PR review always has one review owner: `albatross-dev-agent`.
+- When `albatross-dev-agent` is the PR author, review delegation is mandatory; delegated reviewers execute detailed review, and `albatross-dev-agent` still makes final merge-go/no-go call.
+
+### Issue owner map (assigned by PM Lan)
+
+| Work lane | Required issue labels | Default owner label | Notes |
+| --- | --- | --- | --- |
+| Frontend implementation | `dept/frontend` + one `type/*` | `owner:lanzhou-fe-agent` | UI workflow/state-machine scope. |
+| Backend/API implementation | `dept/backend` + one `type/*` | `owner:kestrel` | Endpoint, contract wiring, persistence, state transition scope. |
+| QA/test execution | `dept/qa` + one `type/*` | `owner:qa` | Smoke/E2E, regression evidence, validation tooling. |
+| Planning/docs/process | `dept/planning` + one `type/*` | `owner:lan` | Scope shaping, roadmap/docs/process updates. |
+| Cross-cutting architecture | keep primary `dept/*` + one `type/*` | `owner:albatross` | Use only when issue mainly controls multi-lane architecture decisions. |
+
+### PR review relation map
+
+| PR author | Review owner (always) | Delegate reviewers (pick by changed surface) |
+| --- | --- | --- |
+| `kestrel-dev-agent` | `albatross-dev-agent` | `avery-chen` (QA/risk) + `lanzhou-fe-agent` when FE contract impact exists |
+| `lanzhou-fe-agent` | `albatross-dev-agent` | `avery-chen` (QA/risk) + `kestrel-dev-agent` when API/contract impact exists |
+| `avery-chen` | `albatross-dev-agent` | `kestrel-dev-agent` for backend/test infra impact, `lanzhou-fe-agent` for FE test impact |
+| `lan` | `albatross-dev-agent` | Domain owner by dept (`kestrel-dev-agent` / `lanzhou-fe-agent` / `avery-chen`) |
+| `albatross-dev-agent` | `albatross-dev-agent` | Mandatory delegation: at least one domain owner + `avery-chen` for independent review |
+
+### PM Lan operating steps
+
+1. On issue creation, apply one `dept/*`, one `type/*`, and one `owner:*` label using the owner map.
+2. When PR opens, request `albatross-dev-agent` as review owner and set `status/in-review`.
+3. Add delegated reviewers from the PR review relation map based on changed files and risk.
+4. Keep one issue -> one branch -> one PR; if scope expands, split into a new issue/PR pair.
 
 ## Member template
 
