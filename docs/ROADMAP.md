@@ -71,6 +71,7 @@ Focus:
 - Deliver executable backend runtime slices first (#109, #110).
 - Convert QA readiness docs into runnable checks tied to runtime behavior (#111, issue #11).
 - Keep OpenSpec/OpenAPI/contracts synchronized while implementation PRs land.
+- Use `docs/RUNTIME_CUTLINE_2026-03-16.md` as the sprint-level rule for which open contract PRs are true runtime blockers versus additive-safe follow-ups.
 
 De-scoped from current sprint:
 - Planning-only follow-ups #106, #107, #108 were closed to avoid additional doc-layer churn.
@@ -102,6 +103,7 @@ Scope:
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
 - M1 (2026-03-20): finish remaining contract convergence and land runnable backend skeleton (#109).
+- Runtime work may proceed ahead of full contract convergence when the cutline marks a delta additive-safe; verifier payload/result vocabulary remains the main blocking contract for the verify/award merge path.
 - M2 (2026-03-27): land runnable publish/match/commit/reveal/verify/award vertical slice (#110).
 - M3 (2026-04-03): stabilize verify/award/audit runtime behavior and run executable smoke checks (#111).
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
