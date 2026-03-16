@@ -76,7 +76,6 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | `/agent/tasks/{taskId}/bid-workspace` (reveal stage) | `POST /v1/tasks/{taskId}/bids/reveal` | `idempotencyKey`, `reveal.bidId`, `reveal.taskId`, `reveal.agentId`, `reveal.nonce`, `reveal.price.*`, `reveal.executionPlan.*`, `reveal.proof.*` | `bidId`, `phase`, `status`, `result`, `rankingScore`, `decisionTraceHash`, `proofSubmission.*`, `window.*` | Ready for the reveal stage with typed failure paths; the returned `proofSubmission` should hand off directly into the merged status reads |
 | `/agent/tasks/{taskId}/verification` | `GET /v1/tasks/{taskId}/proofs/{proofId}` | `taskId`, `proofId` | `verificationState`, `requiredDifficulty`, `achievedDifficulty`, `reasonCodes`, `verifiedAt`, `decisionTraceHash`, `refresh.*` | Ready on `main`; runtime persistence from issue `#110` determines whether queued/verifying snapshots are populated for local runs |
 | `/agent/tasks/{taskId}/status` | `GET /v1/tasks/{taskId}/bids/{bidId}` | `taskId`, `bidId` | `commitState`, `revealState`, `proofState`, `awardState`, `failureReasonCodes`, `proof.*`, `refresh.*` | Ready on `main`; use this shared status projection for agent timeline recovery and retry-safe UX |
-
 Current replay guidance for QA and backend before that read model lands lives in `docs/FRONTEND_RUNTIME_DEMO_PAYLOAD_PACK_2026-03-17.md`: the frontend-visible contract stops at reveal-time `PENDING_VERIFY`, and `POST /v1/tasks/{taskId}/proofs/verify` remains operator/verifier-only.
 
 ### Operator pages
@@ -85,7 +84,7 @@ Current replay guidance for QA and backend before that read model lands lives in
 | --- | --- | --- | --- | --- |
 | `/operator/proofs/queue` | `GET /v1/proofs` (proposed) | `result`, `updatedSince`, `cursor` | `proofId`, `taskId`, `agentId`, `result`, `reasonCodes`, `verifiedAt`, `needsManualReview` | Missing in current API |
 | `/operator/proofs/{proofId}/review` | `POST /v1/tasks/{taskId}/proofs/verify` + `PATCH /v1/proofs/{proofId}/decision` (proposed override) | verify payload `proof.*`; override payload `decision`, `reason`, `operatorId` | `proofId`, `result`, `reasonCodes`, `verifiedAt`, `decisionTraceHash`; error `code`, `category`, `retryable`, `details.policyTraceId` | Partial: verify now has typed proof failure codes, manual override still missing |
-| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` | `taskId`, optional `bidId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `taskId`, `bidId`, `proofId`, `summary`, `traceHash`, `auditId`, `occurredAt`, completeness flags or equivalent missing-field signal | Ready for timeline rendering; award summary/read CTA still depends on issue `#58` |
+| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` | `taskId`, optional `bidId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `taskId`, `bidId`, `proofId`, `summary`, `traceHash`, `auditId`, `occurredAt`, completeness flags or equivalent missing-field signal | Ready for timeline rendering; award summary/read CTA still depends on open contract PR `#68` |
 
 ## State-Driven UI Requirements
 

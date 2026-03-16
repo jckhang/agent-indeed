@@ -29,8 +29,8 @@ This pack stays inside the current merged contract baseline on `main`:
 | 2. Match | `GET /v1/tasks/{taskId}/candidates` | shortlist is returned or `TASK_MATCH_NOT_READY` includes retry guidance | Stable |
 | 3. Commit | `POST /v1/tasks/{taskId}/bids/commit` | server-authored `window` snapshot drives next action | Stable |
 | 4. Reveal | `POST /v1/tasks/{taskId}/bids/reveal` | reveal returns `rankingScore`, `decisionTraceHash`, and `proofSubmission.verificationStatus=PENDING_VERIFY` | Stable |
-| 5. Pending verify | no frontend-readable status endpoint on `main` | frontend keeps `PENDING_VERIFY` from reveal and does not call verifier-only APIs | Blocked on [#59](https://github.com/jckhang/agent-indeed/issues/59) / [#66](https://github.com/jckhang/agent-indeed/pull/66) |
-| 6. Award read | no merged manager award-read endpoint on `main` | frontend keeps award summary explicitly blocked | Blocked on [#58](https://github.com/jckhang/agent-indeed/issues/58) / [#68](https://github.com/jckhang/agent-indeed/pull/68) |
+| 5. Pending verify | no frontend-readable status endpoint on `main` | frontend keeps `PENDING_VERIFY` from reveal and does not call verifier-only APIs | Blocked on open contract PR [#66](https://github.com/jckhang/agent-indeed/pull/66) |
+| 6. Award read | no merged manager award-read endpoint on `main` | frontend keeps award summary explicitly blocked | Blocked on open contract PR [#68](https://github.com/jckhang/agent-indeed/pull/68) |
 
 ## Step 1 - Publish task
 
@@ -333,7 +333,7 @@ Replay assertion:
 QA/backend notes:
 - manager and agent UI must not call `POST /v1/tasks/{taskId}/proofs/verify`; it is verifier/operator scope only
 - do not fabricate queued timestamps, terminal result enums, or refresh metadata
-- issue [#111](https://github.com/jckhang/agent-indeed/issues/111) can reuse this handoff as the expected smoke assertion until the read model from [#59](https://github.com/jckhang/agent-indeed/issues/59) lands
+- issue [#111](https://github.com/jckhang/agent-indeed/issues/111) can reuse this handoff as the expected smoke assertion until the read model from PR [#66](https://github.com/jckhang/agent-indeed/pull/66) lands
 
 ## Step 6 - Award read stays explicitly blocked
 
@@ -346,7 +346,7 @@ Blocked-state fixture:
   "awardRead": {
     "status": "BLOCKED",
     "reason": "AWARD_READ_MODEL_PENDING",
-    "followUp": "issue #58 / PR #68"
+    "followUp": "PR #68"
   }
 }
 ```
