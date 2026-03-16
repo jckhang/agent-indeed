@@ -13,39 +13,38 @@ reviewable release gates for closed-beta readiness. It complements:
 
 | Gate | Status | Ready when | Active dependencies | Evidence to collect |
 | --- | --- | --- | --- | --- |
-| Contract convergence | In progress | The remaining backend contract PRs are merged and the shared enum/error vocabulary is stable across OpenSpec, OpenAPI, and TypeScript contracts. | PR #55, PR #66, PR #68, PR #83, PR #90, PR #92 | `openspec validate --all`, contract diff review, synced `src/api/openapi.yaml` + `src/api/contracts.ts` |
-| Happy-path execution | Blocked | The team can trace one publish -> match -> commit -> reveal -> verify -> award flow without relying on undocumented fields or manual interpretation. | Issue #11, PR #84, PR #95, PR #96, plus the contract gate above | QA smoke checklist, API examples, merged frontend data-gap notes |
-| Negative-scenario coverage | Blocked | QA can exercise no-commit-reveal, signature-invalid, proof-fail, and manual-review/award-block paths with stable expected outcomes. | Issue #11, PR #83, PR #92, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/CLOSED_BETA_SECURITY_READINESS.md` | Smoke/E2E assertions, expected error/result matrix, rollback notes |
-| Audit evidence trail | In progress | Audit outputs show key lifecycle transitions plus enough proof/award context for operator review and beta sign-off. | Issue #10, PR #92, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/OBSERVABILITY_BASELINE.md` | Audit event names, award trace fields, telemetry handoff checklist |
-| Planning + handoff hygiene | In progress | The planning docs, epic rollup, smoke matrix, and QA handoff docs all describe the same open blockers and merged work. | PR #82, PR #84, PR #95, PR #96, PR #97 | `docs/PHASE1_CHECKPOINT_BOARD.md`, `docs/PHASE1_EPIC_STATUS.md`, QA handoff docs stay in sync |
+| Contract convergence | In progress | Remaining backend contract PRs are merged and shared enum/error vocabulary is stable across OpenSpec, OpenAPI, and TypeScript contracts. | PR #66, PR #68, PR #83, PR #90, PR #92 | `openspec validate --all`, contract diff review, synced `src/api/openapi.yaml` + `src/api/contracts.ts` |
+| Runtime happy-path execution | Blocked | One runnable `publish -> match -> commit -> reveal -> verify -> award` flow can be executed against a local service without manual interpretation. | Issue #109, issue #110, issue #111, issue #11, plus contract convergence gate | Service run command, executable smoke/E2E output, linked request/response evidence |
+| Negative-scenario coverage | Blocked | QA can execute core failures (`invalid signature`, `reveal without commit`, `proof FAIL`, `award blocked`) with stable expected outcomes. | Issue #111, issue #11, PR #83, PR #92, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/CLOSED_BETA_SECURITY_READINESS.md` | Runnable assertions, expected error/result matrix, regression evidence |
+| Audit evidence trail | In progress | Audit outputs expose key lifecycle transitions and award/proof context for operator review and beta sign-off. | Issue #110, PR #92, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/OBSERVABILITY_BASELINE.md` | Audit event names, award trace fields, telemetry handoff checklist |
+| Execution + handoff hygiene | In progress | Roadmap/goals/epic/checkpoint docs and active runtime issues all describe the same blockers and next actions. | Issue #109, issue #110, issue #111, issue #11 | `docs/PHASE1_CHECKPOINT_BOARD.md`, `docs/PHASE1_EPIC_STATUS.md`, milestone/label queries stay aligned |
 
 ## Gate Details
 
 ### 1. Contract convergence
 
-This is the main prerequisite for every downstream QA or audit activity.
+This remains the prerequisite for durable runtime behavior and executable QA checks.
 
-- Matching still depends on PR #55.
-- Verification status durability still depends on PR #66.
-- Manager shortlist/award reads still depend on PR #68.
-- Verifier terminal vocabulary and reason-code behavior still depend on PR #83.
-- Onboarding kickoff examples still depend on PR #90.
-- Audit-event and award-trace surface still depends on PR #92.
+- Verification status durability depends on PR #66.
+- Manager shortlist and award reads depend on PR #68.
+- Verifier terminal vocabulary and reason-code behavior depend on PR #83.
+- Onboarding kickoff examples depend on PR #90.
+- Audit event and award-trace surface depends on PR #92.
 
 Release note: if any of these contracts change enum names, required fields, or error-code wording,
 the same update must land in OpenSpec plus both API drafts before the gate can be marked ready.
 
-### 2. Happy-path execution
+### 2. Runtime happy-path execution
 
-The beta happy path is not just one demo; it needs one repeatable handoff pack:
+Happy-path readiness is now runtime-first, not docs-first.
 
-- QA smoke matrix in PR #84
-- frontend data-gap notes in PR #95
-- API example outline in PR #96
-- final executable E2E issue #11 after the contract gates settle
+Required outcome:
 
-The gate is ready only when a reviewer can follow one single source bundle from docs to API examples
-to smoke assertions without guessing missing fields.
+- a local service starts from one documented command
+- one reproducible request sequence executes `publish -> match -> commit -> reveal -> verify -> award`
+- results are captured by executable smoke/E2E checks tied to issue #111 and linked back to issue #11
+
+Reference docs/matrices are useful only if they map directly to runnable assertions.
 
 ### 3. Negative-scenario coverage
 
@@ -56,44 +55,42 @@ Minimum scenarios to keep visible:
 - reveal submitted without a valid prior commit
 - signature-invalid or malformed onboarding/task payload path
 - proof verification returns `FAIL`
-- proof verification returns `MANUAL_REVIEW`
 - award attempt blocked before prerequisite verification is complete
 
-The expected output for each scenario should cite either a stable error code or a stable terminal
-status/result so QA is not validating prose-only behavior.
+Expected output for each scenario must cite a stable error code or terminal status/result.
 
 ### 4. Audit evidence trail
 
-Audit readiness is the clearest remaining M4 blocker after contract convergence.
+Audit readiness is still the clearest M4 blocker after runtime flow and contract convergence.
 
-The beta review pack should be able to answer:
+The beta review pack should answer:
 
 - what happened
 - when it happened
 - which task, bid, proof, and candidate were involved
 - why the award decision was allowed or blocked
 
-That evidence should come from the shared audit/telemetry surfaces, not from ad hoc reviewer notes.
+That evidence must come from shared audit/telemetry surfaces, not ad hoc reviewer notes.
 
-### 5. Planning + handoff hygiene
+### 5. Execution + handoff hygiene
 
-This gate stays green only when the planning layer remains current after merges.
+This gate stays green only when the repo planning surfaces and GitHub runtime threads agree.
 
-At minimum, these docs must agree on which threads are still open:
+At minimum, these must stay in lockstep:
 
 - `docs/PHASE1_CHECKPOINT_BOARD.md`
 - `docs/PHASE1_EPIC_STATUS.md`
 - `docs/PHASE1_GOALS.md`
 - `docs/ROADMAP.md`
-- the active QA handoff docs attached to issue #11 follow-through
+- runtime delivery threads (`#109`, `#110`, `#111`, and blocked follow-through `#11`)
 
 ## Review Routine
 
 Review these gates whenever one of the following happens:
 
-- a Phase 1 PR merges or reopens
+- a Phase 1 contract/runtime PR merges, reopens, or is closed as superseded
 - a contract enum or error-code changes
-- QA smoke scope changes
-- the epic #2 checklist changes
+- QA smoke/E2E execution scope changes
+- epic #2 checklist changes
 
-If a gate changes status, update the epic rollup and the checkpoint board in the same review window.
+If a gate changes status, update the epic rollup and checkpoint board in the same review window.

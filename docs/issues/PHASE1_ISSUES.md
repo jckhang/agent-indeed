@@ -63,6 +63,18 @@ review history, and linked PRs, open the GitHub issue directly.
 - P1-25 Operationalize closed-beta security readiness checklist: [#72](https://github.com/jckhang/agent-indeed/issues/72)
 - P1-26 Draft MVP smoke matrix for merged manager/agent flows: [#79](https://github.com/jckhang/agent-indeed/issues/79)
 - P1-27 Refresh checkpoint board and roadmap mappings after M2/M3 merges: [#80](https://github.com/jckhang/agent-indeed/issues/80)
+- P1-28 Run QA smoke pass on next merged tranche: [#87](https://github.com/jckhang/agent-indeed/issues/87)
+- P1-29 Draft MVP API example outline for QA handoff: [#93](https://github.com/jckhang/agent-indeed/issues/93)
+- P1-30 Capture frontend data gaps after manager/agent UI merges: [#94](https://github.com/jckhang/agent-indeed/issues/94)
+- P1-31 Convert frontend data-gap notes into contract delta checklist: [#99](https://github.com/jckhang/agent-indeed/issues/99)
+- P1-32 Turn API example outline into QA-ready handoff pack: [#100](https://github.com/jckhang/agent-indeed/issues/100)
+- P1-33 Prewrite MVP E2E assertion matrix from merged docs: [#101](https://github.com/jckhang/agent-indeed/issues/101)
+- P1-34 Run backend contract convergence merge train: [#106](https://github.com/jckhang/agent-indeed/issues/106)
+- P1-35 Consolidate QA handoff packet for smoke execution: [#107](https://github.com/jckhang/agent-indeed/issues/107)
+- P1-36 Reconcile frontend delta checklist with contract stack: [#108](https://github.com/jckhang/agent-indeed/issues/108)
+- P1-37 Bootstrap runnable control-plane backend skeleton: [#109](https://github.com/jckhang/agent-indeed/issues/109)
+- P1-38 Implement runnable MVP dispatch vertical slice: [#110](https://github.com/jckhang/agent-indeed/issues/110)
+- P1-39 Execute runtime smoke/E2E checks from QA matrices: [#111](https://github.com/jckhang/agent-indeed/issues/111)
 
 ## Working rule
 
