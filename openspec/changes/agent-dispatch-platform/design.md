@@ -94,6 +94,7 @@ MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立�
 - 依赖 Onboarding Registry 暴露的可检索 skills/identity 元数据，不直接改写 agent 注册数据。
 - 候选查询输出 MUST 区分“未通过硬过滤”和“通过过滤后参与排序”的结果，并为每个候选提供可回放的 `matching_trace_id` 与评分拆解。
 - 当候选快照仍在生成时，Task Marketplace MUST 返回显式的重试信号（`TASK_MATCH_NOT_READY`），避免 manager 端把暂时无结果误判为真正无候选。
+- 后续 manager shortlist / award 读模型工作 MUST 复用同一个 `GET /v1/tasks/{taskId}/candidates` shortlist contract，并保持 `limit` 作为规范分页/裁剪参数；若需要控制评审负载，可增加类似 `includeScoreBreakdown` 的加性开关，但不应为同一 shortlist 语义重新引入 `topK` 等并行 query 形态。新增评审字段也应做加性扩展，避免同一 endpoint 在并行 PR 中出现不兼容 shape。
 
 ### Bid Ledger
 

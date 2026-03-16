@@ -252,11 +252,21 @@ paths:
         - name: limit
           in: query
           required: false
+          description: Canonical shortlist size limit for the matching snapshot.
           schema:
             type: integer
             minimum: 1
             maximum: 50
             default: 10
+        - name: includeScoreBreakdown
+          in: query
+          required: false
+          description: >
+            When false, the server MAY omit per-candidate `scoreBreakdown`
+            details while preserving the rest of the shortlist shape.
+          schema:
+            type: boolean
+            default: true
       responses:
         '200':
           description: Ranked candidates generated from hard filters plus soft scoring

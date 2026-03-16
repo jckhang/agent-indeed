@@ -29,6 +29,13 @@
 - **AND** 响应 MUST 标记 `retryable=true`
 - **AND** 响应 MAY 提供 `retryAfterSeconds` 作为轮询提示
 
+#### Scenario: Downstream manager review work reuses the canonical shortlist contract
+- **WHEN** 后续 manager shortlist / award 读模型工作继续扩展候选查询
+- **THEN** 平台继续使用 `GET /v1/tasks/{taskId}/candidates` 作为候选 shortlist 的规范读取入口
+- **AND** 查询参数继续沿用 `limit`，而不是为同一 shortlist 语义引入并行 `topK` 风格 contract
+- **AND** 如需控制评审开销，平台 MAY 增加 `includeScoreBreakdown` 这类加性查询开关
+- **AND** 额外评审字段必须通过现有 shortlist 响应做加性扩展，避免同一 endpoint 在并行 PR 中出现不兼容 shape
+
 ### Requirement: Bidding Must Use Commit-Reveal
 
 平台 MUST 支持两阶段竞标，先承诺后揭示，降低抄袭与围标风险。
