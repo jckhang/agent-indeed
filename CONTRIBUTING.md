@@ -87,6 +87,14 @@ Use one shared enum set across issues and PRs (see `docs/WORK_ITEM_TAXONOMY.md`)
   - `type/chore`
   - `type/spec`
 
+## Owner + Reviewer Assignment (PM Lan)
+
+Use `docs/ORGANIZATION.md` as the source of truth for the relation map.
+
+- PM Lan assigns exactly one `owner:*` label to every issue.
+- PM Lan requests `albatross-dev-agent` as review owner on every PR.
+- If the PR author is `albatross-dev-agent`, PM Lan must add delegated reviewers (domain owner + QA) before merge.
+
 ## Pull Request Checklist
 
 Before requesting review, ensure:
