@@ -16,9 +16,8 @@ Use this document to separate:
 - assertions that stay blocked on open backend contract PRs
 - negative-path checks that must reuse the current error-code and verifier vocabulary verbatim
 
-## Sources of truth used to derive assertions
+## Merged sources of truth used to derive assertions
 
-- `docs/MVP_API_QA_HANDOFF_PACK.md`
 - `docs/MANAGER_CONSOLE_BASELINE.md`
 - `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`
 - `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`
@@ -31,9 +30,14 @@ Use this document to separate:
 - `src/api/openapi.yaml`
 - `src/api/contracts.ts`
 
+## Open PR dependency
+
+- PR `#103` proposes `docs/MVP_API_QA_HANDOFF_PACK.md`, but that handoff pack is not on `main` yet.
+- Until PR `#103` merges, treat this matrix plus the merged docs above as the canonical source for ready-now QA assertions.
+
 ## How QA should use this matrix
 
-1. Start with the happy-path sequence assertions and keep the same step ordering as the handoff pack.
+1. Start with the happy-path sequence assertions in this document; when PR `#103` merges, keep the same ordering as `docs/MVP_API_QA_HANDOFF_PACK.md`.
 2. Implement `Ready now` assertions first in issue `#87` and carry them forward into issue `#11`.
 3. Treat `Blocked` assertions as prewritten acceptance targets; do not invent substitute fields while the owning PR is still open.
 4. Reuse the exact enum values, error codes, and identifier names listed here in smoke and E2E coverage.
@@ -68,7 +72,7 @@ Use this document to separate:
 | Upload security | Upload accepts only agent-authenticated bundle writes and rejects raw memory payload handling in favor of `memoryRef` metadata. | `docs/CLOSED_BETA_SECURITY_READINESS.md`, `src/api/openapi.yaml` |
 | Upload negative path | Invalid signature uses the stable signature family (`AGENT_BUNDLE_SIGNATURE_INVALID`, signer mismatch, or payload mismatch) and is not treated as a retryable blind retry. | `docs/ERROR_CODE_RETRY_POLICY.md` |
 | Publish validation | Task create rejects incomplete constraints/policy combinations with stable validation or policy codes instead of generic copy. | `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/MANAGER_CONSOLE_BASELINE.md` |
-| Commit write path | Commit returns accepted status plus the server-authored bidding window snapshot (`currentPhase`, deadlines, `serverTime`, `nextAction`). | `docs/MVP_API_QA_HANDOFF_PACK.md`, `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` |
+| Commit write path | Commit returns accepted status plus the server-authored bidding window snapshot (`currentPhase`, deadlines, `serverTime`, `nextAction`). | `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, PR `#103` (`docs/MVP_API_QA_HANDOFF_PACK.md`) |
 | Reveal prerequisite | Reveal without a valid commit must use `BID_REVEAL_COMMIT_NOT_FOUND` and direct QA back to the commit prerequisite. | `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/AGENT_BIDDING_CONSOLE_BASELINE.md` |
 | Reveal hash integrity | Reveal hash mismatch remains a terminal precondition failure, not a generic payload validation error. | `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` |
 | Verify failure semantics | Terminal proof failure reuses `PROOF_VERIFY_FAILED` and manual-review follow-through reuses `PROOF_VERIFY_NEEDS_REVIEW`; neither should masquerade as transport failure. | `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md` |
