@@ -50,7 +50,7 @@ Scope:
 - Manager console baseline (`docs/MANAGER_CONSOLE_BASELINE.md`, issue #43 / PR #53) keeps the publish form, shortlist evidence, and award-summary dependency notes visible while interactive award APIs are still pending.
 - Manager task-composer frontend slice (`docs/MANAGER_TASK_COMPOSER_UI_SLICE.md`, issue #61 / PR #70) documents the current task-create contract and calls out idempotency follow-up explicitly.
 - Manager shortlist review slice (`docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`, issue #62) keeps shortlist fallback states and award blockers reviewable while shortlist/award contracts remain in flight.
-- Frontend runtime dispatch wiring target (`docs/FRONTEND_RUNTIME_DISPATCH_WIRING_2026-03-16.md`, issue #116) locks the first contract-backed manager/agent runtime path and keeps `TASK_MATCH_NOT_READY`, verification-pending, and audit-based award-read fallback behavior explicit while backend read models are still converging.
+- Frontend runtime dispatch wiring target (`docs/FRONTEND_RUNTIME_DISPATCH_WIRING_2026-03-16.md`, issue #116) locks the first contract-backed manager/agent runtime path and keeps `TASK_MATCH_NOT_READY`, verification-pending, and explicitly blocked award-read behavior visible while backend read models are still converging.
 - Commit-reveal bidding workflow.
 - Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps the broader commit/reveal + verification journey visible.
 - Dedicated bid workspace slice (`docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, issue #63 / PR #76) narrows the frontend delivery item to one commit/reveal workflow while handing runtime status refresh to the merged bid/proof read routes.

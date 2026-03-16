@@ -10,9 +10,9 @@ Related runtime backend slice: [#110](https://github.com/jckhang/agent-indeed/is
 Define one frontend runtime-backed dispatch loop that uses the contracts already present on `main` and stays explicit about the remaining read-model gaps.
 
 This target keeps the UI honest in the current repo state:
-- task publish, candidate shortlist, bid commit, bid reveal, proof verify, and task audit timeline contracts already exist in `src/api/openapi.yaml`
-- proof-status reads and award-summary reads still do not exist as dedicated frontend-facing endpoints on `main`
-- the frontend should wire available endpoints now and render blocked or pending states for everything else instead of falling back to silent placeholders
+- task publish, candidate shortlist, bid commit, bid reveal, and proof verify contracts already exist in `src/api/openapi.yaml`
+- proof-status reads, award-summary reads, and any frontend-consumable audit timeline read for this flow still do not exist as merged endpoints on `main`
+- the frontend should wire only the published endpoints now and render blocked or pending states for everything else instead of falling back to silent placeholders
 
 ## Runtime-backed vertical slice
 
@@ -25,7 +25,7 @@ Bounded interpretation for the current contract stack:
 - `commit`: `POST /v1/tasks/{taskId}/bids/commit`
 - `reveal`: `POST /v1/tasks/{taskId}/bids/reveal`
 - `verify-status`: immediate verifier result from `POST /v1/tasks/{taskId}/proofs/verify`, plus explicit pending fallback when no read model exists yet
-- `award-read`: reconstruct winner readiness and awarded outcome from `GET /v1/tasks/{taskId}/events` until a dedicated award read endpoint lands
+- `award-read`: keep the manager award surface explicitly blocked until issue [#58](https://github.com/jckhang/agent-indeed/issues/58) / PR [#68](https://github.com/jckhang/agent-indeed/pull/68) lands a dedicated read model
 
 ## Flow contract map
 
@@ -36,7 +36,7 @@ Bounded interpretation for the current contract stack:
 | Commit bid | `/agent/tasks/{taskId}/bid-workspace` | `POST /v1/tasks/{taskId}/bids/commit` | Use the server-authored `window` snapshot to drive next-step copy and disable local deadline guessing. |
 | Reveal bid | `/agent/tasks/{taskId}/bid-workspace` | `POST /v1/tasks/{taskId}/bids/reveal` | Keep `proofSubmission.proofId`, `verificationStatus`, `rankingScore`, and `decisionTraceHash` as the only durable post-reveal fields. |
 | Verification status | `/agent/tasks/{taskId}/verification` | `POST /v1/tasks/{taskId}/proofs/verify` today; dedicated read still missing | Show terminal verifier output when the current session owns it; otherwise keep a pending state with a contract-gap note instead of fabricating queued or refreshed status. |
-| Award read | `/manager/tasks/{taskId}/award` | `GET /v1/tasks/{taskId}/events` | Derive award-readiness or awarded history from audit events until issue [#58](https://github.com/jckhang/agent-indeed/issues/58) adds a winner-focused read model. |
+| Award read | `/manager/tasks/{taskId}/award` | No merged endpoint on `main` | Keep the rail visible with explicit blocked copy, and link issue [#58](https://github.com/jckhang/agent-indeed/issues/58) until a winner-focused read model lands. |
 
 ## Required UI state handling
 
@@ -66,33 +66,24 @@ Agent copy baseline:
 ### 3. Blocked award actions
 
 Until a dedicated award read/write surface is merged:
-- manager award UI should treat audit timeline data as read-only evidence, not as permission to trigger an award command
-- `TASK_AWARDED` in the audit stream means the task is already terminal
-- missing `TASK_AWARDED` does not mean award is ready; the UI still needs proof success and a real award read model
+- manager award UI should stay explicitly blocked even when shortlist and reveal data are present
+- do not treat proof verification, shortlist ranking, or unpublished audit endpoints as authority to show a winner summary
+- proof success in the current session may unlock clearer copy, but it still does not create a merged award-read contract
 - blocked states should stay explicit even when shortlist data exists
 
 Manager blocked-copy baseline:
 - `Award is blocked until proof verification reaches a terminal pass state.`
-- `Award summary is read-only on the current contract baseline.`
-- `Winner details come from audit events for now; award command support is still pending.`
+- `Award summary is unavailable on the current contract baseline.`
+- `Winner details stay blocked until the shortlist and award read model lands.`
 
-## Award-read via audit timeline
+## Award-read stays blocked on main
 
-Until `GET /v1/tasks/{taskId}/award` exists, the manager runtime slice should read these audit facts from `GET /v1/tasks/{taskId}/events`:
+Until `GET /v1/tasks/{taskId}/award` or an equivalent merged read model exists:
 
-| Audit event | Frontend meaning | Notes |
-| --- | --- | --- |
-| `TASK_CREATED` | Task exists and entered the runtime flow | Use to restore task status and risk/policy summary. |
-| `BID_COMMITTED` | Candidate locked a bid hash | Useful for progress chronology, not for award readiness by itself. |
-| `BID_REVEALED` | Candidate reveal + proof submission completed | `decisionTraceHash` becomes available for shortlist detail and later award evidence. |
-| `POMW_VERIFIED` | Proof reached a terminal verifier decision | `result`, `reasonCodes`, and `manualReviewRequired` drive award-blocked copy. |
-| `TASK_AWARDED` | Task has reached an awarded or closed-no-award terminal state | Treat as the temporary award-read source until a dedicated read model lands. |
-
-Minimum award-read derivation rules:
-- if no `POMW_VERIFIED` event exists for the leading bid, render `Award blocked: verification still pending`
-- if the latest proof result is `FAIL` or `MANUAL_REVIEW`, render `Award blocked` with the returned reason codes
-- if a `TASK_AWARDED` event exists, render the awarded agent, bid, and `decisionTraceHash` from the audit payload
-- if shortlist data exists but audit evidence is incomplete, keep the rail visible with `Audit evidence still incomplete` rather than hiding the state
+- do not call or document `GET /v1/tasks/{taskId}/events` as a manager award-read dependency for issue #116
+- do not derive awarded state from verifier output, shortlist rank, or assumed audit events
+- if the current session knows proof verification is terminal, keep the award rail visible with `Award summary unavailable until the dedicated read model lands`
+- if verification is still pending, keep the stronger blocker copy and link issue [#58](https://github.com/jckhang/agent-indeed/issues/58) / PR [#68](https://github.com/jckhang/agent-indeed/pull/68) as the owning follow-up
 
 ## Existing contract gaps to keep linked
 
@@ -109,7 +100,7 @@ When a runnable frontend app lands, the first runtime integration pass for issue
 2. switch shortlist review to `GET /v1/tasks/{taskId}/candidates` and branch on `TASK_MATCH_NOT_READY`
 3. preserve server-authored bid window state from commit/reveal responses
 4. show `PENDING_VERIFY` and terminal verifier results without promising refresh-safe recovery that the backend cannot yet support
-5. use the task audit timeline as the temporary award-read surface until issue #58 merges
+5. keep award-read explicitly blocked until issue #58 merges a dedicated read model
 
 ## Acceptance criteria mapping
 
