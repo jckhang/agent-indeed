@@ -151,6 +151,15 @@
 - **WHEN** manager 打开某个 task 的 award-ready 视图，但任务阶段、proof 结果或 award command 依赖尚未满足
 - **THEN** 系统展示当前 task/bid/proof 状态、阻塞原因以及待补齐依赖，使 manager 可以理解为何暂时不可 award
 
+#### Scenario: Shortlist read keeps audit-linked review context additive to the canonical endpoint
+- **WHEN** manager 通过 `GET /v1/tasks/{taskId}/candidates` 读取 shortlist
+- **THEN** 响应继续沿用 canonical `limit` shortlist contract，并加性暴露 `missingDataStates`、`proofReadiness`、`shortlistAuditId` 与 `decisionTraceHash`
+
+#### Scenario: Award command reuses audit refs for deterministic replay
+- **WHEN** manager 提交 `POST /v1/tasks/{taskId}/award`
+- **THEN** 请求必须携带 `idempotencyKey`、`shortlistAuditId` 与 `proofAuditId`
+- **AND** 奖励读模型返回 `statusMessage`、proof 摘要、`decisionTraceHash` 与 handoff 状态，便于 UI/QA 复核
+
 ### Requirement: Retry and Idempotency Signals Must Be Explicit
 
 平台 MUST 在失败响应中明确 `retryable` 信号，并为写操作提供可判定的幂等行为。

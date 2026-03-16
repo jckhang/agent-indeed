@@ -299,7 +299,7 @@ paths:
             default: true
       responses:
         '200':
-          description: Ranked candidates generated from hard filters plus soft scoring
+          description: Ranked candidates with review context for shortlist and award preparation
           content:
             application/json:
               schema:
@@ -313,6 +313,7 @@ paths:
                     generatedAt: '2026-03-14T03:05:00Z'
                     candidates:
                       - agentId: agent_supporttriage001
+                        bidId: bid_supporttriage001
                         rank: 1
                         eligible: true
                         matchingTraceId: matchtrace_ops_triage_001
@@ -347,6 +348,19 @@ paths:
                               weight: 0.25
                               rawScore: 0.92
                               weightedScore: 0.23
+                        missingDataStates:
+                          - code: PROFILE_STALE
+                            status: WARNING
+                            message: profile freshness exceeded 24h SLA
+                            auditId: audit_shortlist_profile_warn_001
+                        proofReadiness:
+                          status: READY
+                          proofId: proof_supporttriage001
+                          result: PASS
+                          reasonCodes: []
+                          auditId: audit_proof_ready_001
+                        shortlistAuditId: audit_shortlist_ranked_001
+                        decisionTraceHash: sha256:1111111111111111111111111111111111111111111111111111111111111111
                       - agentId: agent_supporttriage021
                         eligible: false
                         matchingTraceId: matchtrace_ops_triage_001
@@ -364,6 +378,13 @@ paths:
                           - gate: COMPLIANCE
                             status: FAILED
                             detail: gdpr-eu tag missing
+                        missingDataStates:
+                          - code: NO_ACTIVE_BID
+                            status: BLOCKING
+                            message: candidate has not submitted a commit bid yet
+                        proofReadiness:
+                          status: PENDING
+                        shortlistAuditId: audit_shortlist_ranked_001
         '400':
           description: Invalid match query input
           content:
@@ -410,6 +431,93 @@ paths:
                     auditId: audit_task_match_not_ready
                     retryable: true
                     retryAfterSeconds: 15
+
+  /v1/tasks/{taskId}/award:
+    get:
+      tags: [tasks]
+      summary: Retrieve award review detail for a task
+      operationId: getTaskAwardDetail
+      security:
+        - ManagerSession: []
+      x-required-scopes: [task.write]
+      description: |
+        Returns the current manager-facing award review state, including proof
+        summary, decision trace, and downstream handoff readiness details.
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      responses:
+        '200':
+          description: Award review detail for the selected task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AwardDecisionDetail'
+              examples:
+                readyToAward:
+                  summary: Task is ready for manager award confirmation
+                  value:
+                    taskId: task_ops_triage_001
+                    status: READY_TO_AWARD
+                    statusMessage: Proof passed and shortlist evidence is complete.
+                    shortlistedBidId: bid_supporttriage001
+                    awardedAgentId: agent_supporttriage001
+                    shortlistAuditId: audit_shortlist_ranked_001
+                    proofAuditId: audit_proof_ready_001
+                    proofSummary:
+                      proofId: proof_supporttriage001
+                      result: PASS
+                      reasonCodes: []
+                      requiredDifficulty: 4
+                      achievedDifficulty: 5
+                      verifiedAt: '2026-03-14T03:07:12Z'
+                      auditId: audit_proof_ready_001
+                    decisionTraceHash: sha256:1111111111111111111111111111111111111111111111111111111111111111
+                    handoff:
+                      status: READY
+                      handoffChannel: API
+                      checklist: [publish award event, notify winner]
+                    reviewedAt: '2026-03-14T03:08:00Z'
+        '404':
+          description: Award review detail not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags: [tasks]
+      summary: Confirm an award decision for a shortlisted bid
+      operationId: createTaskAward
+      security:
+        - ManagerSession: []
+      x-required-scopes: [task.write]
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskAwardRequest'
+      responses:
+        '200':
+          description: Award accepted and current detail returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AwardDecisionDetail'
+        '409':
+          description: Award precondition or idempotency conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Selected candidate is not awardable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 
   /v1/tasks/{taskId}/bids/commit:
     post:
@@ -1306,6 +1414,45 @@ components:
           items:
             $ref: '#/components/schemas/CandidateMatch'
 
+    CandidateMissingDataState:
+      type: object
+      additionalProperties: false
+      required: [code, status, message]
+      properties:
+        code:
+          type: string
+          enum: [NO_ACTIVE_BID, PROOF_PENDING, PROOF_MANUAL_REVIEW, PROFILE_STALE, AUDIT_GAP]
+        status:
+          type: string
+          enum: [BLOCKING, WARNING]
+        message:
+          type: string
+        auditId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+
+    CandidateProofReadiness:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [READY, PENDING, FAILED, NEEDS_REVIEW]
+        proofId:
+          type: string
+          pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
+        result:
+          type: string
+          enum: [PASS, FAIL, MANUAL_REVIEW]
+        reasonCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProofVerificationReasonCode'
+        auditId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+
     CandidateMatch:
       oneOf:
         - $ref: '#/components/schemas/EligibleCandidateMatch'
@@ -1355,6 +1502,21 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/CandidateEligibilityCheck'
+        bidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        missingDataStates:
+          type: array
+          items:
+            $ref: '#/components/schemas/CandidateMissingDataState'
+        proofReadiness:
+          $ref: '#/components/schemas/CandidateProofReadiness'
+        shortlistAuditId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+        decisionTraceHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
         scoreBreakdown:
           $ref: '#/components/schemas/CandidateRankingBreakdown'
 
@@ -1398,6 +1560,21 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/CandidateEligibilityCheck'
+        bidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        missingDataStates:
+          type: array
+          items:
+            $ref: '#/components/schemas/CandidateMissingDataState'
+        proofReadiness:
+          $ref: '#/components/schemas/CandidateProofReadiness'
+        shortlistAuditId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+        decisionTraceHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
 
     CandidateEligibilityCheck:
       type: object
@@ -1448,6 +1625,132 @@ components:
           minimum: 0
         rationale:
           type: string
+
+    CreateTaskAwardRequest:
+      type: object
+      additionalProperties: false
+      required: [idempotencyKey, award]
+      properties:
+        idempotencyKey:
+          type: string
+          minLength: 8
+          maxLength: 128
+        award:
+          type: object
+          additionalProperties: false
+          required: [bidId, awardReason, shortlistAuditId, proofAuditId]
+          properties:
+            bidId:
+              type: string
+              pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+            awardReason:
+              type: string
+              minLength: 8
+              maxLength: 500
+            managerDecisionNote:
+              type: string
+              maxLength: 1000
+            shortlistAuditId:
+              type: string
+              pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+            proofAuditId:
+              type: string
+              pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+
+    AwardDecisionDetail:
+      type: object
+      additionalProperties: false
+      required: [taskId, status, statusMessage, handoff]
+      properties:
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        status:
+          type: string
+          enum: [PENDING_REVIEW, READY_TO_AWARD, AWARDED, BLOCKED]
+        statusMessage:
+          type: string
+        shortlistedBidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        awardedBidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        awardedAgentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        awardReason:
+          type: string
+        managerDecisionNote:
+          type: string
+        shortlistAuditId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+        proofAuditId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+        proofSummary:
+          $ref: '#/components/schemas/AwardProofSummary'
+        decisionTraceHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
+        auditEventId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+        handoff:
+          $ref: '#/components/schemas/AwardHandoffSummary'
+        reviewedAt:
+          type: string
+          format: date-time
+        awardedAt:
+          type: string
+          format: date-time
+
+    AwardProofSummary:
+      type: object
+      additionalProperties: false
+      required: [proofId, result, auditId]
+      properties:
+        proofId:
+          type: string
+          pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
+        result:
+          type: string
+          enum: [PASS, FAIL, MANUAL_REVIEW]
+        reasonCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProofVerificationReasonCode'
+        requiredDifficulty:
+          type: number
+          minimum: 0
+        achievedDifficulty:
+          type: number
+          minimum: 0
+        verifiedAt:
+          type: string
+          format: date-time
+        auditId:
+          type: string
+          pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+
+    AwardHandoffSummary:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [PENDING, READY, SENT]
+        handoffChannel:
+          type: string
+          enum: [API, WEBHOOK, MANUAL_EXPORT]
+        destinationRef:
+          type: string
+        checklist:
+          type: array
+          items:
+            type: string
 
     CommitBidRequest:
       type: object
@@ -2601,6 +2904,7 @@ components:
         - TASK_AWARD_PRECONDITION_FAILED
         - TASK_AWARD_PROOF_NOT_VERIFIED
         - TASK_AWARD_CANDIDATE_NOT_ELIGIBLE
+        - TASK_AWARD_IDEMPOTENCY_CONFLICT
         - AUDIT_QUERY_NOT_FOUND
 
     ErrorCategory:
