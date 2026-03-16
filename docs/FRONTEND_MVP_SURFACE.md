@@ -38,10 +38,12 @@ Define the minimum manager, agent, and operator console surface needed to execut
 
 1. `/agent/onboarding`
    - Upload signed `AgentBundle` and handle schema/signature failures.
-2. `/agent/tasks/{taskId}/bid-workspace`
-   - Prepare commit, reveal bid payload, and complete `ProofPack` entry from one workflow.
-3. `/agent/tasks/{taskId}/verification`
-   - Observe queued/verifying/`PASS`/`FAIL`/`MANUAL_REVIEW` timeline states, terminal reason codes, and bounded refresh behavior after reveal handoff.
+2. `/agent/tasks/{taskId}/commit`
+   - Submit commit hash before commit deadline.
+3. `/agent/tasks/{taskId}/reveal`
+   - Reveal bid payload + `ProofPack` before reveal deadline.
+4. `/agent/tasks/{taskId}/verification`
+   - Observe queued/verifying/`PASS`/`FAIL`/`MANUAL_REVIEW` states, difficulty delta, reason codes, and bounded refresh behavior after reveal handoff.
 
 ### Operator Console
 
