@@ -12,6 +12,7 @@ This file intentionally stays lightweight so we do not duplicate fast-changing i
 - [Runtime issues missing a status label](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+-label%3A%22status%2Fready-next%22+-label%3A%22status%2Fin-review%22+-label%3A%22status%2Fblocked%22)
 - [Runtime PRs awaiting validation evidence or fixes](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+label%3A%22status%2Fin-review%22)
 - [Planning lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aalbatross%22)
+- [Architecture unblocker control issue](https://github.com/jckhang/agent-indeed/issues/137)
 - [Backend lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Akestrel%22)
 - [Frontend lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Alanzhou-fe-agent%22)
 - [QA lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aavery%22)
@@ -39,6 +40,7 @@ review history, and linked PRs, open the GitHub issue directly.
 
 ### Phase 1 delivery
 
+- Weekly architecture runtime unblocker control: [#137](https://github.com/jckhang/agent-indeed/issues/137)
 - P1-01 Define AgentBundle contract and validation rules: [#3](https://github.com/jckhang/agent-indeed/issues/3)
 - P1-02 Implement onboarding pipeline (signature/schema/index): [#4](https://github.com/jckhang/agent-indeed/issues/4)
 - P1-03 Define TaskSpec and publish endpoint behavior: [#5](https://github.com/jckhang/agent-indeed/issues/5)

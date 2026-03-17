@@ -73,6 +73,7 @@ Focus:
 - Convert QA readiness docs into runnable checks tied to runtime behavior (#111, issue #11).
 - Keep OpenSpec/OpenAPI/contracts synchronized while implementation PRs land.
 - Use `docs/RUNTIME_CUTLINE_2026-03-16.md` as the sprint-level rule for which open contract PRs are true runtime blockers versus additive-safe follow-ups.
+- Use `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` plus issue #137 as the daily owner/blocker ledger for the 2026-03-20 runtime push.
 
 De-scoped from current sprint:
 - Planning-only follow-ups #106, #107, #108 were closed to avoid additional doc-layer churn.
