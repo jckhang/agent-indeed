@@ -50,7 +50,6 @@ This tranche supersedes the overlapping open frontend runtime docs queue:
 - PR [#132](https://github.com/jckhang/agent-indeed/pull/132) demo payload replay pack
 
 Keep only this document plus `docs/FRONTEND_MVP_SURFACE.md` as the durable repo handoff for runtime-backed manager and agent flows. Any surviving PR from the older queue should either point here as the canonical source or be closed as superseded by issue [#145](https://github.com/jckhang/agent-indeed/issues/145).
-
 ## Canonical contract anchors on `main`
 
 These frontend handoff claims are backed by the current API sources of truth on `main`, not by a still-pending side branch:
