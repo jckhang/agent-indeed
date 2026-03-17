@@ -1,6 +1,6 @@
 # Organization
 
-Last updated: 2026-03-16
+Last updated: 2026-03-17
 
 ## Purpose
 
@@ -120,7 +120,7 @@ This map defines who PM Lan assigns as issue owner and who is requested as PR re
 | --- | --- | --- | --- |
 | Frontend implementation | `dept/frontend` + one `type/*` | `owner:lanzhou-fe-agent` | UI workflow/state-machine scope. |
 | Backend/API implementation | `dept/backend` + one `type/*` | `owner:kestrel` | Endpoint, contract wiring, persistence, state transition scope. |
-| QA/test execution | `dept/qa` + one `type/*` | `owner:qa` | Smoke/E2E, regression evidence, validation tooling. |
+| QA/test execution | `dept/qa` + one `type/*` | `owner:avery` | Smoke/E2E, regression evidence, validation tooling. |
 | Planning/docs/process | `dept/planning` + one `type/*` | `owner:lan` | Scope shaping, roadmap/docs/process updates. |
 | Cross-cutting architecture | keep primary `dept/*` + one `type/*` | `owner:albatross` | Use only when issue mainly controls multi-lane architecture decisions. |
 
