@@ -80,6 +80,7 @@ review history, and linked PRs, open the GitHub issue directly.
 - P1-37 Bootstrap runnable control-plane backend skeleton: [#109](https://github.com/jckhang/agent-indeed/issues/109)
 - P1-38 Implement runnable MVP dispatch vertical slice: [#110](https://github.com/jckhang/agent-indeed/issues/110)
 - P1-39 Execute runtime smoke/E2E checks from QA matrices: [#111](https://github.com/jckhang/agent-indeed/issues/111)
+- P1-40 Frontend runtime integration tranche: [#136](https://github.com/jckhang/agent-indeed/issues/136)
 
 ## Working rule
 
