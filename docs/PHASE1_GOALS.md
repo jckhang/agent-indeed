@@ -59,7 +59,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - `ProofPack` accepted and verified with T0/T1/T2 policy mapping.
 - Commit/reveal/verify/award transitions must persist and be queryable in runtime flow checks (issue #110).
 - Runtime implementers should treat `docs/RUNTIME_CUTLINE_2026-03-16.md` as the current go/no-go rule for open contract PR dependencies while the contract stack finishes converging.
-- Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, with focused follow-through in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` and `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`, so commit/reveal and verification acceptance criteria stay reviewable while bid/proof status reads remain backend follow-ups through issue #59.
+- Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, with focused follow-through in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`, and `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md`, so commit/reveal and verification acceptance criteria stay tied to the merged bid/proof read contracts and the runtime integration tranche in issue #136.
 - Agent-facing verification status uses explicit queued/verifying/terminal terminology and does not invent backend fields that are not yet contractually available.
 
 ### G4. Audit and observability baseline

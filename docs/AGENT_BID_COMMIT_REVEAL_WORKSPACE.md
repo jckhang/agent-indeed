@@ -1,12 +1,12 @@
 # Agent Bid Commit/Reveal Workspace (P1-21)
 
-Last updated: 2026-03-15
+Last updated: 2026-03-17
 
 ## Objective
 
 Define the focused frontend execution slice for issue #63 so an agent can move from bid commitment to reveal submission inside one workflow without carrying the full verification-timeline scope in the same delivery item.
 
-This slice builds on `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`: commit/reveal entry is implementable now against the current write contracts, while long-lived verification refresh remains an explicit backend follow-up through issue #59.
+This slice builds on `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`: commit/reveal entry is implementable now against the current write contracts, and the merged bid/proof status reads on `main` now provide the runtime-backed handoff target for issue #136.
 
 ## Scope
 
@@ -88,7 +88,7 @@ Failure rendering:
 
 Success state:
 - Show `status`, `result`, optional `rankingScore`, `decisionTraceHash`, and `proofSubmission.proofId` + `verificationStatus`.
-- If verification is still pending, hand off to the verification route with a clear note that the current repository lacks a durable read model for refresh-safe progress tracking.
+- If verification is still pending, hand off to the verification route with the returned `proofId` and use the merged bid/proof read routes for refresh-safe progress tracking.
 
 ## Cross-stage empty, loading, and blocked states
 
@@ -104,21 +104,21 @@ Success state:
 | Commit submit | `CommitBidRequest` | `POST /v1/tasks/{taskId}/bids/commit` | Ready | Current write contract already returns `window` snapshot and replay-safe result metadata |
 | Commit replay/closed handling | `CommitBidAcceptedResponse` + `CommitBidErrorResponse` | `POST /v1/tasks/{taskId}/bids/commit` response | Ready | Workspace should branch on stable reason codes instead of generic error copy |
 | Reveal submit | `RevealBidRequest` | `POST /v1/tasks/{taskId}/bids/reveal` | Ready | All required `ProofPack` sections can be represented now |
-| Reveal result handoff | `RevealBidAcceptedResponse` + `RevealBidErrorResponse` | `POST /v1/tasks/{taskId}/bids/reveal` response | Partial | Immediate post-submit handoff works, but refresh-safe reads still depend on issue #59 |
-| Verification follow-through | proof/bid read model | Proposed `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` | Pending backend contract | Needed to restore workspace state after browser refresh or cross-device resume |
+| Reveal result handoff | `RevealBidAcceptedResponse` + `RevealBidErrorResponse` | `POST /v1/tasks/{taskId}/bids/reveal` response | Ready | Immediate post-submit handoff can pass `proofSubmission.proofId` into the merged runtime read routes on `main` |
+| Verification follow-through | proof/bid read model | `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` | Ready on `main` | Needed to restore workspace state after browser refresh or cross-device resume; runtime persistence still depends on issue `#110` |
 
 ## Backend dependency feedback
 
 P1-21 keeps four follow-ups explicit instead of hiding them inside frontend-only assumptions:
 
-1. A bid workspace read model is still missing.
-   - Minimum payload: `bidId`, `taskId`, `agentId`, `phase`, `status`, accepted commit timestamp, optional reveal timestamp, latest `decisionTraceHash`, and current window snapshot.
-2. Proof verification still needs a read endpoint.
-   - Minimum payload: `proofId`, `verificationStatus`/`result`, required vs achieved difficulty, `reasonCodes`, `verifiedAt`, optional manual-review note.
-3. Window state should stay server-authored.
-   - Any future read model must echo the same `window` snapshot shape already returned by commit/reveal writes so frontend countdown and CTA logic do not drift.
-4. Required-vs-optional proof metadata needs to stay shared.
+1. Runtime persistence behind the merged bid/proof read endpoints still needs to stay stable.
+   - Minimum payload already exists on `main`; issue `#110` must keep `bidId`, phase/state fields, proof summary, audit refs, and refresh metadata populated for live runs.
+2. Window and refresh state should stay server-authored.
+   - The runtime implementation should preserve `window.nextAction` on writes and `refresh.*` on reads so countdown and polling logic do not drift.
+3. Required-vs-optional proof metadata needs to stay shared.
    - If `ProofPack` changes, this workspace spec, `src/api/openapi.yaml`, and `src/api/contracts.ts` must be updated together.
+4. The issue #136 runbook should remain the source of truth for local smoke evidence.
+   - Workspace validation is not complete until a local runtime run records bid/proof status projection behavior end to end.
 
 ## Acceptance criteria mapping
 
@@ -127,4 +127,4 @@ P1-21 keeps four follow-ups explicit instead of hiding them inside frontend-only
 | Agent can prepare a commit payload and reveal payload from one workflow with clear deadline/state feedback. | Single route, stage-aware shell, and `window.nextAction` guidance keep commit and reveal in one focused workspace. |
 | ProofPack entry/upload inputs align with the current contract and highlight missing required sections before submit. | Reveal stage maps every current required `ProofPack` section and distinguishes required vs optional evidence. |
 | UX states cover commit-window closed, reveal-without-commit, and payload validation failures. | Failure rendering and cross-stage blocked states define explicit handling for each requested case. |
-| Scope stays focused on commit/reveal interaction and does not absorb async verification timeline work. | Verification follow-through is limited to handoff notes; read-model and polling gaps stay tracked as dependencies on issue #59. |
+| Scope stays focused on commit/reveal interaction and does not absorb full verification-screen design work. | Verification follow-through stays limited to the runtime-backed handoff into issue `#136` and the dedicated verification baseline. |

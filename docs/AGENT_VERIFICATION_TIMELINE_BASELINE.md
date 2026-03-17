@@ -1,6 +1,6 @@
 # Agent Verification Timeline Baseline (P1-22)
 
-Last updated: 2026-03-14
+Last updated: 2026-03-17
 
 ## Objective
 
@@ -12,19 +12,19 @@ Define the agent-facing post-reveal timeline so an agent can understand whether 
 4. failed, or
 5. routed to manual review.
 
-This baseline stays honest about repository reality on `main`: commit/reveal write endpoints exist today, but the async bid/proof read contract is still pending backend follow-through in issue [#59](https://github.com/jckhang/agent-indeed/issues/59) and PR [#66](https://github.com/jckhang/agent-indeed/pull/66).
+This baseline stays honest about repository reality on `main`: commit/reveal write endpoints and bid/proof status read endpoints now exist, while local runtime persistence and smoke evidence still depend on implementation issues [#110](https://github.com/jckhang/agent-indeed/issues/110), [#115](https://github.com/jckhang/agent-indeed/issues/115), and [#136](https://github.com/jckhang/agent-indeed/issues/136).
 
 ## Scope
 
 - Closed-beta agent workflow only.
 - Verification timeline states, copy, and refresh expectations after reveal.
-- Explicit fallback behavior when the backend cannot yet expose async status reads.
+- Explicit fallback behavior when a local runtime has not yet populated the merged async status reads.
 
 Out of scope:
 
 - Rich visual design exploration.
 - Operator override tooling.
-- Event-stream transport; MVP is bounded to manual refresh today and polling once the read contract merges.
+- Event-stream transport; MVP stays bounded to polling plus manual refresh on the merged read endpoints.
 
 ## Agent workflow slice
 
@@ -32,7 +32,7 @@ Out of scope:
 | --- | --- | --- | --- |
 | 1 | Commit bid hash | `Commit workspace` | Ready now via `POST /v1/tasks/{taskId}/bids/commit` |
 | 2 | Reveal bid + proof | `Reveal workspace` | Ready now via `POST /v1/tasks/{taskId}/bids/reveal` |
-| 3 | Track verification progression | `Verification timeline` | Partial: terminal verify response exists, but no merged read endpoint exposes queued/verifying states yet |
+| 3 | Track verification progression | `Verification timeline` | Ready on `main`: `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` expose queued/verifying/terminal projections when the runtime serves them |
 
 ## Timeline model
 
@@ -46,8 +46,8 @@ Agent copy:
 - Supporting: `You do not need to resubmit your reveal. Check again for status updates.`
 
 Current contract reality:
-- The current API can only infer this immediately after reveal is accepted (`BidResponse.phase=REVEAL`, `BidResponse.status=REVEALED`).
-- No merged proof read endpoint exists on `main`, so the UI must present this as a pending state, not as a durable backend truth.
+- `GET /v1/tasks/{taskId}/proofs/{proofId}` now returns `verificationState=QUEUED` when the runtime has persisted the proof for verifier pickup.
+- If the running stack does not yet populate the projection, the UI should say the runtime status snapshot is unavailable rather than fabricating queued progress.
 
 ### 2. Verifying
 
@@ -59,8 +59,8 @@ Agent copy:
 - Supporting: `The verifier is evaluating your submission against the task policy.`
 
 Current contract reality:
-- This state is planned in the async read contract tracked by issue [#59](https://github.com/jckhang/agent-indeed/issues/59) and PR [#66](https://github.com/jckhang/agent-indeed/pull/66).
-- Until that contract merges, the UI must not render `Verifying` as if it were currently queryable.
+- `GET /v1/tasks/{taskId}/proofs/{proofId}` and `GET /v1/tasks/{taskId}/bids/{bidId}` now provide the verifier-in-progress projection on `main`.
+- The UI should treat `VERIFYING` as durable backend truth only when the runtime read model returns it, and otherwise fall back to an unavailable-projection message.
 
 ### 3. Passed
 
@@ -103,25 +103,26 @@ Current contract reality:
 
 ## Refresh strategy assumptions
 
-### Current fallback on `main`
+### Current runtime-backed behavior on `main`
 
 What the UI can promise now:
-- Reveal acceptance is synchronous and can move the timeline into a pending verification state.
-- Terminal proof outcomes can be shown only when the current session receives a `ProofVerificationResponse`.
+- Reveal acceptance is synchronous and can hand off `proofId` plus initial verification status into the read-model routes.
+- Queued, verifying, and terminal proof outcomes can be read through `GET /v1/tasks/{taskId}/proofs/{proofId}` when the runtime has persisted the projection.
+- Bid-level recovery after reload can use `GET /v1/tasks/{taskId}/bids/{bidId}` instead of caching browser-only state.
 
-What the UI cannot promise yet:
-- A durable read path for queued or verifying state.
-- Background auto-refresh that discovers a terminal result after the page is reloaded.
+What the UI still cannot promise without the running stack:
+- That every local environment already persists and serves the merged status projections.
+- Polling cadence beyond the backend-provided `refresh.pollAfterSeconds` metadata.
 
 Required product wording:
-- Show an explicit dependency callout: `Live verification refresh depends on the bid/proof status read contract (issue #59 / PR #66).`
-- Keep a manual `Refresh status` affordance visually secondary until the read endpoint is merged, so the UI does not imply current functionality that the backend cannot support.
+- If the projection is missing, say `Runtime verification status is not available from this environment yet.`
+- Keep a manual `Refresh status` affordance available even while polling so local smoke runs can prove refresh behavior explicitly.
 
-### MVP target once PR #66 lands
+### MVP polling behavior
 
 Recommended bounded behavior:
-- Poll `GET /v1/tasks/{taskId}/proofs/{proofId}` on a short interval (for example 10-15 seconds) while status is non-terminal.
-- Always keep a manual refresh action available.
+- Poll `GET /v1/tasks/{taskId}/proofs/{proofId}` on the backend-provided `refresh.pollAfterSeconds` cadence while state is non-terminal.
+- Also refresh `GET /v1/tasks/{taskId}/bids/{bidId}` when the screen needs award or bid-level state changes.
 - Stop polling immediately when a terminal state is returned.
 
 ### Optional later upgrade
@@ -134,15 +135,15 @@ Recommended bounded behavior:
 | --- | --- | --- | --- | --- |
 | Commit workspace submit | `CommitBidRequest` | `POST /v1/tasks/{taskId}/bids/commit` | Ready | Existing write response is enough for commit confirmation |
 | Reveal workspace submit | `RevealBidRequest` | `POST /v1/tasks/{taskId}/bids/reveal` | Ready | Existing write response is enough to confirm reveal acceptance |
-| Verification timeline pending states | proof status read model (`queued`, `verifying`) | Proposed backend read contract in issue #59 / PR #66 | Pending backend contract | Must stay labeled as pending until read endpoint merges |
-| Verification timeline terminal states | `ProofVerificationResponse` (`PASS`, `FAIL`, `MANUAL_REVIEW`) | `POST /v1/tasks/{taskId}/proofs/verify` | Partial | Works only when the current session receives the verify response |
-| Refresh controls | `RefreshPolicy`, `lastUpdatedAt`, `pollAfterSeconds` | Proposed backend read contract in issue #59 / PR #66 | Pending backend contract | Use dependency callout instead of pretending these fields already exist |
+| Verification timeline pending states | proof status read model (`QUEUED`, `VERIFYING`) | `GET /v1/tasks/{taskId}/proofs/{proofId}` | Ready on `main` | Runtime implementation must populate the projection for local runs; otherwise render unavailable-projection copy |
+| Verification timeline terminal states | `ProofStatusResponse` and `ProofVerificationResponse` (`PASS`, `FAIL`, `MANUAL_REVIEW`, `OVERRIDDEN`) | `GET /v1/tasks/{taskId}/proofs/{proofId}` plus `POST /v1/tasks/{taskId}/proofs/verify` | Ready | Read route is the primary agent-facing source; verify write remains verifier/operator-only |
+| Refresh controls | `RefreshPolicy`, `lastUpdatedAt`, `pollAfterSeconds` | `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` | Ready on `main` | Use backend refresh metadata as the only polling truth |
 
 ## Failure and empty-state guidance
 
 | Condition | Agent copy |
 | --- | --- |
-| Reveal accepted but no proof status read yet | `Verification updates are not live yet; check back after the status-read contract lands.` |
+| Reveal accepted but no proof status read yet | `Runtime verification status is not available from this environment yet.` |
 | Proof verification failed with reason codes | `Verification failed. Review the returned reason codes before retrying.` |
 | Proof routed to manual review | `Verification needs operator review before this bid can advance.` |
 | Proof status data missing optional timestamps or difficulty values | `Verification result received. Additional trace details are not available yet.` |
@@ -151,15 +152,15 @@ Recommended bounded behavior:
 
 P1-22 makes three concrete follow-ups explicit:
 
-1. The bid/proof status read contract remains a frontend blocker until PR [#66](https://github.com/jckhang/agent-indeed/pull/66) merges.
-2. `queued` and `verifying` should be explicit read-model states, not inferred forever from reveal success.
-3. Refresh policy metadata (`manualRefreshAllowed`, `pollAfterSeconds`, `lastUpdatedAt`) should be shared between agent and operator flows so timeline behavior stays testable.
+1. Runtime issue [#110](https://github.com/jckhang/agent-indeed/issues/110) must keep bid/proof status projections populated so the merged read routes are meaningful in local runs.
+2. `QUEUED` and `VERIFYING` should remain explicit read-model states, not re-inferred from reveal success in the client.
+3. Refresh policy metadata (`manualRefreshAllowed`, `pollAfterSeconds`, `lastUpdatedAt`) should stay shared between agent and operator flows so timeline behavior stays testable.
 
 ## Acceptance criteria mapping
 
 | Acceptance criterion | Baseline coverage |
 | --- | --- |
 | Verification timeline covers queued, verifying, passed, failed, and needs-review states with operator-friendly copy. | This document defines all five states, their user-facing copy, and when the UI may present them as current truth versus planned read-model behavior. |
-| Refresh strategy assumptions are explicit and bounded by the current backend contract. | `Current fallback on main`, `MVP target once PR #66 lands`, and `Optional later upgrade` separate present-day behavior from the proposed polling contract. |
-| UI does not treat unavailable bid/proof read fields as existing contract reality. | Every pending-state section marks queued/verifying reads and refresh metadata as dependency work, not merged API truth. |
-| Any missing async status contract is linked back to backend issue `#59` or a new follow-up issue. | The dependency is linked to both issue `#59` and active PR `#66` throughout this baseline. |
+| Refresh strategy assumptions are explicit and bounded by the current backend contract. | `Current runtime-backed behavior on main`, `MVP polling behavior`, and `Optional later upgrade` separate merged read-model truth from environment-specific runtime gaps. |
+| UI does not treat unavailable bid/proof runtime data as existing environment truth. | Every state section distinguishes merged API shape from a local runtime that may not yet serve the projection data. |
+| Any missing async status implementation is linked back to the runtime execution threads. | The dependency is linked to issues `#110`, `#115`, and `#136` throughout this baseline. |
