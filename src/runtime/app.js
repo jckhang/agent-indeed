@@ -11,8 +11,10 @@ const TASK_EVENTS_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/events$/;
 const TASK_AUDIT_EVENTS_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/audit-events$/;
 const TASK_BID_COMMIT_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/bids\/commit$/;
 const TASK_BID_REVEAL_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/bids\/reveal$/;
+const TASK_BID_STATUS_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/bids\/(bid_[a-zA-Z0-9_-]{8,64})$/;
 const TASK_PROOF_POLICY_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/proof-policy$/;
 const TASK_PROOF_VERIFY_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/proofs\/verify$/;
+const TASK_PROOF_STATUS_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/proofs\/(proof_[a-zA-Z0-9_-]{8,64})$/;
 const TASK_AWARD_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/award$/;
 const BID_EVENTS_PATTERN = /^\/v1\/bids\/(bid_[a-zA-Z0-9_-]{8,64})\/events$/;
 
@@ -596,6 +598,148 @@ function buildWindow(task, serverTime) {
   };
 }
 
+function buildRefreshPolicy({ lastUpdatedAt, pollAfterSeconds = 2, manualRefreshAllowed = true }) {
+  return {
+    mode: "POLL",
+    pollAfterSeconds,
+    manualRefreshAllowed,
+    lastUpdatedAt
+  };
+}
+
+function isTerminalProofState(result) {
+  return result === "PASS" || result === "FAIL" || result === "MANUAL_REVIEW";
+}
+
+function mapProofStatusReasonCodes(verification) {
+  if (!verification?.result) {
+    return undefined;
+  }
+
+  if (verification.result === "FAIL") {
+    return ["PROOF_VERIFY_FAILED"];
+  }
+
+  if (verification.result === "MANUAL_REVIEW") {
+    return ["PROOF_VERIFY_NEEDS_REVIEW"];
+  }
+
+  return undefined;
+}
+
+function buildBidStatusResponse({ task, bid, proof, award, nowValue }) {
+  const window = buildWindow(task, nowValue);
+  const proofReasonCodes = mapProofStatusReasonCodes(bid.verification);
+  let revealState = "REVEALED";
+  if (!bid.reveal) {
+    if (window.currentPhase === "COMMIT_OPEN") {
+      revealState = "WAITING_FOR_WINDOW";
+    } else if (window.currentPhase === "REVEAL_OPEN") {
+      revealState = "READY";
+    } else {
+      revealState = "REJECTED";
+    }
+  }
+
+  let proofState = "NOT_SUBMITTED";
+  if (proof) {
+    proofState = proof.verification?.result ?? "QUEUED";
+  }
+
+  let awardState = "NOT_DECIDED";
+  if (award?.bidId === bid.bidId) {
+    awardState = "AWARDED";
+  } else if (award?.bidId && award.bidId !== bid.bidId) {
+    awardState = "NOT_SELECTED";
+  } else if (bid.verification?.result === "PASS") {
+    awardState = "SHORTLISTED";
+  } else if (bid.verification?.result === "FAIL") {
+    awardState = "NOT_SELECTED";
+  }
+
+  const failureReasonCodes = [];
+  if (!bid.reveal && window.currentPhase === "CLOSED") {
+    failureReasonCodes.push("BID_REVEAL_WINDOW_CLOSED");
+  }
+  if (proofReasonCodes?.length) {
+    failureReasonCodes.push(...proofReasonCodes);
+  }
+
+  const lastUpdatedAt = award?.awardedAt ?? bid.statusChangedAt ?? bid.commit?.committedAt ?? task.createdAt;
+  return {
+    bidId: bid.bidId,
+    taskId: bid.taskId,
+    agentId: bid.agentId,
+    latestPhase: bid.phase,
+    commitState: bid.commit ? "COMMITTED" : "PENDING",
+    revealState,
+    proofState,
+    awardState,
+    deadlines: {
+      commitDeadline: task.commitDeadline,
+      revealDeadline: task.revealDeadline
+    },
+    ...(proof
+      ? {
+          proof: {
+            proofId: proof.proofId,
+            ...(proof.verification?.result ? { result: proof.verification.result } : {}),
+            ...(proofReasonCodes?.length ? { reasonCodes: proofReasonCodes } : {}),
+            ...(proof.verification?.verifiedAt ? { verifiedAt: proof.verification.verifiedAt } : {}),
+            ...(proof.verification?.decisionTraceHash
+              ? { decisionTraceHash: proof.verification.decisionTraceHash }
+              : {})
+          }
+        }
+      : {}),
+    ...(failureReasonCodes.length ? { failureReasonCodes } : {}),
+    auditRefs: {
+      ...(bid.auditRefs?.reveal || bid.auditRefs?.commit
+        ? { bidAuditId: bid.auditRefs.reveal ?? bid.auditRefs.commit }
+        : {}),
+      ...(bid.auditRefs?.verify ? { proofAuditId: bid.auditRefs.verify } : {}),
+      ...(bid.decisionTraceHash ? { decisionTraceHash: bid.decisionTraceHash } : {})
+    },
+    refresh: buildRefreshPolicy({
+      lastUpdatedAt,
+      pollAfterSeconds:
+        awardState === "AWARDED" || awardState === "NOT_SELECTED" || isTerminalProofState(proofState)
+          ? 30
+          : 2
+    })
+  };
+}
+
+function buildProofStatusResponse({ proof, nowValue }) {
+  const reasonCodes = mapProofStatusReasonCodes(proof.verification);
+  const verificationState = proof.verification?.result ?? "QUEUED";
+  const lastUpdatedAt = proof.verification?.verifiedAt ?? proof.submittedAt ?? nowValue;
+
+  return {
+    proofId: proof.proofId,
+    taskId: proof.taskId,
+    bidId: proof.bidId,
+    agentId: proof.agentId,
+    verificationState,
+    ...(proof.verification?.requiredDifficulty !== undefined
+      ? { requiredDifficulty: proof.verification.requiredDifficulty }
+      : {}),
+    ...(proof.verification?.achievedDifficulty !== undefined
+      ? { achievedDifficulty: proof.verification.achievedDifficulty }
+      : {}),
+    ...(reasonCodes?.length ? { reasonCodes } : {}),
+    ...(proof.verification?.result === "MANUAL_REVIEW" ? { needsManualReview: true } : {}),
+    ...(proof.verification?.decisionTraceHash
+      ? { decisionTraceHash: proof.verification.decisionTraceHash }
+      : {}),
+    ...(proof.verification?.verifiedAt ? { verifiedAt: proof.verification.verifiedAt } : {}),
+    refresh: buildRefreshPolicy({
+      lastUpdatedAt,
+      pollAfterSeconds: isTerminalProofState(verificationState) ? 30 : 2
+    })
+  };
+}
+
 function buildRevealHash(reveal) {
   return sha256(
     JSON.stringify({
@@ -1096,6 +1240,34 @@ export function createApp({
       });
     }
 
+    const bidStatusMatch = requestUrl.pathname.match(TASK_BID_STATUS_PATTERN);
+    if (req.method === "GET" && bidStatusMatch) {
+      const taskId = bidStatusMatch[1];
+      const bidId = bidStatusMatch[2];
+      const task = store.getTask(taskId);
+      const bid = store.getBidForTask(taskId, bidId);
+      if (!task || !bid) {
+        return reply(
+          404,
+          buildError(
+            "BID_STATUS_NOT_FOUND",
+            "AUDIT",
+            `no bid status projection exists for bid ${bidId} on task ${taskId}`,
+            {
+              auditId: "audit_bid_status_not_found",
+              retryable: true,
+              retryAfterSeconds: 2,
+              details: { taskId, bidId }
+            }
+          )
+        );
+      }
+
+      const proof = bid.proofId ? store.getProof(bid.proofId) : null;
+      const award = store.findAwardForTask(taskId);
+      return reply(200, buildBidStatusResponse({ task, bid, proof, award, nowValue }));
+    }
+
     const policyMatch = requestUrl.pathname.match(TASK_PROOF_POLICY_PATTERN);
     if (req.method === "POST" && policyMatch) {
       const taskId = policyMatch[1];
@@ -1248,6 +1420,31 @@ export function createApp({
         verifiedAt: verification.verifiedAt,
         bidId: bidRecord?.bidId
       });
+    }
+
+    const proofStatusMatch = requestUrl.pathname.match(TASK_PROOF_STATUS_PATTERN);
+    if (req.method === "GET" && proofStatusMatch) {
+      const taskId = proofStatusMatch[1];
+      const proofId = proofStatusMatch[2];
+      const proof = store.getProof(proofId);
+      if (!proof || proof.taskId !== taskId) {
+        return reply(
+          404,
+          buildError(
+            "PROOF_STATUS_NOT_FOUND",
+            "AUDIT",
+            `no proof status projection exists for proof ${proofId} on task ${taskId}`,
+            {
+              auditId: "audit_proof_status_not_found",
+              retryable: true,
+              retryAfterSeconds: 2,
+              details: { taskId, proofId }
+            }
+          )
+        );
+      }
+
+      return reply(200, buildProofStatusResponse({ proof, nowValue }));
     }
 
     const awardMatch = requestUrl.pathname.match(TASK_AWARD_PATTERN);

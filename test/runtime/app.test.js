@@ -311,6 +311,18 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
     assert.equal(commitBody.result, "COMMITTED");
     assert.equal(commitBody.window.currentPhase, "COMMIT_OPEN");
 
+    const committedBidStatusResponse = await fetch(
+      `${baseUrl}/v1/tasks/${taskId}/bids/${reveal.bidId}`
+    );
+    assert.equal(committedBidStatusResponse.status, 200);
+    const committedBidStatusBody = await committedBidStatusResponse.json();
+    assert.equal(committedBidStatusBody.commitState, "COMMITTED");
+    assert.equal(committedBidStatusBody.revealState, "WAITING_FOR_WINDOW");
+    assert.equal(committedBidStatusBody.proofState, "NOT_SUBMITTED");
+    assert.equal(committedBidStatusBody.awardState, "NOT_DECIDED");
+    assert.equal(committedBidStatusBody.refresh.mode, "POLL");
+    assert.equal(committedBidStatusBody.refresh.pollAfterSeconds, 2);
+
     const replayCommitResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/bids/commit`, {
       method: "POST",
       headers: {
@@ -371,6 +383,15 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
     assert.equal(revealBody.proofSubmission.verificationStatus, "PENDING_VERIFY");
     assert.equal(revealBody.window.currentPhase, "REVEAL_OPEN");
 
+    const queuedProofStatusResponse = await fetch(
+      `${baseUrl}/v1/tasks/${taskId}/proofs/${proof.proofId}`
+    );
+    assert.equal(queuedProofStatusResponse.status, 200);
+    const queuedProofStatusBody = await queuedProofStatusResponse.json();
+    assert.equal(queuedProofStatusBody.verificationState, "QUEUED");
+    assert.equal(queuedProofStatusBody.refresh.mode, "POLL");
+    assert.equal(queuedProofStatusBody.refresh.pollAfterSeconds, 2);
+
     const verifyResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/proofs/verify`, {
       method: "POST",
       headers: {
@@ -386,6 +407,30 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
     assert.equal(verifyBody.result, "PASS");
     assert.equal(verifyBody.policyTraceId, policyBody.policyTraceId);
     assert.equal(verifyBody.reasonCodes.length, 0);
+
+    const verifiedBidStatusResponse = await fetch(
+      `${baseUrl}/v1/tasks/${taskId}/bids/${reveal.bidId}`
+    );
+    assert.equal(verifiedBidStatusResponse.status, 200);
+    const verifiedBidStatusBody = await verifiedBidStatusResponse.json();
+    assert.equal(verifiedBidStatusBody.latestPhase, "REVEAL");
+    assert.equal(verifiedBidStatusBody.revealState, "REVEALED");
+    assert.equal(verifiedBidStatusBody.proofState, "PASS");
+    assert.equal(verifiedBidStatusBody.awardState, "SHORTLISTED");
+    assert.equal(verifiedBidStatusBody.proof.proofId, proof.proofId);
+    assert.equal(verifiedBidStatusBody.proof.result, "PASS");
+    assert.equal(verifiedBidStatusBody.refresh.pollAfterSeconds, 30);
+
+    const verifiedProofStatusResponse = await fetch(
+      `${baseUrl}/v1/tasks/${taskId}/proofs/${proof.proofId}`
+    );
+    assert.equal(verifiedProofStatusResponse.status, 200);
+    const verifiedProofStatusBody = await verifiedProofStatusResponse.json();
+    assert.equal(verifiedProofStatusBody.bidId, reveal.bidId);
+    assert.equal(verifiedProofStatusBody.verificationState, "PASS");
+    assert.equal(verifiedProofStatusBody.requiredDifficulty, verifyBody.requiredDifficulty);
+    assert.equal(verifiedProofStatusBody.achievedDifficulty, verifyBody.achievedDifficulty);
+    assert.equal(verifiedProofStatusBody.refresh.pollAfterSeconds, 30);
 
     const awardDetailResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/award`);
     assert.equal(awardDetailResponse.status, 200);
@@ -417,6 +462,14 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
     assert.equal(awardBody.awardedBidId, reveal.bidId);
     assert.equal(awardBody.awardedAgentId, reveal.agentId);
     assert.equal(awardBody.auditEventId, "audit_00000005");
+
+    const awardedBidStatusResponse = await fetch(
+      `${baseUrl}/v1/tasks/${taskId}/bids/${reveal.bidId}`
+    );
+    assert.equal(awardedBidStatusResponse.status, 200);
+    const awardedBidStatusBody = await awardedBidStatusResponse.json();
+    assert.equal(awardedBidStatusBody.awardState, "AWARDED");
+    assert.equal(awardedBidStatusBody.refresh.pollAfterSeconds, 30);
 
     const replayAwardResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/award`, {
       method: "POST",
@@ -684,6 +737,23 @@ test("reveal without a commit and failed verification return stable errors", asy
       "HASHCASH_BITS_BELOW_MINIMUM"
     ]);
 
+    const failedBidStatusResponse = await fetch(
+      `${baseUrl}/v1/tasks/${taskId}/bids/${failingReveal.bidId}`
+    );
+    assert.equal(failedBidStatusResponse.status, 200);
+    const failedBidStatusBody = await failedBidStatusResponse.json();
+    assert.equal(failedBidStatusBody.proofState, "FAIL");
+    assert.equal(failedBidStatusBody.awardState, "NOT_SELECTED");
+    assert.deepEqual(failedBidStatusBody.failureReasonCodes, ["PROOF_VERIFY_FAILED"]);
+
+    const failedProofStatusResponse = await fetch(
+      `${baseUrl}/v1/tasks/${taskId}/proofs/${failingProof.proofId}`
+    );
+    assert.equal(failedProofStatusResponse.status, 200);
+    const failedProofStatusBody = await failedProofStatusResponse.json();
+    assert.equal(failedProofStatusBody.verificationState, "FAIL");
+    assert.deepEqual(failedProofStatusBody.reasonCodes, ["PROOF_VERIFY_FAILED"]);
+
     const awardDetailResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/award`);
     assert.equal(awardDetailResponse.status, 200);
     const awardDetailBody = await awardDetailResponse.json();
@@ -734,6 +804,25 @@ test("GET /v1/bids/:bidId/events rejects bid ids shorter than the published cont
   try {
     const response = await fetch(`${baseUrl}/v1/bids/bid_short/events`);
     assert.equal(response.status, 404);
+  } finally {
+    server.close();
+    await once(server, "close");
+  }
+});
+
+test("bid/proof status routes return 404 when the task-scoped projection does not exist", async () => {
+  const { server, baseUrl } = await startTestServer();
+
+  try {
+    const bidResponse = await fetch(`${baseUrl}/v1/tasks/task_00000001/bids/bid_00000001`);
+    assert.equal(bidResponse.status, 404);
+    const bidBody = await bidResponse.json();
+    assert.equal(bidBody.code, "BID_STATUS_NOT_FOUND");
+
+    const proofResponse = await fetch(`${baseUrl}/v1/tasks/task_00000001/proofs/proof_00000001`);
+    assert.equal(proofResponse.status, 404);
+    const proofBody = await proofResponse.json();
+    assert.equal(proofBody.code, "PROOF_STATUS_NOT_FOUND");
   } finally {
     server.close();
     await once(server, "close");
