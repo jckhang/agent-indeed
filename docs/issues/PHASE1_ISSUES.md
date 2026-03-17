@@ -12,7 +12,7 @@ This file intentionally stays lightweight so we do not duplicate fast-changing i
 - [Planning lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aalbatross%22)
 - [Backend lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Akestrel%22)
 - [Frontend lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Alanzhou-fe-agent%22)
-- [QA lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aqa%22)
+- [QA lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aavery%22)
 
 ## Stable issue index
 
