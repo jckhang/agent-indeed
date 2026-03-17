@@ -28,7 +28,7 @@ reviewable release gates for closed-beta readiness. It complements:
 This remains the prerequisite for durable runtime behavior and executable QA checks.
 
 - Verifier terminal vocabulary and award-trace expectations now come from merged PR #83 and merged PR #92.
-- The active convergence risk is no longer speculative design work; it is review drift on PR #126, PR #127, and PR #139 versus the contracts already merged on `main`.
+- The active convergence risk is no longer speculative design work; it is the last concrete review drift on PR #126 and PR #139 plus final rereview confirmation on PR #127 versus the contracts already merged on `main`.
 - PR #140 is the planning guardrail that keeps those threads tied to one dated blocker ledger instead of duplicating stale snapshots across long-lived docs.
 
 Release note: if any active runtime branch changes enum names, required fields, route shapes, or error-code wording, the same update must land in OpenSpec plus both API drafts before the gate can be marked ready.

@@ -14,7 +14,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 
 | Epic acceptance area | Current status | Source of truth | Next gate |
 | --- | --- | --- | --- |
-| OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts`, issue #137, PR #140 | Keep the active runtime/doc threads (`#126`, `#127`, `#139`, `#140`) aligned to merged `main` contracts and make sure review-required validation evidence lives in the PR body, not just comments. |
+| OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts`, issue #137, PR #140 | Keep the active runtime/doc threads (`#126`, `#127`, `#139`, `#140`) aligned to merged `main` contracts while the remaining review queue is worked down to the last concrete blockers. |
 | End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, issues #11, #109, #110, #111, PRs #126 and #127 | Merge the runnable backend slices and let issue #111 execute the smoke/E2E path against the real runtime before unblocking issue #11. |
 | Core negative scenarios are covered | Blocked | issues #11 and #111, `docs/CLOSED_BETA_SECURITY_READINESS.md`, `docs/ERROR_CODE_RETRY_POLICY.md`, PR #127 | Turn the documented failure cases into executable assertions tied to the vertical-slice runtime and capture evidence back on issue #11. |
 | Audit events cover key state transitions | In progress | issue #110, PR #127, `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md` | Keep the award/proof/audit surfaces contract-aligned while issue #110 proves the emitted runtime trail and QA consumes it in issue #111. |
@@ -43,9 +43,9 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 ### Remaining blocked slices
 
 - Issue #11 remains blocked until PR #126 and PR #127 provide a stable local runtime and issue #111 converts the QA matrix into executable evidence.
-- PR #126 still needs the required validation evidence copied into the PR body before the bootstrap slice is merge-ready.
-- PR #127 still needs the vertical-slice runtime branch to stay aligned with the published `bidId` contract and any follow-up review notes.
-- PR #139 remains blocked on doc-to-contract drift for bid/proof status reads plus missing validation output in the PR body.
+- PR #126 now has literal validation output in the PR body; the remaining blocker is a `risk.valueScore` example in `src/runtime/README.md` that still exceeds the 0..1 contract range.
+- PR #127 has the task-scoped bid/proof status handlers pushed for rereview; the active follow-up is to keep the branch aligned with the published polling contract until review closes.
+- PR #139 now carries validation output in the PR body; the remaining blocker is doc-to-contract drift on bid/proof status reads versus the merged contract surface.
 - PR #140 remains open until the runtime blocker ledger accurately mirrors the live review queue and owner handoffs.
 
 ## Runtime Execution Queue (2026-03-17)
@@ -53,9 +53,9 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | Thread | Current disposition | Why | Next owner / next action |
 | --- | --- | --- | --- |
 | PR #140 `docs: add runtime unblocker control ledger` | In review | The planning ledger is now the weekly owner/blocker source, but it has to stay synced to the live runtime review state. | `albatross-dev-agent`: keep the lane ledger updated as blocker comments land and use it to prep the 2026-03-20 epic checkpoint. |
-| PR #126 `[P1-37] Bootstrap runnable control-plane backend skeleton` | Blocked | Review still requires literal validation evidence in the PR template/body before the runtime bootstrap slice can merge. | `kestrel`: move the already-run validation output into the PR body and keep the branch on current `origin/main`. |
-| PR #127 `[P1-38] Implement runnable MVP dispatch vertical slice` | Blocked | The branch carries the main executable flow, but review still tracks contract-alignment follow-up on the bid-event route and any runtime drift. | `kestrel`: resolve the active contract note, rerun runtime validation, and repost exact output in the PR thread/body. |
-| PR #139 `docs: add frontend runtime integration tranche` | Blocked | The tranche currently claims bid/proof status read behavior that is not present in merged contracts and is missing literal validation output in the PR body. | `lanzhou-fe-agent`: scope the doc set back to merged `main` contracts, paste validation output into the PR body, and keep the branch tied to issues #115/#110. |
+| PR #126 `[P1-37] Bootstrap runnable control-plane backend skeleton` | Blocked | Validation evidence is now in the PR body, but one `risk.valueScore` example in `src/runtime/README.md` still exceeds the published 0..1 contract range. | `kestrel`: fix the remaining sample payload drift, rerun the affected checks, and reply with the exact output. |
+| PR #127 `[P1-38] Implement runnable MVP dispatch vertical slice` | In review | The task-scoped bid/proof status handlers are now pushed on the branch and mapped to the published polling projection; review is waiting on confirmation that the follow-up closes the remaining thread. | `kestrel`: hold the branch on current `origin/main`, rerun validation if more changes land, and close the loop in review. |
+| PR #139 `docs: add frontend runtime integration tranche` | Blocked | Validation output is now present in the PR body, but the tranche still claims bid/proof status read behavior that does not match the merged contract surface. | `lanzhou-fe-agent`: scope the doc set back to merged `main` contracts (or land the missing contract work separately) and keep the branch tied to issues #115/#110. |
 | Issue #120 / issue #111 | Waiting on runtime | QA cannot close the weekly sweep until the backend runtime path becomes stable and reproducible from one documented command path. | `avery`: convert the matrices into executable checks as soon as the runtime branches settle. |
 
 ## Checkpoint Rollup
