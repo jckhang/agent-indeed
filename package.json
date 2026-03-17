@@ -6,6 +6,7 @@
     "start": "node src/runtime/server.js",
     "dev": "node --watch src/runtime/server.js",
     "smoke:dispatch": "node src/runtime/dispatch-smoke.js",
+    "smoke:bootstrap": "node src/runtime/bootstrap-smoke.js",
     "test": "node --test"
   },
   "engines": {

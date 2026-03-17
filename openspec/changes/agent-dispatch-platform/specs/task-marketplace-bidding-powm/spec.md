@@ -239,6 +239,11 @@
 - **AND** 至少一个 runtime route 支持把已持久化实体重新读回，便于 smoke check 与后续 vertical slice 接续
 - **AND** runtime 提供 task 级别 audit readback，便于本地验证状态写入与事件时间线
 
+#### Scenario: Repository exposes one-command bootstrap smoke verification
+- **WHEN** 开发者执行仓库约定的本地 smoke 命令
+- **THEN** 命令自动启动 runtime baseline 并串行探测 `/healthz`、`/readyz` 与一个 `/v1/*` 写读回路径
+- **AND** 命令输出 task/audit readback 的结果摘要，便于 FE/QA 复用同一条本地验证路径
+
 #### Scenario: Runtime storage abstractions cover core lifecycle entities
 - **WHEN** 本地 control-plane 初始化存储层
 - **THEN** 平台为 `task`、`bid`、`proof`、`award` 与 `audit` 建立明确的存储抽象

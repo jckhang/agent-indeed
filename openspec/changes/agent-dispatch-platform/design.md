@@ -171,4 +171,5 @@ MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立�
    - 在 contract-only 阶段之后，先交付单进程本地 control plane 骨架，而不是等待完整微服务拆分。
    - 首个可运行基线暴露 `/healthz`、`/readyz` 与至少一个 `/v1/*` namespaced route，并为 task/bid/proof/award/audit 建立确定性 ID 的存储抽象。
    - 本地 readback 路径至少覆盖 persisted task 与 task 级 audit timeline，确保 smoke check 可以直接观察状态写入结果。
+   - 仓库需要提供一个单命令 bootstrap smoke 路径，自动启动本地服务并探测 health/readiness/summary/task/audit readback，减少下游 QA/FE 手工拼接 curl 的门槛。
    - Phase 1 早期允许以内存存储启动，只要 contract、OpenSpec 与后续 vertical slice 可以在相同边界上继续演进。

@@ -24,3 +24,4 @@ Agent dispatch platform prototype.
 - HR hiring plan: `docs/HR_HIRING_PLAN.md`
 - Runtime control-plane scaffold: `src/runtime/README.md`
 - Runnable dispatch smoke command: `npm run smoke:dispatch`
+- Runtime bootstrap smoke command: `npm run smoke:bootstrap`

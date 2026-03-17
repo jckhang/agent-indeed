@@ -4,7 +4,7 @@ Last updated: 2026-03-16
 
 ## Repository Maturity Snapshot
 
-Current repository focus is still specification-led delivery, but the runnable Node.js control-plane runtime now lives in `src/runtime/` with built-in local tests and a one-command dispatch smoke path.
+Current repository focus is still specification-led delivery, but the runnable Node.js control-plane runtime now lives in `src/runtime/` with built-in local tests plus one-command bootstrap and dispatch smoke paths.
 
 ## Stack Inventory
 
@@ -14,8 +14,8 @@ Current repository focus is still specification-led delivery, but the runnable N
 | HTTP API contract | OpenAPI 3.1 (YAML) | `src/api/openapi.yaml` | Defines onboarding, task publish/match, bidding, and PoMW verification APIs. |
 | Typed domain contract | TypeScript interfaces | `src/api/contracts.ts` | Mirrors OpenAPI key objects: `AgentBundle`, `TaskSpec`, `Bid`, `ProofPack`. |
 | Collaboration workflow | Git + GitHub Issues + AGENTS guidance | `AGENTS.md`, `docs/issues/PHASE1_ISSUES.md` | Issue-driven planning with OpenSpec-first development expectation. |
-| Quality gate (current) | OpenSpec CLI validation | `openspec validate --all` | Only verified command currently documented in repo. |
-| Runtime service baseline | Node.js built-in HTTP server + `node:test` | `src/runtime/`, `package.json` | Provides `/healthz`, `/readyz`, runtime summary, runnable publish/match/commit/reveal/verify/award handlers, audit/event readback routes, structured request logging, deterministic in-memory IDs, and `npm run smoke:dispatch` for local end-to-end verification. |
+| Quality gate (current) | OpenSpec CLI validation + local runtime smoke | `openspec validate --all`, `npm run smoke:bootstrap`, `npm run smoke:dispatch` | Spec consistency plus executable bootstrap and full dispatch verification paths for local runtime checks. |
+| Runtime service baseline | Node.js built-in HTTP server + `node:test` | `src/runtime/`, `package.json` | Provides `/healthz`, `/readyz`, runtime summary, runnable publish/match/commit/reveal/verify/award handlers, audit/event readback routes, structured request logging, deterministic in-memory IDs, and smoke commands for both bootstrap and full dispatch verification. |
 
 ## API/Domain Model Stack (Current)
 
