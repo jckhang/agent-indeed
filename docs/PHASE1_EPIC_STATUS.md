@@ -44,8 +44,8 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 ### Remaining blocked slices
 
 - Issue #11 remains blocked until PR #127 and PR #129 provide a stable local runtime and issue #111 converts the QA matrix into executable evidence.
-- PR #129 is still blocked because the PR body does not yet include the literal validation output for `npm test`, `npm run smoke:bootstrap`, OpenSpec validation, diff-check, and the pre-push guard.
-- PR #127 is functionally `LGTM`, but it now conflicts with `origin/main` after PR #126 merged; the active follow-up is rebase, rerun validation, and force-push for a clean review surface.
+- PR #129 is still blocked because the branch is merge-conflicting and the PR body still does not include the literal validation output for `npm test`, `npm run smoke:bootstrap`, OpenSpec validation, diff-check, and the pre-push guard.
+- PR #127 is now back on the latest `main`, carries fresh validation output from the 2026-03-17T13:04Z rebase, and is mergeable; the remaining backend queue risk is concentrated in PR #129 rather than the vertical-slice branch.
 - PR #140 and PR #141 remain open until the blocker ledger and epic/beta rollups match the live post-merge queue (`#127`/`#129` open; `#126`/`#139` merged).
 
 ## Runtime Execution Queue (2026-03-17)
@@ -53,9 +53,9 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | Thread | Current disposition | Why | Next owner / next action |
 | --- | --- | --- | --- |
 | PR #140 `docs: add runtime unblocker control ledger` | In review | The planning ledger is now the dated owner/blocker source, but it has to stay synced to the live post-merge runtime queue. | `albatross-dev-agent`: keep the lane ledger current and close the loop on re-review. |
-| PR #141 `docs: refresh phase 1 epic runtime rollup` | In review | The epic and beta readiness rollups need to describe the current queue (`#127`, `#129`, `#140`) instead of the already-merged blockers. | `albatross-dev-agent`: refresh the epic/beta docs from live GitHub state and close the re-review thread. |
+| PR #141 `docs: refresh phase 1 epic runtime rollup` | In review | The epic and beta readiness rollups need to describe the current queue (`#127` mergeable, `#129` blocked, `#140`/`#141` in review) instead of the already-merged blockers. | `albatross-dev-agent`: refresh the epic/beta docs from live GitHub state and close the re-review thread. |
 | PR #129 `feat: add runtime bootstrap smoke command` | Blocked | The smoke harness work landed, but review still requires pasted literal validation output in the PR body before merge. | `kestrel`: paste the exact command output in the PR body, rerun if needed, and re-request review. |
-| PR #127 `[P1-38] Implement runnable MVP dispatch vertical slice` | Blocked on rebase | The branch behavior is `LGTM`, but the open PR now conflicts with `origin/main` after PR #126 merged. | `kestrel`: rebase onto fresh `origin/main`, rerun validation, and force-push the cleaned-up branch. |
+| PR #127 `[P1-38] Implement runnable MVP dispatch vertical slice` | Ready to merge | The branch has been rebased onto current `main`, fresh validation output is posted, and Avery re-confirmed `LGTM` on the refreshed head. | `kestrel`: keep the posted evidence in the PR body and merge once the queue is clear. |
 | Issue #120 / issue #111 | Waiting on runtime | QA cannot close the weekly sweep until the backend runtime path becomes stable and reproducible from one documented command path. | `avery`: convert the matrices into executable checks as soon as PR #127 and PR #129 settle. |
 
 ## Checkpoint Rollup
@@ -63,7 +63,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | Checkpoint | Epic relevance | Current note |
 | --- | --- | --- |
 | M1 | Service bootstrap + queue control | Issue #137 / PR #140 and issue #115 / PR #129 are the current gates for a credible runtime baseline by 2026-03-20. |
-| M2 | Runnable publish/match/bid foundation | PR #127 is the remaining open execution follow-through on top of the now-merged backend/frontend baseline from PR #126 and PR #139. |
+| M2 | Runnable publish/match/bid foundation | PR #127 is now mergeable on the latest base; the remaining runtime execution drag is PR #129's unresolved validation-evidence + rebase cleanup. |
 | M3 | Verify, audit, and executable QA | Issue #120 / issue #111 carry the burden of turning the merged runtime path into runnable smoke evidence tied back to issue #11. |
 | M4 | Beta readiness sign-off | Issue #11 final E2E evidence and audit/security verification remain required. |
 
