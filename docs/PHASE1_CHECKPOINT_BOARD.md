@@ -12,6 +12,14 @@ This document keeps only the stable checkpoint structure and links to the live m
 | M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | Verify/audit runtime durability plus executable QA conversion (#111, PR #83, PR #92). |
 | M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | Final E2E evidence, audit trail sign-off, and security readiness closure (issue #11). |
 
+## Metadata hygiene queries
+
+Use these GitHub queries before a checkpoint comment so milestone views and runtime queue labels stay trustworthy:
+
+- [Runtime issues missing milestones](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+no%3Amilestone)
+- [Runtime PRs missing milestones](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+no%3Amilestone)
+- [Runtime PRs missing priority](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+-label%3A%22priority%2FP0%22+-label%3A%22priority%2FP1%22)
+
 ## Runtime pivot anchors
 
 Sprint pivot dated 2026-03-16 keeps these issue anchors as the default execution path:
@@ -25,8 +33,9 @@ Sprint pivot dated 2026-03-16 keeps these issue anchors as the default execution
 
 1. Open milestone issue and PR links instead of editing status snapshots in-repo.
 2. Use labels such as `status/ready-next`, `status/in-review`, and owner labels to decide next merge or rebase action.
-3. Treat missing validation evidence in a PR body/comment as a real blocker, even when the code diff looks complete.
-4. Capture only durable planning changes in repo docs; keep comments, review notes, and volatile state in GitHub threads.
+3. Run the metadata hygiene queries and clear any missing milestone or priority gaps before posting the checkpoint.
+4. Treat missing validation evidence in a PR body/comment as a real blocker, even when the code diff looks complete.
+5. Capture only durable planning changes in repo docs; keep comments, review notes, and volatile state in GitHub threads.
 
 ## When to edit this file
 

@@ -14,6 +14,9 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
 - Dirty queue: [open dirty PR candidates](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+-label%3ALGTM)
 - Runtime review queue: [open runtime PRs in review](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+label%3A%22status%2Fin-review%22)
 - Runtime label audit: [open ready-next runtime issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+label%3A%22status%2Fready-next%22)
+- Runtime issue milestone audit: [runtime issues missing milestones](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+no%3Amilestone)
+- Runtime PR milestone audit: [runtime PRs missing milestones](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+no%3Amilestone)
+- Runtime PR priority audit: [runtime PRs missing priority](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+-label%3A%22priority%2FP0%22+-label%3A%22priority%2FP1%22)
 - Planning lane: [owner:albatross issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aalbatross%22)
 - Review-requested planning PRs: [owner:albatross PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22owner%3Aalbatross%22)
 
@@ -27,11 +30,12 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
    - clean tranche: `LGTM` + mergeable/clean
    - dirty follow-ons: conflict/rebase needed or blocked by review comments
 3. Merge the clean tranche in dependency-aware order, re-pulling `main` after each merge if the next PR depends on the newly merged contract/docs baseline.
-4. For every dirty follow-on PR, leave a signed thread note that states:
+4. Before calling the queue clean, run the milestone/priority audit links and fix any missing `owner:*`, `priority/*`, `status/*`, `stream/*`, or milestone metadata on open runtime threads.
+5. For every dirty follow-on PR, leave a signed thread note that states:
    - the owner label already carrying the follow-up
    - why the PR is blocked or dirty
    - the exact next step (`rebase origin/main`, rerun validation, or address the named review comment)
-5. Only update repo docs when the planning structure changes. Do not copy day-to-day issue/PR state into `docs/issues/PHASE1_ISSUES.md` or `docs/PHASE1_CHECKPOINT_BOARD.md`.
+6. Only update repo docs when the planning structure changes. Do not copy day-to-day issue/PR state into `docs/issues/PHASE1_ISSUES.md` or `docs/PHASE1_CHECKPOINT_BOARD.md`.
 
 ## Validation gates
 
