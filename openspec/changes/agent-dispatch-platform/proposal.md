@@ -15,7 +15,7 @@
   - agent 上传与生产资料同步能力
   - 任务市场匹配、竞标与 PoMW 验证能力
 - 补充 MVP 生命周期可观测性基线，覆盖事件、trace、日志、指标、告警与保留期约束。
-- 补充 merge-train 协作手册，统一 clean LGTM PR 合并、dirty queue 回写、validation evidence 回贴、durable blocker issue 升级规则与每周 checkpoint 评论模板。
+- 补充 merge-train 协作手册，统一 clean LGTM PR 合并、dirty queue 回写、validation evidence 回贴、durable blocker issue 升级规则、lane coverage audit 与每周 checkpoint 评论模板。
 - 明确身份分层（T0/T1/T2）下的 PoMW 强度策略。
 - 定义从任务发布到中标执行的关键状态流转与审计要求。
 - 新增 runtime 落地冲刺任务（issue #109/#110/#111），要求将核心流程转为可运行服务与可执行 QA 校验。
@@ -37,7 +37,7 @@
 - 新增 OpenSpec 规范文件，作为后续服务拆分与 API 设计依据。
 - 新增 `docs/OBSERVABILITY_BASELINE.md`，作为后续后端埋点、运维告警与审计可视化的统一契约。
 - 规划类 repo 文档改为稳定索引与 GitHub 查询入口，避免在仓库内复制高频变化的 issue / PR 状态。
-- 新增 `docs/MERGE_TRAIN_PLAYBOOK.md`，作为规划负责人推进 clean merge queue、dirty queue follow-up、validation evidence 审核与 blocker issue 升级的操作基线。
+- 新增 `docs/MERGE_TRAIN_PLAYBOOK.md`，作为规划负责人推进 clean merge queue、dirty queue follow-up、validation evidence 审核、lane coverage audit 与 blocker issue 升级的操作基线。
 - 新增 `docs/RUNTIME_EXECUTION_HANDOFF.md`，作为 runtime sprint 中 backend/QA/planning 的统一命令与证据交接基线。
 - 明确 issue #146 与 epic #2 的 GitHub 评论分工，减少 review-burndown 期间重复回贴和状态漂移。
 - 将影响后续模块：Registry、Matching、Bidding、PoMW Verifier、Audit/Reputation、Settlement。

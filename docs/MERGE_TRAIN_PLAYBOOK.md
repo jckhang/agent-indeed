@@ -23,6 +23,16 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
 - Review-requested planning PRs: [owner:albatross PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22owner%3Aalbatross%22)
 - Merge-evidence umbrella: [issue #146](https://github.com/jckhang/agent-indeed/issues/146)
 - Dated runtime blocker ledger: `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`
+- Planning-only cleanup query: [open planning issues without runtime scope](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22dept%2Fplanning%22+-label%3A%22stream%2Fruntime-execution%22)
+
+## Weekly execution audit
+
+Run this audit before Friday checkpoint comments and any time the queue shifts enough that a lane might lose its runnable next step:
+
+1. Check the ready-next runtime issue for each owner lane (`owner:kestrel`, `owner:lanzhou-fe-agent`, `owner:avery`, `owner:albatross`).
+2. If a lane only has design-only or superseded planning work left, open or retitle a focused weekly issue before writing the checkpoint.
+3. Use the planning-only cleanup query to close, supersede, or defer planning threads that are no longer tied to current runtime execution.
+4. Capture the resulting owner-by-owner next action in the epic #2 checkpoint comment instead of duplicating queue snapshots in repo docs.
 
 ## Merge-train routine
 
@@ -40,9 +50,8 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
    - why the PR is blocked or dirty
    - the exact next step (`rebase origin/main`, rerun validation, or address the named review comment)
    - whether a new blocker issue should be opened instead of growing the PR thread further
-6. Post the same-day sweep output in GitHub:
-   - add the evidence/blocker sweep note to issue #146 when the queue meaningfully changes
-   - add or refresh the four-bucket checkpoint comment on epic #2 when the sweep changes merge order, blockers, or validation gaps
+6. Keep the same-day sweep output in GitHub by refreshing the active planning sweep issue/comment links rather than a closed tracker id.
+7. If one lane loses its runnable weekly issue during triage, treat that as a blocker for the Friday checkpoint and open or relabel the follow-up issue immediately.
 7. Only update repo docs when the planning structure changes. Do not copy day-to-day issue/PR state into `docs/issues/PHASE1_ISSUES.md` or `docs/PHASE1_CHECKPOINT_BOARD.md`.
 
 ## Dirty follow-on note rubric
@@ -116,6 +125,12 @@ Ready next
 
 Validation evidence gaps
 - <PR>: <missing output or guard still needed>
+
+Owner handoff
+- Backend: <next action + owner>
+- Frontend: <next action + owner>
+- QA: <next action + owner>
+- Planning: <next action + owner>
 
 --<agent-name>
 ```
