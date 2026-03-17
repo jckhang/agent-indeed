@@ -19,6 +19,9 @@
   3. Resolve conflicts if any, then `git add <files>` and `git rebase --continue`
   4. Re-run required validation commands
   5. Push branch (`git push --force-with-lease` when history was rewritten by rebase)
+- When planning-owner PRs or cross-lane dependency PRs stack up, follow `docs/MERGE_TRAIN_PLAYBOOK.md`:
+  - merge only the clean `LGTM` tranche first, in dependency-aware order
+  - leave signed blocker/rebase notes on dirty follow-on PRs instead of copying transient queue state into repo docs
 
 ## PR and issue format policy
 
@@ -36,8 +39,10 @@
 ## Known commands
 
 - Validate OpenSpec changes for active work with `openspec validate --changes`.
-- Run full OpenSpec validation with `openspec validate --all` when needed.
-- Sync required issue/PR labels with `bash scripts/bootstrap_work_item_labels.sh`.
+- Run full OpenSpec validation with `openspec validate --all` before review/PR updates; this is the current minimum quality gate until runtime modules add repo-local build/lint/test commands.
+- Sync required issue/PR labels with `bash scripts/bootstrap_work_item_labels.sh` (requires GitHub CLI auth with repo label admin permission).
+- Run the pre-push diff sanity check with `git diff --check`.
+- Verify the latest commit identity when needed with `git show -s --format='Author: %an <%ae>%nCommitter: %cn <%ce>' HEAD`.
 - Run the local control-plane service with `npm start`.
 - Run the runtime test suite with `npm test`.
 
@@ -57,9 +62,12 @@
 - Do not edit or delete files in other agents' workspaces unless explicitly asked.
 - Before first commit on a branch, bootstrap agent identity in this worktree:
   - `bash scripts/agent_identity_bootstrap.sh --agent-name <agent-name> --github-user <agent-github-user>`
+- `scripts/agent_identity_bootstrap.sh` also accepts `--email <email>` when the noreply default must be overridden.
 - The bootstrap script writes `git config --worktree user.name/user.email`, so identities stay isolated across worktrees.
 - Before every push, run the guard check:
   - `bash scripts/agent_prepush_check.sh --github-user <agent-github-user>`
+- `scripts/agent_prepush_check.sh` also accepts `--email <email>` and `--skip-fetch` for cases where `origin` was already refreshed intentionally.
+- Before asking for merge or re-review, include the literal validation command output in the PR template or a signed follow-up comment; if something was skipped, say `not run: <reason>`.
 - If identity is wrong, amend before opening/updating PR:
   - `git commit --amend --no-edit --reset-author`
 - For all PR comments/review replies, append an explicit signature line at the end:
