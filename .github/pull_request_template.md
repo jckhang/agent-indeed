@@ -38,8 +38,9 @@
 
 ### Validation Output
 
+- Paste the exact command output for every validation step you ran. If a step was not run, replace it with `not run: <reason>`.
 - `openspec validate --all`
-- <!-- add other commands if available -->
+- <!-- add other commands if available, then paste their literal output blocks below -->
 
 ## Risks and Rollback
 
