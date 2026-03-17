@@ -1,12 +1,15 @@
 # Frontend Runtime Integration Tranche (P1-40)
 
-Last updated: 2026-03-17
+Last updated: 2026-03-18
 
 Related issue: [#136](https://github.com/jckhang/agent-indeed/issues/136)
+Mainline sync issue: [#145](https://github.com/jckhang/agent-indeed/issues/145)
 
 ## Objective
 
 Capture the first runtime-backed frontend handoff slice for this week's execution sprint so the MVP can be demonstrated through real manager and agent flows instead of static-fixture-only wiring.
+
+This document is now the single surviving frontend runtime handoff against the merged backend baseline on `main`. It absorbs the still-open frontend runtime doc queue from PRs [#122](https://github.com/jckhang/agent-indeed/pull/122), [#125](https://github.com/jckhang/agent-indeed/pull/125), and [#132](https://github.com/jckhang/agent-indeed/pull/132) so wiring guidance, fixture vocabulary, and QA replay payloads stop drifting independently.
 
 This tranche is intentionally grounded in the current `main` baseline:
 - manager publish uses `POST /v1/tasks`
@@ -19,6 +22,15 @@ Execution dependencies remain explicit:
 - runtime service baseline: [#115](https://github.com/jckhang/agent-indeed/issues/115)
 - runnable vertical slice: [#110](https://github.com/jckhang/agent-indeed/issues/110)
 - QA runtime checks: [#111](https://github.com/jckhang/agent-indeed/issues/111)
+
+## Canonical handoff status
+
+This tranche supersedes the overlapping open frontend runtime docs queue:
+- PR [#122](https://github.com/jckhang/agent-indeed/pull/122) runtime wiring target
+- PR [#125](https://github.com/jckhang/agent-indeed/pull/125) frontend fixture pack
+- PR [#132](https://github.com/jckhang/agent-indeed/pull/132) demo payload replay pack
+
+Keep only this document plus `docs/FRONTEND_MVP_SURFACE.md` as the durable repo handoff for runtime-backed manager and agent flows. Any surviving PR from the older queue should either point here as the canonical source or be closed as superseded by issue [#145](https://github.com/jckhang/agent-indeed/issues/145).
 
 ## Scope
 
@@ -42,6 +54,298 @@ Out of scope:
 | `/manager/tasks/{taskId}/review` | Manager | `GET /v1/tasks/{taskId}/candidates`, `GET /v1/tasks/{taskId}/award` | Render shortlist freshness, candidate ranking, blockers, and award-readiness from runtime reads |
 | `/agent/tasks/{taskId}/bid-workspace` | Agent | `POST /v1/tasks/{taskId}/bids/commit`, `POST /v1/tasks/{taskId}/bids/reveal` | Preserve server-authored window state and hand off to verification without inventing hidden state |
 | `/agent/tasks/{taskId}/verification` | Agent | `GET /v1/tasks/{taskId}/bids/{bidId}`, `GET /v1/tasks/{taskId}/proofs/{proofId}` | Poll and manually refresh until proof reaches a terminal verification state |
+
+## Canonical payload checkpoints
+
+Use the examples in this section as the only repo-local payload pack for the merged runtime baseline. They intentionally cover the same vertical slice as the route map above:
+`publish -> match -> commit -> reveal -> verify-status refresh -> award-read`.
+
+### 1. Publish task
+
+Request:
+
+```http
+POST /v1/tasks
+Authorization: Bearer <manager-session>
+X-Workspace-Id: ws_runtime_demo
+Content-Type: application/json
+```
+
+```json
+{
+  "task": {
+    "title": "Triage overnight support backlog",
+    "description": "Classify P1 and P2 tickets before 09:00 UTC.",
+    "budget": {
+      "currency": "USD",
+      "minAmount": 300,
+      "maxAmount": 450,
+      "settlementModel": "FIXED"
+    },
+    "sla": {
+      "deadlineAt": "2026-03-14T15:00:00Z",
+      "maxLatencyMs": 300000,
+      "minSuccessRate": 0.9
+    },
+    "constraints": {
+      "identityTierMin": "T1",
+      "requiredSkills": ["support", "routing"],
+      "preferredSkills": ["triage"],
+      "complianceTags": ["gdpr-eu"]
+    },
+    "risk": {
+      "level": "MEDIUM",
+      "valueScore": 0.72,
+      "abuseSensitivity": "MEDIUM"
+    },
+    "powmPolicy": {
+      "mode": "AUTO_TIERED",
+      "baseDifficulty": 0.82,
+      "challengeType": "SAMPLE_EXECUTION"
+    },
+    "biddingWindow": {
+      "commitDeadline": "2026-03-14T13:30:00Z",
+      "revealDeadline": "2026-03-14T15:00:00Z"
+    }
+  }
+}
+```
+
+Success response:
+
+```json
+{
+  "taskId": "task_ops_triage_001",
+  "status": "OPEN_FOR_MATCHING",
+  "commitDeadline": "2026-03-14T13:30:00Z",
+  "revealDeadline": "2026-03-14T15:00:00Z"
+}
+```
+
+### 2. Fetch shortlist
+
+Request:
+
+```http
+GET /v1/tasks/task_ops_triage_001/candidates?limit=5&includeScoreBreakdown=true
+Authorization: Bearer <manager-session>
+```
+
+Matched response:
+
+```json
+{
+  "taskId": "task_ops_triage_001",
+  "status": "MATCHED",
+  "generatedAt": "2026-03-14T03:05:00Z",
+  "candidates": [
+    {
+      "agentId": "agent_supporttriage001",
+      "rank": 1,
+      "eligible": true,
+      "matchingTraceId": "matchtrace_ops_triage_001",
+      "identityTier": "T1",
+      "matchedSkills": ["support", "routing"],
+      "complianceStatus": "PASSED"
+    },
+    {
+      "agentId": "agent_supporttriage021",
+      "eligible": false,
+      "matchingTraceId": "matchtrace_ops_triage_001",
+      "identityTier": "T0",
+      "matchedSkills": ["support"],
+      "missingRequiredSkills": ["routing"],
+      "complianceStatus": "FAILED"
+    }
+  ]
+}
+```
+
+Pending response:
+
+```json
+{
+  "code": "TASK_MATCH_NOT_READY",
+  "category": "MATCHING",
+  "message": "candidate matching snapshot is not ready for task task_ops_triage_001",
+  "auditId": "audit_task_match_not_ready",
+  "retryable": true,
+  "retryAfterSeconds": 15
+}
+```
+
+### 3. Commit bid
+
+Request:
+
+```http
+POST /v1/tasks/task_ops_triage_001/bids/commit
+Authorization: Bearer <agent-token>
+Content-Type: application/json
+```
+
+```json
+{
+  "idempotencyKey": "commit-task_ops_triage_001-agent_alpha-001",
+  "commit": {
+    "bidId": "bid_alpha_commit_01",
+    "taskId": "task_ops_triage_001",
+    "agentId": "agent_kestrel_alpha",
+    "bidHash": "sha256:3b6447d58f3386261f9fcb3f298e51fb67dbf0fa7ed9f4a186b2d0f4ed57f3c2",
+    "committedAt": "2026-03-14T13:05:00Z"
+  }
+}
+```
+
+Success response:
+
+```json
+{
+  "bidId": "bid_alpha_commit_01",
+  "taskId": "task_ops_triage_001",
+  "agentId": "agent_kestrel_alpha",
+  "phase": "COMMIT",
+  "status": "COMMITTED",
+  "result": "COMMITTED",
+  "window": {
+    "currentPhase": "COMMIT_OPEN",
+    "commitDeadline": "2026-03-14T13:30:00Z",
+    "revealDeadline": "2026-03-14T15:00:00Z",
+    "serverTime": "2026-03-14T13:05:01Z",
+    "nextAction": "WAIT_FOR_REVEAL_WINDOW"
+  }
+}
+```
+
+### 4. Reveal bid and proof
+
+Request:
+
+```http
+POST /v1/tasks/task_ops_triage_001/bids/reveal
+Authorization: Bearer <agent-token>
+Content-Type: application/json
+```
+
+```json
+{
+  "idempotencyKey": "reveal-task_ops_triage_001-agent_alpha-001",
+  "reveal": {
+    "bidId": "bid_alpha_commit_01",
+    "taskId": "task_ops_triage_001",
+    "agentId": "agent_kestrel_alpha",
+    "nonce": "nonce-alpha-001",
+    "price": {
+      "currency": "USD",
+      "amount": 420
+    },
+    "executionPlan": {
+      "summary": "Route P1 first, finish P2 batch second.",
+      "etaSeconds": 5700
+    },
+    "proof": {
+      "proofSchemaVersion": "1.0",
+      "proofId": "proof_alpha_01",
+      "taskId": "task_ops_triage_001"
+    }
+  }
+}
+```
+
+Success response:
+
+```json
+{
+  "bidId": "bid_alpha_commit_01",
+  "phase": "REVEAL",
+  "status": "REVEALED",
+  "result": "ACCEPTED",
+  "rankingScore": 0.87,
+  "decisionTraceHash": "tracehash_reveal_001",
+  "proofSubmission": {
+    "proofId": "proof_alpha_01",
+    "verificationStatus": "PENDING_VERIFY"
+  }
+}
+```
+
+### 5. Refresh proof and bid status
+
+Proof-status response:
+
+```json
+{
+  "proofId": "proof_alpha_01",
+  "taskId": "task_ops_triage_001",
+  "bidId": "bid_alpha_commit_01",
+  "agentId": "agent_kestrel_alpha",
+  "verificationState": "VERIFYING",
+  "reasonCodes": [],
+  "refresh": {
+    "mode": "POLL",
+    "pollAfterSeconds": 10,
+    "manualRefreshAllowed": true,
+    "lastUpdatedAt": "2026-03-14T13:22:00Z"
+  }
+}
+```
+
+Bid-status response:
+
+```json
+{
+  "bidId": "bid_alpha_commit_01",
+  "taskId": "task_ops_triage_001",
+  "agentId": "agent_kestrel_alpha",
+  "latestPhase": "REVEAL",
+  "commitState": "COMMITTED",
+  "revealState": "REVEALED",
+  "proofState": "VERIFYING",
+  "awardState": "SHORTLISTED",
+  "failureReasonCodes": [],
+  "deadlines": {
+    "commitDeadline": "2026-03-14T13:30:00Z",
+    "revealDeadline": "2026-03-14T15:00:00Z"
+  },
+  "proof": {
+    "proofId": "proof_alpha_01"
+  },
+  "refresh": {
+    "mode": "POLL",
+    "pollAfterSeconds": 10,
+    "manualRefreshAllowed": true,
+    "lastUpdatedAt": "2026-03-14T13:22:00Z"
+  }
+}
+```
+
+### 6. Read manager award readiness
+
+Request:
+
+```http
+GET /v1/tasks/task_ops_triage_001/award
+Authorization: Bearer <manager-session>
+```
+
+Response:
+
+```json
+{
+  "taskId": "task_ops_triage_001",
+  "status": "READY_TO_AWARD",
+  "statusMessage": "Proof passed and the shortlist audit trail is complete.",
+  "shortlistedBidId": "bid_alpha_commit_01",
+  "proofSummary": {
+    "proofId": "proof_alpha_01",
+    "result": "PASS",
+    "auditId": "audit_proof_alpha_01"
+  },
+  "handoff": {
+    "status": "READY"
+  }
+}
+```
 
 ## Manager runtime flow
 
@@ -177,6 +481,13 @@ Record the following in issue [#136](https://github.com/jckhang/agent-indeed/iss
 - whether agent bid/proof status reads returned queued/verifying/terminal states correctly
 - any blockers from #110, #115, or #111 that prevented full execution
 
+## Validation evidence expectations
+
+Whenever this handoff is referenced from a PR or issue comment:
+- paste the exact command output for each validation step instead of saying `passed`
+- include `openspec validate --all`, `git diff --check`, and `bash scripts/agent_prepush_check.sh --github-user lanzhou-fe-agent`
+- if a command is skipped, record `not run: <reason>` verbatim so reviewer pickup does not block on missing evidence
+
 ## Acceptance criteria mapping
 
 | Acceptance criterion | How this tranche covers it |
@@ -185,3 +496,4 @@ Record the following in issue [#136](https://github.com/jckhang/agent-indeed/iss
 | UI state transitions reflect runtime statuses and error reasons instead of placeholder-only states. | Loading/error/empty/retry-safe requirements and route-specific runtime expectations are tied to read/write response fields already present in `src/api/openapi.yaml` and `src/api/contracts.ts`. |
 | A reproducible local runbook and evidence links are posted back to this issue. | The local runtime runbook specifies the minimum evidence to post back to issue #136 and the linked PR. |
 | Progress references implementation threads #110 and #115. | Both dependencies are named in the objective, execution dependency list, and runbook. |
+| Duplicate runtime docs are collapsed into one mergeable frontend handoff. | Issue #145 now points PRs #122, #125, and #132 at this tranche as the canonical merged-baseline handoff for wiring, payloads, and replay guidance. |

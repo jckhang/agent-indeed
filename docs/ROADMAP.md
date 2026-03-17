@@ -1,6 +1,6 @@
 # Agent Indeed Roadmap
 
-Last updated: 2026-03-16
+Last updated: 2026-03-18
 
 ## Product North Star
 
@@ -43,7 +43,7 @@ Scope:
   - #109 bootstrap runnable backend skeleton
   - #110 implement runnable dispatch vertical slice (`publish -> match -> commit -> reveal -> verify -> award`)
   - #111 convert QA smoke/E2E matrices into executable checks
-- Keep the remaining runtime contract review queue focused on PRs #66 and #68, with PR #122 held to the merged `main` baseline, rather than treating every historical contract PR as a current blocker.
+- Treat the proof-status and award-read contracts from PRs #66 and #68 as merged baseline work; the remaining frontend follow-through is to keep the runtime handoff docs aligned to `main` and collapse stale queue branches through issue #145.
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
 - Manager shortlist and award review contracts with audit-linked status context.
@@ -53,8 +53,8 @@ Scope:
 - Commit-reveal bidding workflow.
 - Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps the broader commit/reveal + verification journey visible.
 - Dedicated bid workspace slice (`docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, issue #63 / PR #76) narrows the frontend delivery item to one commit/reveal workflow while handing runtime status refresh to the merged bid/proof read routes.
-- Frontend runtime integration tranche (`docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md`, issue #136) defines the first manager + agent runtime-backed smoke path and the local evidence runbook tied to #110 and #115.
-- Audit visibility console baseline (`docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`, issue #47) keeps task/bid timeline review, failure translation, and missing-field alert requirements visible while audit query and award-read contracts are still pending.
+- Frontend runtime integration tranche (`docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md`, issues #136 and #145) defines the first manager + agent runtime-backed smoke path, absorbs the old runtime wiring/fixture/demo doc queue, and keeps one local evidence runbook tied to #110 and #115.
+- Audit visibility console baseline (`docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`, issue #47) keeps task/bid timeline review, failure translation, and missing-field alert requirements visible while audit query completeness and local runtime materialization are still pending.
 - PoMW verification baseline with identity-tier policy.
 - Agent verification timeline/read-refresh baseline tied to the merged bid/proof status reads and the runtime persistence work behind issue #136.
 - Auditable award events and minimal reputation writeback hook.
@@ -104,7 +104,7 @@ Scope:
 
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
-- M1 (2026-03-20): close the remaining contract review queue (#66, #68) and land runnable backend skeleton (#109).
+- M1 (2026-03-20): absorb the merged runtime read-model baseline into one frontend handoff doc, then land runnable backend skeleton (#109).
 - Runtime work may proceed ahead of full contract convergence when the cutline marks a delta additive-safe; verifier payload/result vocabulary is now merged, so the remaining near-term review risk is contract drift on the additive read surfaces and frontend wiring handoff.
 - M2 (2026-03-27): land runnable publish/match/commit/reveal/verify/award vertical slice (#110).
 - M3 (2026-04-03): stabilize verify/award/audit runtime behavior and run executable smoke checks (#111).
