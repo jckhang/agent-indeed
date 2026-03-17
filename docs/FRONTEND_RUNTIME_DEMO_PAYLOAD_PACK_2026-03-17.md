@@ -8,18 +8,19 @@ Source PRs: [#122](https://github.com/jckhang/agent-indeed/pull/122), [#125](htt
 
 ## Goal
 
-Turn the runtime wiring target and fixture-pack docs into one compact replay pack that QA and backend can use against the local service as soon as PR [#126](https://github.com/jckhang/agent-indeed/pull/126) and PR [#129](https://github.com/jckhang/agent-indeed/pull/129) land.
+Turn the runtime wiring target and fixture-pack docs into one compact replay pack that QA and backend can use against the local service now that PR [#126](https://github.com/jckhang/agent-indeed/pull/126) is merged, with only PR [#129](https://github.com/jckhang/agent-indeed/pull/129) still outstanding for the runnable smoke command.
 
 This pack stays inside the current merged contract baseline on `main`:
-`publish -> match -> commit -> reveal -> pending-verify -> award-read blocked`
+`publish -> match -> commit -> reveal -> verify-status -> award-read`
 
 ## Canonical sources
 
 - merged contract baseline: `src/api/openapi.yaml`, `src/api/contracts.ts`
 - frontend runtime sequencing source: PR [#122](https://github.com/jckhang/agent-indeed/pull/122)
 - frontend fixture vocabulary source: PR [#125](https://github.com/jckhang/agent-indeed/pull/125)
-- runnable backend dependency: PR [#126](https://github.com/jckhang/agent-indeed/pull/126)
-- smoke-command dependency: PR [#129](https://github.com/jckhang/agent-indeed/pull/129)
+- runnable backend baseline merged via PR [#126](https://github.com/jckhang/agent-indeed/pull/126)
+- remaining smoke-command dependency: PR [#129](https://github.com/jckhang/agent-indeed/pull/129)
+- merged frontend reads: PR [#66](https://github.com/jckhang/agent-indeed/pull/66) and PR [#68](https://github.com/jckhang/agent-indeed/pull/68)
 
 ## Replay sequence at a glance
 
@@ -29,8 +30,8 @@ This pack stays inside the current merged contract baseline on `main`:
 | 2. Match | `GET /v1/tasks/{taskId}/candidates` | shortlist is returned or `TASK_MATCH_NOT_READY` includes retry guidance | Stable |
 | 3. Commit | `POST /v1/tasks/{taskId}/bids/commit` | server-authored `window` snapshot drives next action | Stable |
 | 4. Reveal | `POST /v1/tasks/{taskId}/bids/reveal` | reveal returns `rankingScore`, `decisionTraceHash`, and `proofSubmission.verificationStatus=PENDING_VERIFY` | Stable |
-| 5. Pending verify | no frontend-readable status endpoint on `main` | frontend keeps `PENDING_VERIFY` from reveal and does not call verifier-only APIs | Blocked on open contract PR [#66](https://github.com/jckhang/agent-indeed/pull/66) |
-| 6. Award read | no merged manager award-read endpoint on `main` | frontend keeps award summary explicitly blocked | Blocked on open contract PR [#68](https://github.com/jckhang/agent-indeed/pull/68) |
+| 5. Pending verify | `GET /v1/tasks/{taskId}/proofs/{proofId}` or `GET /v1/tasks/{taskId}/bids/{bidId}` | frontend can move from reveal handoff into queued/verifying/terminal refresh-safe reads without calling verifier-only APIs | Ready via merged PR [#66](https://github.com/jckhang/agent-indeed/pull/66) |
+| 6. Award read | `GET /v1/tasks/{taskId}/award` | frontend can render manager award readiness, proof summary, and handoff detail | Ready via merged PR [#68](https://github.com/jckhang/agent-indeed/pull/68) |
 
 ## Step 1 - Publish task
 
@@ -312,7 +313,7 @@ QA/backend notes:
 - `proofSubmission.verificationStatus` is the only frontend-readable verify handoff on `main`
 - keep proof details behind the authenticated agent flow; do not invent read models here
 
-## Step 5 - Pending verify stays blocked on reveal-only state
+## Step 5 - Pending verify moves from reveal handoff into merged status reads
 
 No frontend-readable proof-status endpoint is merged on `main`.
 
@@ -333,28 +334,32 @@ Replay assertion:
 QA/backend notes:
 - manager and agent UI must not call `POST /v1/tasks/{taskId}/proofs/verify`; it is verifier/operator scope only
 - do not fabricate queued timestamps, terminal result enums, or refresh metadata
-- issue [#111](https://github.com/jckhang/agent-indeed/issues/111) can reuse this handoff as the expected smoke assertion until the read model from PR [#66](https://github.com/jckhang/agent-indeed/pull/66) lands
+- issue [#111](https://github.com/jckhang/agent-indeed/issues/111) can reuse this handoff plus the merged proof-status reads from PR [#66](https://github.com/jckhang/agent-indeed/pull/66) as the expected smoke assertion
 
-## Step 6 - Award read stays explicitly blocked
+## Step 6 - Award read on the merged baseline
 
-No merged manager award-read endpoint is available on `main`.
+The manager award-read endpoint is now merged on `main` via `GET /v1/tasks/{taskId}/award`.
 
-Blocked-state fixture:
+Award-read fixture:
 
 ```json
 {
   "awardRead": {
-    "status": "BLOCKED",
-    "reason": "AWARD_READ_MODEL_PENDING",
-    "followUp": "PR #68"
+    "status": "READY_TO_AWARD",
+    "statusMessage": "Proof passed and shortlist evidence is complete.",
+    "shortlistedBidId": "bid_alpha_01",
+    "awardedAgentId": "agent_alpha",
+    "handoff": {
+      "status": "READY"
+    }
   }
 }
 ```
 
 QA/backend notes:
-- do not substitute `GET /v1/tasks/{taskId}/events` for manager award-read
-- keep award summary blocked even if shortlist or proof data is already visible in the same session
-- issue [#111](https://github.com/jckhang/agent-indeed/issues/111) should assert this blocked manager state until the award read model merges
+- do not substitute `GET /v1/tasks/{taskId}/events` for manager award-read; use `GET /v1/tasks/{taskId}/award`
+- render award summary from the merged manager payload, with audit events remaining supplemental context
+- issue [#111](https://github.com/jckhang/agent-indeed/issues/111) should assert the merged award-read payload once the smoke command from PR [#129](https://github.com/jckhang/agent-indeed/pull/129) lands
 
 ## Stable vs blocked ledger
 
@@ -364,15 +369,15 @@ QA/backend notes:
 | Match | shortlist payload and `TASK_MATCH_NOT_READY` retry signal | none for this replay pack |
 | Commit | commit request plus server-authored `window` | none for this replay pack |
 | Reveal | reveal request plus `proofSubmission.verificationStatus=PENDING_VERIFY` | refresh-safe proof-status reads |
-| Verify | reveal handoff copy and pending-state assertion | frontend-readable proof result model |
-| Award | explicit blocked-state fixture | manager winner summary and award history read model |
+| Verify | reveal handoff copy plus merged proof-status refresh reads | verifier-only `POST /v1/tasks/{taskId}/proofs/verify` remains out of frontend scope |
+| Award | merged manager award-read fixture | smoke-command coverage from PR #129 |
 
 ## Validation use
 
-When PR [#126](https://github.com/jckhang/agent-indeed/pull/126) and PR [#129](https://github.com/jckhang/agent-indeed/pull/129) merge, QA issue [#111](https://github.com/jckhang/agent-indeed/issues/111) should be able to replay this sequence with these pass/fail checks:
+With PR [#126](https://github.com/jckhang/agent-indeed/pull/126) already merged, QA issue [#111](https://github.com/jckhang/agent-indeed/issues/111) should be able to replay this sequence as soon as PR [#129](https://github.com/jckhang/agent-indeed/pull/129) lands, using these pass/fail checks:
 
 1. publish returns a real `taskId` and deadlines
 2. shortlist returns either ranked candidates or `TASK_MATCH_NOT_READY`
 3. commit and reveal both echo a server `window` snapshot
 4. reveal exposes only `PENDING_VERIFY` to frontend callers
-5. award-read remains blocked until the dedicated read model lands
+5. award-read returns the merged manager review payload once the smoke command is available
