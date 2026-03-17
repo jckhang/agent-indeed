@@ -45,6 +45,8 @@ function buildProof({
   agentId = "agent_kestrel_alpha",
   qualityScore = 0.9,
   credentialLevel = "T1",
+  signerDid,
+  signature = "sig-proof-001",
   antiSybil
 } = {}) {
   return {
@@ -55,8 +57,8 @@ function buildProof({
     capturedAt: "2026-03-19T00:30:00Z",
     identityProof: {
       credentialLevel,
-      signerDid: `did:key:${agentId}`,
-      signature: "sig-proof-001"
+      signerDid: signerDid ?? `did:key:${agentId}`,
+      signature
     },
     sampleWork: {
       sampleTaskDigest: "sha256:sample-task-001",
@@ -585,7 +587,7 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
   }
 });
 
-test("reveal without a commit and failed verification return stable errors", async () => {
+test("invalid signature, reveal without a commit, and failed verification return stable errors", async () => {
   let currentTime = "2026-03-16T00:00:00.000Z";
   const { server, baseUrl, setNow } = await startTestServer({
     now: () => currentTime
@@ -605,6 +607,96 @@ test("reveal without a commit and failed verification return stable errors", asy
 
     currentTime = "2026-03-19T00:10:00.000Z";
     setNow(currentTime);
+
+    const invalidSignatureProof = buildProof({
+      taskId,
+      proofId: "proof_00000011",
+      agentId: "agent_kestrel_alpha",
+      signerDid: "did:key:agent_kestrel_intruder"
+    });
+    const invalidSignatureReveal = {
+      bidId: "bid_00000011",
+      taskId,
+      agentId: "agent_kestrel_alpha",
+      nonce: "nonce-invalid-signature",
+      price: {
+        currency: "USD",
+        amount: 200
+      },
+      executionPlan: {
+        summary: "Attempt verify with a tampered signerDid",
+        etaSeconds: 300
+      },
+      proof: invalidSignatureProof
+    };
+
+    currentTime = "2026-03-16T00:10:00.000Z";
+    setNow(currentTime);
+
+    const invalidSignatureCommitResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/bids/commit`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        idempotencyKey: "idem-commit-invalid-signature",
+        commit: {
+          bidId: invalidSignatureReveal.bidId,
+          taskId,
+          agentId: invalidSignatureReveal.agentId,
+          bidHash: buildRevealHash(invalidSignatureReveal),
+          committedAt: "2026-03-16T00:10:00.000Z"
+        }
+      })
+    });
+    assert.equal(invalidSignatureCommitResponse.status, 202);
+
+    const invalidSignaturePolicyResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/proof-policy`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        agentId: invalidSignatureReveal.agentId,
+        identityTier: "T1",
+        trustScore: 0.84
+      })
+    });
+    assert.equal(invalidSignaturePolicyResponse.status, 200);
+    const invalidSignaturePolicyBody = await invalidSignaturePolicyResponse.json();
+
+    currentTime = "2026-03-19T00:10:00.000Z";
+    setNow(currentTime);
+
+    const invalidSignatureRevealResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/bids/reveal`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        idempotencyKey: "idem-reveal-invalid-signature",
+        reveal: invalidSignatureReveal
+      })
+    });
+    assert.equal(invalidSignatureRevealResponse.status, 200);
+
+    const invalidSignatureVerifyResponse = await fetch(
+      `${baseUrl}/v1/tasks/${taskId}/proofs/verify`,
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          policyTraceId: invalidSignaturePolicyBody.policyTraceId,
+          proof: invalidSignatureProof
+        })
+      }
+    );
+    assert.equal(invalidSignatureVerifyResponse.status, 422);
+    const invalidSignatureVerifyBody = await invalidSignatureVerifyResponse.json();
+    assert.equal(invalidSignatureVerifyBody.code, "PROOF_VERIFY_FAILED");
+    assert.deepEqual(invalidSignatureVerifyBody.details.reasonCodes, ["TRACE_SIGNATURE_INVALID"]);
 
     const missingCommitProof = buildProof({
       taskId,
@@ -770,8 +862,8 @@ test("reveal without a commit and failed verification return stable errors", asy
         award: {
           bidId: failingReveal.bidId,
           awardReason: "Proof failed verification and should not award.",
-          shortlistAuditId: awardDetailBody.shortlistAuditId,
-          proofAuditId: awardDetailBody.proofAuditId
+          shortlistAuditId: failedBidStatusBody.auditRefs.bidAuditId,
+          proofAuditId: failedBidStatusBody.auditRefs.proofAuditId
         }
       })
     });

@@ -809,6 +809,14 @@ function verifyProofAgainstPolicy(policy, proof) {
   const qualityScore = proof.sampleWork.qualityScore ?? 0;
   const runtimeMs = proof.sampleWork.runtimeMs ?? Number.MAX_SAFE_INTEGER;
   const reasonCodes = [];
+  const expectedSignerDid = `did:key:${proof.agentId}`;
+  const hasValidSignature =
+    typeof proof.identityProof.signature === "string" &&
+    proof.identityProof.signature.startsWith("sig-");
+
+  if (proof.identityProof.signerDid !== expectedSignerDid || !hasValidSignature) {
+    reasonCodes.push("TRACE_SIGNATURE_INVALID");
+  }
 
   if (proof.identityProof.credentialLevel !== policy.inputSnapshot.identityTier) {
     reasonCodes.push("IDENTITY_TIER_MISMATCH");

@@ -39,6 +39,6 @@
 
 - [x] 5.1 落地可运行 control-plane service skeleton（issue #109），包含健康检查、基础配置与最小持久化抽象。
 - [x] 5.2 打通可执行的 MVP 垂直路径（issue #110）：`publish -> match -> commit -> reveal -> verify -> award`，并持久化关键状态转移。
-- [ ] 5.3 将 smoke/E2E 文档矩阵转为可执行校验（issue #111），并把验证证据回写 issue #11。
+- [x] 5.3 将 smoke/E2E 文档矩阵转为可执行校验（issue #111），并把验证证据回写 issue #11。
 - [x] 5.4 输出前端 runtime 集成 tranche 与本地 runbook（issue #136），串联 manager publish / shortlist / award-readiness 与 agent commit / reveal / status-refresh 路径。
 - [x] 5.5 收敛前端 runtime 文档队列（issue #145），把 wiring target、fixture pack 与 demo payload pack 合并进单一 mainline handoff。
