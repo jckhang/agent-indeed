@@ -35,7 +35,6 @@ Sprint pivot dated 2026-03-16 keeps these issue anchors as the default execution
 1. Open milestone issue and PR links instead of editing status snapshots in-repo.
 2. Use labels such as `status/ready-next`, `status/in-review`, and owner labels to decide next merge or rebase action.
 3. Run the metadata hygiene queries and clear any missing milestone or priority gaps before posting the checkpoint.
-<<<<<<< HEAD
 4. Use `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` for the dated owner/blocker ledger instead of copying that volatile table into this guide.
 5. Treat missing validation evidence in a PR body/comment as a real blocker, even when the code diff looks complete.
 6. Capture only durable planning changes in repo docs; keep comments, review notes, and volatile state in GitHub threads.
