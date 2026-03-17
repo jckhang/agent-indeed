@@ -429,6 +429,27 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
     assert.match(eventsBody.events[0].eventId, /^aev_/);
     assert.equal(eventsBody.events.at(-1).payload.awardedBidId, reveal.bidId);
 
+    const pagedEventsResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/events?limit=2`);
+    assert.equal(pagedEventsResponse.status, 200);
+    const pagedEventsBody = await pagedEventsResponse.json();
+    assert.equal(pagedEventsBody.hasMore, true);
+    assert.equal(pagedEventsBody.nextCursor, pagedEventsBody.events.at(-1).eventId);
+    assert.deepEqual(
+      pagedEventsBody.events.map((event) => event.eventType),
+      ["TASK_CREATED", "BID_COMMITTED"]
+    );
+
+    const continuedEventsResponse = await fetch(
+      `${baseUrl}/v1/tasks/${taskId}/events?limit=2&cursor=${pagedEventsBody.nextCursor}`
+    );
+    assert.equal(continuedEventsResponse.status, 200);
+    const continuedEventsBody = await continuedEventsResponse.json();
+    assert.equal(continuedEventsBody.hasMore, true);
+    assert.deepEqual(
+      continuedEventsBody.events.map((event) => event.eventType),
+      ["BID_REVEALED", "POMW_VERIFIED"]
+    );
+
     const legacyEventsResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/audit-events`);
     assert.equal(legacyEventsResponse.status, 200);
     const legacyEventsBody = await legacyEventsResponse.json();
@@ -445,7 +466,19 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
       bidEventsBody.events.map((event) => event.eventType),
       ["BID_COMMITTED", "BID_REVEALED", "POMW_VERIFIED", "TASK_AWARDED"]
     );
-    assert.equal(logEntries.at(-1)?.statusCode, 200);
+
+    const invalidAuditQueryResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/events?limit=0`);
+    assert.equal(invalidAuditQueryResponse.status, 400);
+    const invalidAuditQueryBody = await invalidAuditQueryResponse.json();
+    assert.equal(invalidAuditQueryBody.code, "AUDIT_QUERY_LIMIT_INVALID");
+
+    const invalidCursorResponse = await fetch(
+      `${baseUrl}/v1/bids/${reveal.bidId}/events?cursor=aev_missing_00000001`
+    );
+    assert.equal(invalidCursorResponse.status, 400);
+    const invalidCursorBody = await invalidCursorResponse.json();
+    assert.equal(invalidCursorBody.code, "AUDIT_CURSOR_INVALID");
+    assert.equal(logEntries.at(-1)?.statusCode, 400);
   } finally {
     server.close();
     await once(server, "close");

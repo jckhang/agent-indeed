@@ -356,8 +356,58 @@ function buildAuditEventListResponse({ taskId, bidId, events }) {
   return {
     taskId,
     ...(bidId ? { bidId } : {}),
-    hasMore: false,
-    events
+    hasMore: events.hasMore,
+    ...(events.nextCursor ? { nextCursor: events.nextCursor } : {}),
+    events: events.records
+  };
+}
+
+function parseAuditPagination(searchParams) {
+  const cursor = searchParams.get("cursor") ?? undefined;
+  const limitRaw = searchParams.get("limit");
+  const limit = limitRaw === null ? 50 : Number.parseInt(limitRaw, 10);
+
+  if (!Number.isInteger(limit) || limit < 1 || limit > 200) {
+    return {
+      error: buildError("AUDIT_QUERY_LIMIT_INVALID", "AUDIT", "limit must be between 1 and 200", {
+        auditId: "audit_query_limit_invalid"
+      })
+    };
+  }
+
+  return {
+    cursor,
+    limit
+  };
+}
+
+function paginateAuditEvents(events, { cursor, limit }) {
+  if (!cursor) {
+    const records = events.slice(0, limit);
+    return {
+      records,
+      hasMore: events.length > records.length,
+      nextCursor: events.length > records.length ? records.at(-1)?.eventId : undefined
+    };
+  }
+
+  const cursorIndex = events.findIndex((event) => event.eventId === cursor);
+  if (cursorIndex === -1) {
+    return {
+      error: buildError("AUDIT_CURSOR_INVALID", "AUDIT", `cursor ${cursor} was not found`, {
+        auditId: "audit_query_cursor_invalid"
+      })
+    };
+  }
+
+  const records = events.slice(cursorIndex + 1, cursorIndex + 1 + limit);
+  return {
+    records,
+    hasMore: cursorIndex + 1 + limit < events.length,
+    nextCursor:
+      cursorIndex + 1 + limit < events.length && records.length > 0
+        ? records.at(-1)?.eventId
+        : undefined
   };
 }
 
@@ -1199,7 +1249,17 @@ export function createApp({
 
       const bidId = requestUrl.searchParams.get("bidId") ?? undefined;
       const events = store.listAuditEventsForTask(taskId, { bidId });
-      return reply(200, buildAuditEventListResponse({ taskId, bidId, events }));
+      const pagination = parseAuditPagination(requestUrl.searchParams);
+      if (pagination.error) {
+        return reply(400, pagination.error);
+      }
+
+      const pagedEvents = paginateAuditEvents(events, pagination);
+      if (pagedEvents.error) {
+        return reply(400, pagedEvents.error);
+      }
+
+      return reply(200, buildAuditEventListResponse({ taskId, bidId, events: pagedEvents }));
     }
 
     const taskAuditEventsMatch = requestUrl.pathname.match(TASK_AUDIT_EVENTS_PATTERN);
@@ -1236,7 +1296,20 @@ export function createApp({
         );
       }
 
-      return reply(200, buildAuditEventListResponse({ taskId: events[0].taskId, bidId, events }));
+      const pagination = parseAuditPagination(requestUrl.searchParams);
+      if (pagination.error) {
+        return reply(400, pagination.error);
+      }
+
+      const pagedEvents = paginateAuditEvents(events, pagination);
+      if (pagedEvents.error) {
+        return reply(400, pagedEvents.error);
+      }
+
+      return reply(
+        200,
+        buildAuditEventListResponse({ taskId: events[0].taskId, bidId, events: pagedEvents })
+      );
     }
 
     logRequest({

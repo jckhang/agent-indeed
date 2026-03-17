@@ -63,8 +63,8 @@ The smoke command boots the runtime on an ephemeral port, publishes a task, mate
 - `POST /v1/tasks` - create a task using the current contract baseline
 - `GET /v1/tasks/{taskId}` - inspect a persisted task record from the runtime store
 - `GET /v1/tasks/{taskId}/audit-events` - inspect the runtime audit trail for one task
-- `GET /v1/tasks/{taskId}/events` - inspect the full contract-shaped task event stream
-- `GET /v1/bids/{bidId}/events` - inspect the bid-scoped audit/event timeline
+- `GET /v1/tasks/{taskId}/events` - inspect the full contract-shaped task event stream, with optional `bidId`, `cursor`, and `limit`
+- `GET /v1/bids/{bidId}/events` - inspect the bid-scoped audit/event timeline, with optional `cursor` and `limit`
 
 ## Runtime behavior
 
