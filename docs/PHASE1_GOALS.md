@@ -17,10 +17,13 @@ Ship the first usable agent dispatch loop for closed beta:
 
 - Current sprint focus moves from planning-doc expansion to runnable implementation slices.
 - Runtime cutline decisions for open contract PRs live in `docs/RUNTIME_CUTLINE_2026-03-16.md`; use that table to decide which deltas block runtime merge versus which are additive-safe follow-ups.
+- Architecture coordination for the 2026-03-17 to 2026-03-20 unblocker window lives in `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` and issue #137.
 - Active implementation issues for this pivot:
   - #109 backend runtime skeleton
   - #110 runnable dispatch vertical slice
   - #111 executable QA smoke/E2E checks
+- Active coordination issue for this pivot:
+  - #137 architecture runtime unblocker control
 - Planning-only follow-ups (#106, #107, #108) were closed to keep sprint bandwidth on runtime delivery.
 - QA prewrite-only tracks (#87, PR #84, PR #104) were superseded by runtime execution issue #111.
 
