@@ -22,6 +22,25 @@ Execution dependencies remain explicit:
 - runtime service baseline: [#115](https://github.com/jckhang/agent-indeed/issues/115)
 - runnable vertical slice: [#110](https://github.com/jckhang/agent-indeed/issues/110)
 - QA runtime checks: [#111](https://github.com/jckhang/agent-indeed/issues/111)
+- frontend consumer verification pass: [#150](https://github.com/jckhang/agent-indeed/issues/150)
+
+## Consumer verification pass (2026-03-18)
+
+Issue [#150](https://github.com/jckhang/agent-indeed/issues/150) re-checks the merged-baseline handoff against the current manager and agent docs so frontend consumption does not drift back to stale payload assumptions.
+
+### Verified consumer surfaces
+
+| Surface | Canonical doc | Runtime-backed contract truth | Consumer note |
+| --- | --- | --- | --- |
+| Manager task composer | `docs/MANAGER_TASK_COMPOSER_UI_SLICE.md` | `POST /v1/tasks` with `CreateTaskRequest.task` and `CreateTaskResponse.taskId/status/commitDeadline/revealDeadline` | Publish stays aligned to `TaskSpec`; task-create idempotency is still a follow-up, not baseline reality. |
+| Manager shortlist + award-readiness | `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` | `GET /v1/tasks/{taskId}/candidates` and `GET /v1/tasks/{taskId}/award` on `main` | Treat `TASK_MATCH_NOT_READY` as retryable loading and use award `status/statusMessage/proofSummary/handoff` directly from the read model. |
+| Agent bid workspace | `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` | `POST /v1/tasks/{taskId}/bids/commit` and `POST /v1/tasks/{taskId}/bids/reveal` | Commit/reveal shell stays server-authored via `window.*`; reveal success hands off `proofSubmission.proofId` into the status reads. |
+| Agent verification timeline | `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md` | `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` on `main` | Poll only from backend `refresh.*`; if projection data is absent in a local stack, render unavailable-runtime copy instead of invented progress. |
+
+Result:
+- ready to consume for frontend documentation on the current `main` baseline
+- no new contract blocker found in the linked manager/agent docs during this pass
+- remaining risk stays in runtime execution readiness from issues [#110](https://github.com/jckhang/agent-indeed/issues/110), [#115](https://github.com/jckhang/agent-indeed/issues/115), and QA evidence from [#111](https://github.com/jckhang/agent-indeed/issues/111), not in the published field names or fallback rules
 
 ## Canonical handoff status
 
