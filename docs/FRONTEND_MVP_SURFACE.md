@@ -1,8 +1,9 @@
 # Frontend MVP Surface and API Wiring Matrix
 
-Last updated: 2026-03-17
+Last updated: 2026-03-18
 
 Related issue: [#33](https://github.com/jckhang/agent-indeed/issues/33)
+Runtime mainline handoff: `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md` (issues [#136](https://github.com/jckhang/agent-indeed/issues/136) and [#145](https://github.com/jckhang/agent-indeed/issues/145))
 
 ## Goal
 
@@ -82,7 +83,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | --- | --- | --- | --- | --- |
 | `/operator/proofs/queue` | `GET /v1/proofs` (proposed) | `result`, `updatedSince`, `cursor` | `proofId`, `taskId`, `agentId`, `result`, `reasonCodes`, `verifiedAt`, `needsManualReview` | Missing in current API |
 | `/operator/proofs/{proofId}/review` | `POST /v1/tasks/{taskId}/proofs/verify` + `PATCH /v1/proofs/{proofId}/decision` (proposed override) | verify payload `proof.*`; override payload `decision`, `reason`, `operatorId` | `proofId`, `result`, `reasonCodes`, `verifiedAt`, `decisionTraceHash`; error `code`, `category`, `retryable`, `details.policyTraceId` | Partial: verify now has typed proof failure codes, manual override still missing |
-| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` | `taskId`, optional `bidId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `taskId`, `bidId`, `proofId`, `summary`, `traceHash`, `auditId`, `occurredAt`, completeness flags or equivalent missing-field signal | Ready for timeline rendering; award summary/read CTA still depends on issue `#58` |
+| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` | `taskId`, optional `bidId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `taskId`, `bidId`, `proofId`, `summary`, `traceHash`, `auditId`, `occurredAt`, completeness flags or equivalent missing-field signal | Ready for operator timeline rendering; manager award summary belongs to merged `GET /v1/tasks/{taskId}/award`, with local runtime population still tracked under issue `#110` |
 
 ## State-Driven UI Requirements
 
@@ -108,7 +109,7 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 
 ## Recommended Contract Follow-Ups
 
-1. Build the runtime integration tranche in `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md` on top of `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` instead of inferring async state from write responses.
+1. Build the runtime integration tranche in `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md` as the canonical merged-baseline handoff for publish, shortlist, commit, reveal, bid/proof refresh, and award-read instead of splitting that guidance across separate runtime doc packs.
 2. Standardize error shape (`code`, `category`, `message`, `retryable`, `details`, `auditId`) across all write endpoints.
 3. Keep runtime handlers from issue `#110` aligned with the merged bid/proof read projections so refresh works after reload and cross-route handoff.
 4. Freeze state enums for task, bid, proof, and award in `openapi.yaml` and `contracts.ts` to reduce UI branching drift.
