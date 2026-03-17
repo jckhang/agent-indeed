@@ -1,6 +1,6 @@
 # Manager Shortlist Review and Award-Readiness UI Slice (P1-20)
 
-Last updated: 2026-03-15
+Last updated: 2026-03-18
 
 Related issue: [#62](https://github.com/jckhang/agent-indeed/issues/62)
 
@@ -10,14 +10,15 @@ Define the manager-side shortlist review and award-readiness slice that starts a
 
 This slice stays explicit about current repo reality:
 - `docs/MANAGER_CONSOLE_BASELINE.md` already captures the broader manager baseline.
-- `main` still treats shortlist and award reads as pending backend work.
-- PR [#68](https://github.com/jckhang/agent-indeed/pull/68) is the active contract proposal for `GET /v1/tasks/{taskId}/candidates`, `GET /v1/tasks/{taskId}/award`, and `POST /v1/tasks/{taskId}/award`.
-- The UI must remain fallback-first until those contracts merge; it should not invent hidden fields or pretend award actions are fully shippable today.
+- `main` now includes the merged shortlist and award read contracts for `GET /v1/tasks/{taskId}/candidates` and `GET /v1/tasks/{taskId}/award`.
+- `POST /v1/tasks/{taskId}/award` is contract-ready on `main`, but live runtime execution still depends on the runnable dispatch implementation from issue [#110](https://github.com/jckhang/agent-indeed/issues/110).
+- The UI must remain fallback-first for missing runtime data or unavailable handlers; it should not invent hidden fields or pretend local environments are more complete than the running stack actually is.
 
 Related planning context:
 - `docs/FRONTEND_MVP_SURFACE.md`
+- `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md`
 - issue [#43](https://github.com/jckhang/agent-indeed/issues/43) for the original manager console baseline
-- issue [#58](https://github.com/jckhang/agent-indeed/issues/58) / PR [#68](https://github.com/jckhang/agent-indeed/pull/68) for shortlist and award contract follow-through
+- issue [#58](https://github.com/jckhang/agent-indeed/issues/58) for shortlist and award contract follow-through
 
 ## Scope
 
@@ -51,11 +52,11 @@ The shell should always keep three elements visible:
 
 | Step | Manager intent | UI behavior | Contract dependency |
 | --- | --- | --- | --- |
-| 1 | Open review after publish | Restore task summary and fetch shortlist/award-readiness data | proposed shortlist + award reads |
+| 1 | Open review after publish | Restore task summary and fetch shortlist/award-readiness data | merged shortlist + award reads on `main` |
 | 2 | Understand ranking quality | Show ranked candidates, score breakdown, and missing-data states without collapsing rows | shortlist read model |
 | 3 | Inspect a candidate | Expand proof status, trace refs, and blocker explanation for one candidate | shortlist detail fields |
 | 4 | Check whether award is possible | Render readiness state, current blockers, and follow-up dependency notes | award summary read model |
-| 5 | Hand off to award action only when supported | Keep CTA disabled or secondary when command/read dependencies are still pending | award command contract |
+| 5 | Hand off to award action only when supported | Keep CTA disabled or secondary when runtime handlers are absent or blocked in the current environment | award command contract + issue `#110` runtime wiring |
 
 ## Shortlist review surface
 
@@ -111,7 +112,7 @@ Fallback behavior:
 | Loading shortlist | Show table skeleton plus task header; avoid fake candidate counts. |
 | Empty shortlist | Explain whether no candidates matched or shortlist generation has not completed yet. |
 | Partial shortlist | Keep rows visible and badge missing dimensions or pending proof data. |
-| API error / contract missing | Show task id, surfaced error text, and a dependency note pointing to issue #58 / PR #68 instead of generic failure copy. |
+| API error / runtime unavailable | Show task id, surfaced error text, and a dependency note pointing to issue #58 or issue #110 instead of generic failure copy. |
 
 ## Award-readiness rail
 
@@ -146,23 +147,23 @@ Fallback behavior:
 | Review shell surface | Contract/input | Status on `main` | Notes |
 | --- | --- | --- | --- |
 | Task summary | task state + shortlist freshness | Partial | State exists today; freshness still depends on shortlist read support. |
-| Candidate shortlist table | proposed `GET /v1/tasks/{taskId}/candidates` | Pending backend contract | PR #68 is the active proposal; UI must tolerate partial fields until it lands. |
-| Candidate detail panel | shortlist audit refs + proof summary + `decisionTraceHash` | Pending backend contract | Missing fields should become explicit fallback copy, not hidden UI branches. |
-| Award-readiness rail | proposed `GET /v1/tasks/{taskId}/award` | Pending backend contract | Must expose blockers and dependency notes even before all award detail fields are ready. |
-| Award handoff CTA | proposed `POST /v1/tasks/{taskId}/award` | Pending backend contract | Keep the call-to-action disabled or secondary until contract support is real on the baseline. |
+| Candidate shortlist table | `GET /v1/tasks/{taskId}/candidates` | Ready | Render `TASK_MATCH_NOT_READY` as a retryable shortlist-loading state, not as an empty result. |
+| Candidate detail panel | shortlist audit refs + proof readiness + `decisionTraceHash` | Ready | Missing optional fields should become explicit fallback copy, not hidden UI branches. |
+| Award-readiness rail | `GET /v1/tasks/{taskId}/award` | Ready | Use `status`, `statusMessage`, `proofSummary`, `handoff`, and trace fields directly from the merged read model. |
+| Award handoff CTA | `POST /v1/tasks/{taskId}/award` | Contract-ready | Keep the call-to-action disabled or secondary when the current runtime stack does not yet execute the write path. |
 
 ## Backend dependency feedback
 
-P1-20 keeps three contract gaps explicit instead of burying them inside frontend assumptions:
+P1-20 keeps three runtime-consumer gaps explicit instead of burying them inside frontend assumptions:
 
-1. Shortlist reads still need durable freshness and missing-data signals.
-   - Minimum UI-safe fields: ranked rows, hard-filter outcome, score breakdown, proof readiness, shortlist freshness timestamp, and an audit reference when available.
-2. Award-readiness reads must expose blockers as first-class fields.
-   - Minimum UI-safe fields: task state, recommended candidate summary, readiness enum, blocker list, proof summary, and decision/audit references.
+1. Shortlist freshness and retry semantics still need to stay stable in the running stack.
+   - Minimum UI-safe fields already exist on `main`: ranked rows, hard-filter outcome, score breakdown, proof readiness, shortlist freshness metadata, and `TASK_MATCH_NOT_READY` as a retryable loading path.
+2. Award-readiness reads must stay the source of truth for blockers.
+   - Use `status`, `statusMessage`, `proofSummary`, `handoff`, and decision/audit references from the merged read model instead of reconstructing award readiness in the client.
 3. Award command support must remain distinguishable from award-readiness visibility.
-   - The UI should not infer that a visible winner summary means the award write path is already safe to trigger.
+   - The UI should not infer that a visible winner summary means the current local runtime already executes the award write path successfully.
 
-These gaps should stay tied to issue #58 / PR #68 and downstream audit work, not copied into ad hoc frontend-only payload guesses.
+These gaps should stay tied to issue #58, issue #110, and downstream audit work, not copied into ad hoc frontend-only payload guesses.
 
 ## Acceptance criteria mapping
 
