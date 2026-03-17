@@ -1,0 +1,69 @@
+# Runtime Control Plane Skeleton
+
+This directory holds the first runnable backend control-plane scaffold for Agent Indeed.
+
+## Local commands
+
+- Start the service: `npm start`
+- Start with file watching: `npm run dev`
+- Run the built-in runtime tests: `npm test`
+
+## Boot and probe
+
+Start the control plane in one terminal:
+
+```bash
+npm start
+```
+
+Then verify the bootstrap probes and one namespaced task route from another terminal:
+
+```bash
+curl -s http://127.0.0.1:3000/healthz
+curl -s http://127.0.0.1:3000/readyz
+curl -s http://127.0.0.1:3000/v1/runtime/summary
+curl -s -X POST http://127.0.0.1:3000/v1/tasks \
+  -H 'content-type: application/json' \
+  -H 'x-workspace-id: workspace-kestrel' \
+  -d '{
+    "task": {
+      "title": "Bootstrap runtime smoke",
+      "description": "Persist one task through the local control plane",
+      "budget": { "currency": "USD", "minAmount": 100, "maxAmount": 200 },
+      "sla": { "deadlineAt": "2026-03-20T00:00:00Z", "maxLatencyMs": 5000 },
+      "constraints": {
+        "identityTierMin": "T1",
+        "requiredSkills": ["backend", "api"]
+      },
+      "risk": { "level": "LOW", "valueScore": 0.2 },
+      "powmPolicy": { "mode": "AUTO_TIERED", "baseDifficulty": 2 },
+      "biddingWindow": {
+        "commitDeadline": "2026-03-19T00:00:00Z",
+        "revealDeadline": "2026-03-20T00:00:00Z"
+      }
+    }
+  }'
+curl -s http://127.0.0.1:3000/v1/tasks/task_00000001/audit-events
+```
+
+## Current endpoints
+
+- `GET /healthz` - liveness and process metadata
+- `GET /readyz` - readiness plus in-memory storage checks
+- `GET /v1/runtime/summary` - counts for task/bid/proof/award/audit stores
+- `POST /v1/tasks` - create a task using the current contract baseline
+- `GET /v1/tasks/{taskId}` - inspect a persisted task record from the runtime store
+- `GET /v1/tasks/{taskId}/audit-events` - inspect the runtime audit trail for one task
+
+## Runtime behavior
+
+- Every request emits one structured log entry with `service`, `method`, `path`, `statusCode`, `durationMs`, and `workspaceId`.
+- Runtime configuration is loaded from `HOST`, `PORT`, and `SERVICE_NAME`, and invalid values fail fast during startup.
+- Local shutdown on `SIGINT`/`SIGTERM` closes the HTTP listener cleanly so follow-on smoke runs can reuse the same port.
+
+## Notes
+
+- Storage is intentionally in-memory for the first bootstrap slice.
+- IDs are deterministic, monotonic prefixes (`task_00000001`, `audit_00000001`, ...).
+- Persistence abstractions now cover task, bid, proof, award, and audit entities with deterministic ids.
+- This scaffold is the runtime base for the later dispatch vertical slice work.

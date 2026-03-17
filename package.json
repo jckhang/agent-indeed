@@ -1,0 +1,13 @@
+{
+  "name": "agent-indeed-control-plane",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/runtime/server.js",
+    "dev": "node --watch src/runtime/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20.11"
+  }
+}
