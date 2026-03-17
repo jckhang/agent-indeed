@@ -51,7 +51,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - historical similarity
 - Manager console baseline is captured in `docs/MANAGER_CONSOLE_BASELINE.md` so task publish, shortlist review, and award-state acceptance criteria stay reviewable while shortlist/award read-model gaps are still backend follow-ups.
 - The focused shortlist/award manager review slice is captured in `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` so fallback states and award blockers stay explicit while shortlist/award contracts remain under review.
-- The first runtime-backed frontend wiring target is captured in `docs/FRONTEND_RUNTIME_DISPATCH_WIRING_2026-03-16.md` so issue #116 can consume current publish/match/commit/reveal/verify endpoints without inventing unavailable proof-read, audit-read, or award-read contracts.
+- The first runtime-backed frontend wiring target is captured in `docs/FRONTEND_RUNTIME_DISPATCH_WIRING_2026-03-16.md` so issue #116 can consume the merged publish/match/commit/reveal/status/award routes on `main` without inventing verifier-only or runtime-unmaterialized fields.
 
 ### G3. Bidding and PoMW baseline
 
@@ -60,7 +60,8 @@ Ship the first usable agent dispatch loop for closed beta:
 - `ProofPack` accepted and verified with T0/T1/T2 policy mapping.
 - Commit/reveal/verify/award transitions must persist and be queryable in runtime flow checks (issue #110).
 - Runtime implementers should treat `docs/RUNTIME_CUTLINE_2026-03-16.md` as the current go/no-go rule for open contract PR dependencies while the contract stack finishes converging.
-- Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, with focused follow-through in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`, and `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md`, so commit/reveal and verification acceptance criteria stay tied to the merged bid/proof read contracts and the runtime integration tranche in issue #136.- Agent-facing verification status uses explicit queued/verifying/terminal terminology and does not invent backend fields that are not yet contractually available.
+- Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, with focused follow-through in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`, and `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md`, so commit/reveal and verification acceptance criteria stay tied to the merged bid/proof read contracts and the runtime integration tranche in issue #136.
+- Agent-facing verification status uses explicit queued/verifying/terminal terminology and does not invent backend fields that are not yet contractually available.
 
 ### G4. Audit and observability baseline
 
