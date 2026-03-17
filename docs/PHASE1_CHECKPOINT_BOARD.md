@@ -36,6 +36,7 @@ Sprint pivot dated 2026-03-16 keeps these issue anchors as the default execution
 3. Run the metadata hygiene queries and clear any missing milestone or priority gaps before posting the checkpoint.
 4. Treat missing validation evidence in a PR body/comment as a real blocker, even when the code diff looks complete.
 5. Capture only durable planning changes in repo docs; keep comments, review notes, and volatile state in GitHub threads.
+6. If merge-train triage uncovers a new durable blocker, open or link a follow-up issue instead of adding a status snapshot here.
 
 ## When to edit this file
 
@@ -55,3 +56,5 @@ When posting the weekly checkpoint comment on epic #2, keep it in GitHub and use
 - `Blocked`: active issue/PR plus the concrete blocker and current owner
 - `Ready next`: the next executable slice queued for each lane
 - `Validation evidence gaps`: any PR that still needs pasted command output before review can close
+
+When a checkpoint calls out a blocker, prefer a GitHub issue or PR link plus the owner label already on that thread rather than copying queue snapshots into this document.

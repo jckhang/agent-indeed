@@ -75,9 +75,11 @@
 
 10. 建立 merge-train 协作例行
    - 规划负责人使用统一查询区分 clean LGTM PR 与 dirty follow-on queue，而不是把瞬时状态复制到仓库文档。
-   - runtime 冲刺期间额外维护 review queue 与 label audit 查询，优先发现缺少 status label 或缺少 validation evidence 的活跃线程。
+   - runtime 冲刺期间额外维护 review queue、dirty-but-approved queue 与 label audit 查询，优先发现缺少 status label、缺少 validation evidence，或已经 LGTM 但尚未 rebase 的活跃线程。
    - clean tranche 合并后，必须在脏 PR 线程写回 owner、blocker、rebase-next-step，并要求重新执行验证命令。
+   - merge-train blocker note 必须同时说明：main 上发生了什么变化、当前 owner label、下一步命令/评审动作，以及是否需要新开 follow-up issue 保持 PR 聚焦。
    - 任何请求 re-review 的 PR 都必须附带 literal validation output；未贴出输出时，规划侧将其视为阻塞项而不是“默认已跑”。
+   - 当新 blocker 会跨越多个 rebase 周期、需要跨 lane 接力，或会让现有 PR 超出原始验收范围时，必须升级为 follow-up issue，而不是只留在 PR 评论里。
    - 例行流程写入 `docs/MERGE_TRAIN_PLAYBOOK.md` 并在 `CONTRIBUTING.md` 链接，减少多 agent 并行时的重复沟通和冲突。
 
 11. Phase 1 当前冲刺采用 runtime-first 交付
