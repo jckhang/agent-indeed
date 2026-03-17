@@ -1,6 +1,6 @@
 # Phase 1 Beta Readiness Gates
 
-Last updated: 2026-03-16
+Last updated: 2026-03-17
 
 This document turns epic #2 (`[Phase 1 Epic] Agent Dispatch Foundation MVP`) into a small set of
 reviewable release gates for closed-beta readiness. It complements:
@@ -9,16 +9,17 @@ reviewable release gates for closed-beta readiness. It complements:
 - `docs/ROADMAP.md` for phase checkpoints and milestone dates
 - `docs/PHASE1_EPIC_STATUS.md` for the current issue/PR rollup
 - `docs/RUNTIME_CUTLINE_2026-03-16.md` for the runtime-start cutline on open contract deltas
+- `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` for the dated owner/blocker ledger during the 2026-03-20 push
 
 ## Gate Summary
 
 | Gate | Status | Ready when | Active dependencies | Evidence to collect |
 | --- | --- | --- | --- | --- |
-| Contract convergence | In progress | Remaining backend contract PRs are merged and shared enum/error vocabulary is stable across OpenSpec, OpenAPI, and TypeScript contracts. | PR #66, PR #68, PR #83, merged PR #90, merged PR #92 | `openspec validate --all`, contract diff review, synced `src/api/openapi.yaml` + `src/api/contracts.ts` |
-| Runtime happy-path execution | Blocked | One runnable `publish -> match -> commit -> reveal -> verify -> award` flow can be executed against a local service without manual interpretation. | Issue #109, issue #110, issue #111, issue #11, plus contract convergence gate | Service run command, executable smoke/E2E output, linked request/response evidence |
-| Negative-scenario coverage | Blocked | QA can execute core failures (`invalid signature`, `reveal without commit`, `proof FAIL`, `award blocked`) with stable expected outcomes. | Issue #111, issue #11, PR #83, merged PR #92, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/CLOSED_BETA_SECURITY_READINESS.md` | Runnable assertions, expected error/result matrix, regression evidence |
-| Audit evidence trail | In progress | Audit outputs expose key lifecycle transitions and award/proof context for operator review and beta sign-off. | Issue #110, merged PR #92, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/OBSERVABILITY_BASELINE.md` | Audit event names, award trace fields, telemetry handoff checklist |
-| Execution + handoff hygiene | In progress | Roadmap/goals/epic/checkpoint docs and active runtime issues all describe the same blockers and next actions. | Issue #109, issue #110, issue #111, issue #11 | `docs/PHASE1_CHECKPOINT_BOARD.md`, `docs/PHASE1_EPIC_STATUS.md`, milestone/label queries stay aligned |
+| Contract convergence | In progress | Active runtime and handoff PRs stay inside the merged OpenSpec/OpenAPI/TypeScript baseline and carry reviewable validation evidence in the PR body. | PR #129 (merge-ready), PR #133 (doc alignment), PR #140, PR #141, merged PR #83, merged PR #92, merged PR #126, merged PR #127, merged PR #139 | `openspec validate --all`, runtime/OpenAPI diff review, synced `src/api/openapi.yaml` + `src/api/contracts.ts`, pasted validation output in PR templates |
+| Runtime happy-path execution | Blocked | One runnable `publish -> match -> commit -> reveal -> verify -> award` flow can be executed against a local service without manual interpretation. | issue #115, PR #129, merged PR #127 baseline, issue #111, issue #11 | Service run command, executable smoke/E2E output, linked request/response evidence |
+| Negative-scenario coverage | Blocked | QA can execute core failures (`invalid signature`, `reveal without commit`, `proof FAIL`, `award blocked`) with stable expected outcomes. | issue #120, issue #111, issue #11, merged PR #127 baseline, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/CLOSED_BETA_SECURITY_READINESS.md` | Runnable assertions, expected error/result matrix, regression evidence |
+| Audit evidence trail | In progress | Audit outputs expose key lifecycle transitions and award/proof context for operator review and beta sign-off. | merged PR #127, merged PR #92, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/OBSERVABILITY_BASELINE.md` | Audit event names, award trace fields, telemetry handoff checklist |
+| Execution + handoff hygiene | In progress | Roadmap/goals/epic/checkpoint docs and the live runtime queue all describe the same blockers and next actions. | issue #137, PR #140, PR #141, issue #115, PR #129, issue #120, issue #111, issue #11 | `docs/PHASE1_CHECKPOINT_BOARD.md`, `docs/PHASE1_EPIC_STATUS.md`, `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`, milestone/label queries stay aligned |
 
 ## Gate Details
 
@@ -26,20 +27,17 @@ reviewable release gates for closed-beta readiness. It complements:
 
 This remains the prerequisite for durable runtime behavior and executable QA checks.
 
-- Verification status durability depends on PR #66.
-- Manager shortlist and award reads depend on PR #68.
-- Verifier terminal vocabulary and reason-code behavior depend on PR #83.
-- Onboarding kickoff examples now come from merged PR #90.
-- Audit event and award-trace surface now comes from merged PR #92.
+- Verifier terminal vocabulary and award-trace expectations now come from merged PR #83 and merged PR #92.
+- The merged runtime/frontend baseline is on `main` through PR #126 and PR #139; PR #127 merged on 2026-03-17 at 13:54:46Z, so the active convergence risk is now keeping merge-ready PR #129 plus the doc queue (`#133`, `#140`, `#141`) synced to the published contract vocabulary.
+- PR #140 is the planning guardrail that keeps those threads tied to one dated blocker ledger instead of duplicating stale snapshots across long-lived docs.
 
-Release note: if any of these contracts change enum names, required fields, or error-code wording,
-the same update must land in OpenSpec plus both API drafts before the gate can be marked ready.
+Release note: if any active runtime branch changes enum names, required fields, route shapes, or error-code wording, the same update must land in OpenSpec plus both API drafts before the gate can be marked ready.
 
 ### 2. Runtime happy-path execution
 
-Happy-path readiness is now runtime-first, not docs-first.
+Happy-path readiness is runtime-first, not docs-first.
 
-While this gate remains blocked until the runnable flow exists, the runtime threads do not have to wait for every open contract PR. Use `docs/RUNTIME_CUTLINE_2026-03-16.md` to separate true blockers from additive-safe follow-ups.
+While this gate remains blocked until the runnable flow exists, the runtime threads do not have to wait for every historical contract branch. Use `docs/RUNTIME_CUTLINE_2026-03-16.md` plus `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` to separate true blockers from additive-safe follow-ups.
 
 Required outcome:
 
@@ -47,7 +45,7 @@ Required outcome:
 - one reproducible request sequence executes `publish -> match -> commit -> reveal -> verify -> award`
 - results are captured by executable smoke/E2E checks tied to issue #111 and linked back to issue #11
 
-Reference docs/matrices are useful only if they map directly to runnable assertions.
+Reference docs and planning notes are only useful if they map directly to runnable assertions and a stable local command path.
 
 ### 3. Negative-scenario coverage
 
@@ -60,7 +58,7 @@ Minimum scenarios to keep visible:
 - proof verification returns `FAIL`
 - award attempt blocked before prerequisite verification is complete
 
-Expected output for each scenario must cite a stable error code or terminal status/result.
+Expected output for each scenario must cite a stable error code or terminal status/result from the merged contract vocabulary.
 
 ### 4. Audit evidence trail
 
@@ -85,7 +83,8 @@ At minimum, these must stay in lockstep:
 - `docs/PHASE1_EPIC_STATUS.md`
 - `docs/PHASE1_GOALS.md`
 - `docs/ROADMAP.md`
-- runtime delivery threads (`#109`, `#110`, `#111`, and blocked follow-through `#11`)
+- `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`
+- runtime delivery threads (`#115`, merge-ready `#129`, doc-alignment `#133`, `#120`, `#111`, and blocked follow-through `#11`)
 
 ## Review Routine
 
