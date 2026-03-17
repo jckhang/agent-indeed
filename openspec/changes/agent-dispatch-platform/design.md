@@ -82,6 +82,11 @@
    - 2026-03-16 起，交付节奏从“持续追加规划文档”切换为“优先交付可运行实现”。
    - 当前冲刺以 issue #109（服务骨架）、#110（端到端垂直切片）、#111（可执行 QA 校验）为主线。
    - `Implement` 类 issue 的关闭标准必须包含运行时代码或可执行测试证据，spec/docs-only PR 不再作为单独关闭依据。
+12. Bid / proof 异步状态读取在 MVP 阶段统一采用轮询
+   - 写接口（commit、reveal、verify）只保证接收或返回当前决策快照，不承诺前端可以仅靠写响应完成后续时间线渲染。
+   - 读接口补充 `GET /v1/tasks/{taskId}/bids/{bidId}` 与 `GET /v1/tasks/{taskId}/proofs/{proofId}`，提供 commit/reveal/proof/award 的当前状态投影。
+   - 响应必须携带 `refresh.mode=POLL`、`pollAfterSeconds`、`manualRefreshAllowed` 与 `lastUpdatedAt`，明确 MVP 刷新策略是轮询优先，事件流留作后续增强而不是隐式依赖。
+   - 失败原因统一返回稳定 reason code，而不是要求前端从日志或自由文本推断。
 
 ## Backend Module Boundaries
 
@@ -107,6 +112,7 @@ MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立�
 - 负责 commit-reveal 窗口控制、bid hash 持久化、reveal payload 校验、以及 reveal 与 commit 的关联校验。
 - 拥有 bid lifecycle 中 `commit -> reveal` 的写入权。
 - 依赖 Task Marketplace 提供的 task 窗口与 candidate eligibility 快照，不自行定义准入规则。
+- 对外暴露 bid 状态读模型，明确给出 `commitState`、`revealState`、`proofState`、`awardState` 与失败原因码，供 agent UI 与 operator UI 复用。
 
 ### PoMW Policy and Verifier
 
@@ -127,6 +133,7 @@ MVP control plane 采用“单仓多模块”边界，而不是在 Phase 1 立�
   - `MEDIUM`: T1 或中等风险任务，要求更高样本质量阈值
   - `HIGH`: T2 或高风险任务，增加 hashcash / stake 等抗女巫约束
   - `VERY_HIGH`: CRITICAL 风险或低 trust 的高价值任务，启用混合 challenge 与人工复核兜底
+- 对外暴露 proof 状态读模型，覆盖 `QUEUED`、`VERIFYING`、`PASSED`、`FAILED`、`NEEDS_REVIEW`、`OVERRIDDEN`，并返回稳定 reason code、decision trace 与建议轮询间隔。
 
 ### Audit Ledger
 

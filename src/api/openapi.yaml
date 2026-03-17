@@ -673,6 +673,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProofVerifyErrorResponse'
 
+  /v1/tasks/{taskId}/bids/{bidId}:
+    get:
+      tags: [bids]
+      summary: Read the current bid, proof, and award status projection
+      operationId: getBidStatus
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+        - $ref: '#/components/parameters/BidIdParam'
+      responses:
+        '200':
+          description: Current bid status snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BidStatusResponse'
+        '404':
+          description: Bid status projection not found for the task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /v1/tasks/{taskId}/proofs/verify:
     post:
       tags: [proofs]
@@ -1065,6 +1087,28 @@ paths:
                     retryable: true
                     retryAfterSeconds: 5
 
+  /v1/tasks/{taskId}/proofs/{proofId}:
+    get:
+      tags: [proofs]
+      summary: Read the current proof verification status projection
+      operationId: getProofStatus
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+        - $ref: '#/components/parameters/ProofIdParam'
+      responses:
+        '200':
+          description: Current proof verification snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProofStatusResponse'
+        '404':
+          description: Proof status projection not found for the task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     AgentBearer:
@@ -1113,7 +1157,6 @@ components:
         minLength: 8
         maxLength: 512
       description: Required when an operator triggers a manual proof verification override.
-
     BidIdParam:
       name: bidId
       in: path
@@ -1149,6 +1192,13 @@ components:
         minimum: 1
         maximum: 200
         default: 50
+    ProofIdParam:
+      name: proofId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
 
   schemas:
     UploadAgentBundleRequest:
@@ -2062,6 +2112,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProofVerificationReasonCode'
+        decisionTraceHash:
+          type: string
+          pattern: '^sha256:[a-f0-9]{64}$'
         verifiedAt:
           type: string
           format: date-time
@@ -2227,6 +2280,181 @@ components:
           type: number
           minimum: 0
           maximum: 1
+
+    RefreshPolicy:
+      type: object
+      additionalProperties: false
+      required: [mode, pollAfterSeconds, manualRefreshAllowed, lastUpdatedAt]
+      properties:
+        mode:
+          type: string
+          enum: [POLL]
+          description: MVP refresh contract. Event streams remain deferred.
+        pollAfterSeconds:
+          type: integer
+          minimum: 1
+        manualRefreshAllowed:
+          type: boolean
+        lastUpdatedAt:
+          type: string
+          format: date-time
+
+    BidStatusReasonCode:
+      type: string
+      enum:
+        - BID_COMMIT_WINDOW_CLOSED
+        - BID_COMMIT_DUPLICATE
+        - BID_REVEAL_PAYLOAD_INVALID
+        - BID_REVEAL_COMMIT_NOT_FOUND
+        - BID_REVEAL_HASH_MISMATCH
+        - BID_REVEAL_WINDOW_CLOSED
+        - PROOF_VERIFY_FAILED
+        - PROOF_VERIFY_NEEDS_REVIEW
+
+    ProofStatusReasonCode:
+      type: string
+      enum:
+        - PROOF_VERIFY_FAILED
+        - PROOF_VERIFY_NEEDS_REVIEW
+        - PROOF_VERIFY_PAYLOAD_INVALID
+        - PROOF_VERIFY_POLICY_INVALID
+
+    BidStatusResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - bidId
+        - taskId
+        - agentId
+        - latestPhase
+        - commitState
+        - revealState
+        - proofState
+        - awardState
+        - refresh
+      properties:
+        bidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        agentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        latestPhase:
+          type: string
+          enum: [COMMIT, REVEAL]
+        commitState:
+          type: string
+          enum: [PENDING, COMMITTED, REJECTED]
+        revealState:
+          type: string
+          enum: [WAITING_FOR_WINDOW, READY, REVEALED, REJECTED]
+        proofState:
+          oneOf:
+            - type: string
+              enum: [NOT_SUBMITTED, QUEUED, VERIFYING, OVERRIDDEN]
+            - $ref: '#/components/schemas/ProofVerificationStatus'
+        awardState:
+          type: string
+          enum: [NOT_DECIDED, SHORTLISTED, AWARDED, NOT_SELECTED]
+        deadlines:
+          type: object
+          additionalProperties: false
+          required: [commitDeadline, revealDeadline]
+          properties:
+            commitDeadline:
+              type: string
+              format: date-time
+            revealDeadline:
+              type: string
+              format: date-time
+        proof:
+          type: object
+          additionalProperties: false
+          required: [proofId]
+          properties:
+            proofId:
+              type: string
+              pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
+            result:
+              type: string
+              enum: [PASS, FAIL, MANUAL_REVIEW]
+            reasonCodes:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProofStatusReasonCode'
+            verifiedAt:
+              type: string
+              format: date-time
+            decisionTraceHash:
+              type: string
+        failureReasonCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/BidStatusReasonCode'
+        auditRefs:
+          type: object
+          additionalProperties: false
+          properties:
+            bidAuditId:
+              type: string
+              pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+            proofAuditId:
+              type: string
+              pattern: '^audit_[a-zA-Z0-9_-]{8,64}$'
+            decisionTraceHash:
+              type: string
+        refresh:
+          $ref: '#/components/schemas/RefreshPolicy'
+
+    ProofStatusResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - proofId
+        - taskId
+        - agentId
+        - verificationState
+        - refresh
+      properties:
+        proofId:
+          type: string
+          pattern: '^proof_[a-zA-Z0-9_-]{8,64}$'
+        taskId:
+          type: string
+          pattern: '^task_[a-zA-Z0-9_-]{8,64}$'
+        bidId:
+          type: string
+          pattern: '^bid_[a-zA-Z0-9_-]{8,64}$'
+        agentId:
+          type: string
+          pattern: '^agent_[a-zA-Z0-9_-]{8,64}$'
+        verificationState:
+          oneOf:
+            - type: string
+              enum: [QUEUED, VERIFYING, OVERRIDDEN]
+            - $ref: '#/components/schemas/ProofVerificationStatus'
+        requiredDifficulty:
+          type: number
+          minimum: 0
+        achievedDifficulty:
+          type: number
+          minimum: 0
+        reasonCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProofStatusReasonCode'
+        needsManualReview:
+          type: boolean
+        decisionTraceHash:
+          type: string
+        verifiedAt:
+          type: string
+          format: date-time
+        refresh:
+          $ref: '#/components/schemas/RefreshPolicy'
 
     AgentBundle:
       type: object
@@ -2897,10 +3125,12 @@ components:
         - PROOF_POLICY_INPUT_INVALID
         - PROOF_POLICY_TRACE_MISSING
         - PROOF_POLICY_TRACE_NOT_FOUND
+        - BID_STATUS_NOT_FOUND
         - PROOF_VERIFY_PAYLOAD_INVALID
         - PROOF_VERIFY_POLICY_INVALID
         - PROOF_VERIFY_FAILED
         - PROOF_VERIFY_NEEDS_REVIEW
+        - PROOF_STATUS_NOT_FOUND
         - TASK_AWARD_PRECONDITION_FAILED
         - TASK_AWARD_PROOF_NOT_VERIFIED
         - TASK_AWARD_CANDIDATE_NOT_ELIGIBLE
