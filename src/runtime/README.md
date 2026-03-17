@@ -53,7 +53,7 @@ To exercise the runnable vertical slice in one command without managing a long-l
 npm run smoke:dispatch
 ```
 
-The smoke command boots the runtime on an ephemeral port, publishes a task, materializes candidates, commits and reveals a bid, resolves proof policy, verifies the proof, awards the task, and confirms the task/bid audit timelines before printing the resulting ids as JSON.
+The smoke command boots the runtime on an ephemeral port, publishes a task, materializes candidates, commits and reveals a bid, resolves proof policy, checks award readiness, awards the task with the contract-shaped idempotent payload, and confirms the task/bid audit timelines before printing the resulting ids as JSON.
 
 ## Current endpoints
 
@@ -62,9 +62,11 @@ The smoke command boots the runtime on an ephemeral port, publishes a task, mate
 - `GET /v1/runtime/summary` - counts for task/bid/proof/award/audit stores
 - `POST /v1/tasks` - create a task using the current contract baseline
 - `GET /v1/tasks/{taskId}` - inspect a persisted task record from the runtime store
+- `GET /v1/tasks/{taskId}/award` - inspect manager-facing award readiness or awarded detail for one task
 - `GET /v1/tasks/{taskId}/audit-events` - inspect the runtime audit trail for one task
 - `GET /v1/tasks/{taskId}/events` - inspect the full contract-shaped task event stream, with optional `bidId`, `cursor`, and `limit`
 - `GET /v1/bids/{bidId}/events` - inspect the bid-scoped audit/event timeline, with optional `cursor` and `limit`
+- `POST /v1/tasks/{taskId}/award` - submit the nested `CreateTaskAwardRequest` payload with `idempotencyKey`, `award.bidId`, `award.shortlistAuditId`, and `award.proofAuditId`
 
 ## Runtime behavior
 

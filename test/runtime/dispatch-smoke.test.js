@@ -28,6 +28,7 @@ test("runDispatchSmoke executes the publish to award flow", async () => {
     "PASS proof-policy-issued",
     "PASS bid-revealed",
     "PASS proof-verified",
+    "PASS award-ready",
     "PASS task-awarded",
     "PASS task-audit-timeline",
     "PASS bid-audit-timeline"

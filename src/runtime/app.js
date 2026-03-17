@@ -14,7 +14,7 @@ const TASK_BID_REVEAL_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/bids\
 const TASK_PROOF_POLICY_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/proof-policy$/;
 const TASK_PROOF_VERIFY_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/proofs\/verify$/;
 const TASK_AWARD_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/award$/;
-const BID_EVENTS_PATTERN = /^\/v1\/bids\/(bid_[a-zA-Z0-9_-]{1,64})\/events$/;
+const BID_EVENTS_PATTERN = /^\/v1\/bids\/(bid_[a-zA-Z0-9_-]{8,64})\/events$/;
 
 function sha256(value) {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
@@ -268,19 +268,174 @@ function validateVerifyPayload(payload) {
 }
 
 function validateAwardPayload(payload) {
-  if (!payload || typeof payload !== "object" || !payload.bidId) {
+  if (!payload || typeof payload !== "object") {
     return buildError(
       "TASK_AWARD_PRECONDITION_FAILED",
       "PRECONDITION",
-      "bidId is required to award a task",
+      "award payload is required",
       {
         auditId: "audit_task_award_invalid_payload",
-        details: { field: "bidId" }
+        details: { field: "body" }
       }
     );
   }
 
+  if (!payload.idempotencyKey) {
+    return buildError(
+      "TASK_AWARD_PRECONDITION_FAILED",
+      "PRECONDITION",
+      "idempotencyKey is required to award a task",
+      {
+        auditId: "audit_task_award_invalid_payload",
+        details: { field: "idempotencyKey" }
+      }
+    );
+  }
+
+  if (!payload.award || typeof payload.award !== "object") {
+    return buildError(
+      "TASK_AWARD_PRECONDITION_FAILED",
+      "PRECONDITION",
+      "award payload is required",
+      {
+        auditId: "audit_task_award_invalid_payload",
+        details: { field: "award" }
+      }
+    );
+  }
+
+  const requiredFields = ["bidId", "awardReason", "shortlistAuditId", "proofAuditId"];
+  for (const field of requiredFields) {
+    if (!payload.award[field]) {
+      return buildError(
+        "TASK_AWARD_PRECONDITION_FAILED",
+        "PRECONDITION",
+        `award.${field} is required`,
+        {
+          auditId: "audit_task_award_invalid_payload",
+          details: { field: `award.${field}` }
+        }
+      );
+    }
+  }
+
   return null;
+}
+
+function pickPrimaryAwardBid(bids) {
+  return [...bids]
+    .filter((bid) => bid.reveal)
+    .sort((left, right) => {
+    const leftPass = left.verification?.result === "PASS" ? 1 : 0;
+    const rightPass = right.verification?.result === "PASS" ? 1 : 0;
+    if (leftPass !== rightPass) {
+      return rightPass - leftPass;
+    }
+
+    const leftScore = left.rankingScore ?? -1;
+    const rightScore = right.rankingScore ?? -1;
+    if (leftScore !== rightScore) {
+      return rightScore - leftScore;
+    }
+
+    return (left.statusChangedAt ?? "").localeCompare(right.statusChangedAt ?? "");
+    })[0] ?? null;
+}
+
+function buildAwardProofSummary(bid) {
+  if (!bid?.proofId || !bid.verification) {
+    return undefined;
+  }
+
+  return {
+    proofId: bid.proofId,
+    result: bid.verification.result,
+    reasonCodes: bid.verification.reasonCodes,
+    requiredDifficulty: bid.verification.requiredDifficulty,
+    achievedDifficulty: bid.verification.achievedDifficulty,
+    verifiedAt: bid.verification.verifiedAt,
+    auditId: bid.auditRefs?.verify
+  };
+}
+
+function buildAwardDecisionDetail({ task, bid, award }) {
+  if (award && bid) {
+    return {
+      taskId: task.taskId,
+      status: "AWARDED",
+      statusMessage: "Award confirmed and ready for downstream handoff.",
+      shortlistedBidId: award.bidId,
+      awardedBidId: award.bidId,
+      awardedAgentId: bid.agentId,
+      awardReason: award.award.awardReason,
+      ...(award.award.managerDecisionNote ? { managerDecisionNote: award.award.managerDecisionNote } : {}),
+      shortlistAuditId: award.award.shortlistAuditId,
+      proofAuditId: award.award.proofAuditId,
+      proofSummary: buildAwardProofSummary(bid),
+      decisionTraceHash: award.award.decisionTraceHash,
+      auditEventId: bid.auditRefs?.award,
+      handoff: {
+        status: "READY",
+        handoffChannel: "API",
+        checklist: ["publish award event", "notify winner"]
+      },
+      reviewedAt: award.awardedAt,
+      awardedAt: award.awardedAt
+    };
+  }
+
+  if (bid?.verification?.result === "PASS") {
+    return {
+      taskId: task.taskId,
+      status: "READY_TO_AWARD",
+      statusMessage: "Proof passed and shortlist evidence is complete.",
+      shortlistedBidId: bid.bidId,
+      awardedAgentId: bid.agentId,
+      shortlistAuditId: bid.auditRefs?.reveal ?? bid.auditRefs?.commit,
+      proofAuditId: bid.auditRefs?.verify,
+      proofSummary: buildAwardProofSummary(bid),
+      decisionTraceHash: bid.decisionTraceHash ?? bid.verification.decisionTraceHash,
+      handoff: {
+        status: "READY",
+        handoffChannel: "API",
+        checklist: ["publish award event", "notify winner"]
+      },
+      reviewedAt: bid.verification.verifiedAt
+    };
+  }
+
+  if (bid) {
+    const blockedMessage = !bid.proofId || !bid.verification
+      ? "Award is blocked until proof verification reaches a terminal result."
+      : `Bid ${bid.bidId} is not awardable because proof result is ${bid.verification.result}.`;
+
+    return {
+      taskId: task.taskId,
+      status: "BLOCKED",
+      statusMessage: blockedMessage,
+      shortlistedBidId: bid.bidId,
+      awardedAgentId: bid.agentId,
+      shortlistAuditId: bid.auditRefs?.reveal ?? bid.auditRefs?.commit,
+      proofAuditId: bid.auditRefs?.verify,
+      ...(buildAwardProofSummary(bid) ? { proofSummary: buildAwardProofSummary(bid) } : {}),
+      ...(bid.decisionTraceHash ? { decisionTraceHash: bid.decisionTraceHash } : {}),
+      handoff: {
+        status: "PENDING",
+        checklist: ["wait for proof verification", "refresh award readiness"]
+      },
+      reviewedAt: bid.statusChangedAt
+    };
+  }
+
+  return {
+    taskId: task.taskId,
+    status: "PENDING_REVIEW",
+    statusMessage: "No shortlisted bid is ready for award yet.",
+    handoff: {
+      status: "PENDING",
+      checklist: ["materialize shortlist", "complete bid reveal", "verify proof"]
+    }
+  };
 }
 
 function buildTaskDetailResponse(record) {
@@ -535,21 +690,6 @@ function verifyProofAgainstPolicy(policy, proof) {
     requiredDifficulty: round(requiredDifficulty),
     achievedDifficulty,
     reasonCodes
-  };
-}
-
-function buildAwardResponse({ awardId, taskId, bidId, agentId, awardedAt, decisionTraceHash, scoreSummary, proofSummary, awardReason }) {
-  return {
-    awardId,
-    taskId,
-    status: "AWARDED",
-    awardedBidId: bidId,
-    awardedAgentId: agentId,
-    awardedAt,
-    decisionTraceHash,
-    scoreSummary,
-    proofSummary,
-    ...(awardReason ? { awardReason } : {})
   };
 }
 
@@ -1111,6 +1251,25 @@ export function createApp({
     }
 
     const awardMatch = requestUrl.pathname.match(TASK_AWARD_PATTERN);
+    if (req.method === "GET" && awardMatch) {
+      const taskId = awardMatch[1];
+      const task = store.getTask(taskId);
+      if (!task) {
+        return reply(
+          404,
+          buildError("TASK_MATCH_TASK_NOT_FOUND", "MATCHING", `task_id ${taskId} was not found`, {
+            auditId: "audit_task_match_not_found"
+          })
+        );
+      }
+
+      const award = store.findAwardForTask(taskId);
+      const bids = store.listBidsForTask(taskId);
+      const bid = award ? store.getBid(award.bidId) : pickPrimaryAwardBid(bids);
+
+      return reply(200, buildAwardDecisionDetail({ task, bid, award }));
+    }
+
     if (req.method === "POST" && awardMatch) {
       const taskId = awardMatch[1];
       const task = store.getTask(taskId);
@@ -1140,13 +1299,39 @@ export function createApp({
         return reply(400, validationError);
       }
 
-      const bid = store.getBidForTask(taskId, payload.bidId);
+      const awardRequest = payload.award;
+      const bid = store.getBidForTask(taskId, awardRequest.bidId);
       if (!bid) {
         return reply(
           404,
-          buildError("AUDIT_QUERY_NOT_FOUND", "AUDIT", `bid ${payload.bidId} was not found for task ${taskId}`, {
+          buildError("AUDIT_QUERY_NOT_FOUND", "AUDIT", `bid ${awardRequest.bidId} was not found for task ${taskId}`, {
             auditId: "audit_task_award_bid_not_found"
           })
+        );
+      }
+
+      const expectedShortlistAuditId = bid.auditRefs?.reveal ?? bid.auditRefs?.commit;
+      const expectedProofAuditId = bid.auditRefs?.verify;
+      if (
+        awardRequest.shortlistAuditId !== expectedShortlistAuditId ||
+        awardRequest.proofAuditId !== expectedProofAuditId
+      ) {
+        return reply(
+          409,
+          buildError(
+            "TASK_AWARD_PRECONDITION_FAILED",
+            "PRECONDITION",
+            "award evidence references do not match the current shortlist/proof audit trail",
+            {
+              auditId: "audit_task_award_precondition_failed",
+              details: {
+                bidId: awardRequest.bidId,
+                taskId,
+                expectedShortlistAuditId,
+                expectedProofAuditId
+              }
+            }
+          )
         );
       }
 
@@ -1156,13 +1341,13 @@ export function createApp({
           buildError(
             "TASK_AWARD_PROOF_NOT_VERIFIED",
             "PRECONDITION",
-            `award is blocked until proof verification reaches a terminal result for bid ${payload.bidId}`,
+            `award is blocked until proof verification reaches a terminal result for bid ${awardRequest.bidId}`,
             {
               auditId: "audit_task_award_proof_not_verified",
               retryable: true,
               retryAfterSeconds: 1,
               details: {
-                bidId: payload.bidId,
+                bidId: awardRequest.bidId,
                 taskId,
                 proofId: bid.proofId
               }
@@ -1173,15 +1358,15 @@ export function createApp({
 
       if (bid.verification.result !== "PASS") {
         return reply(
-          409,
+          422,
           buildError(
             "TASK_AWARD_PRECONDITION_FAILED",
             "PRECONDITION",
-            `bid ${payload.bidId} is not awardable because proof result is ${bid.verification.result}`,
+            `bid ${awardRequest.bidId} is not awardable because proof result is ${bid.verification.result}`,
             {
               auditId: "audit_task_award_precondition_failed",
               details: {
-                bidId: payload.bidId,
+                bidId: awardRequest.bidId,
                 taskId,
                 proofId: bid.proofId,
                 proofResult: bid.verification.result
@@ -1191,14 +1376,18 @@ export function createApp({
         );
       }
 
-      const awardReason = payload.awardReason ?? "Highest score among fully verified candidates.";
+      const awardReason = awardRequest.awardReason;
       const award = store.createAward({
         taskId,
         bidId: bid.bidId,
+        idempotencyKey: payload.idempotencyKey,
         award: {
           agentId: bid.agentId,
           awardedAt: nowValue,
           awardReason,
+          managerDecisionNote: awardRequest.managerDecisionNote,
+          shortlistAuditId: awardRequest.shortlistAuditId,
+          proofAuditId: awardRequest.proofAuditId,
           actorId: workspaceId,
           decisionTraceHash: bid.decisionTraceHash ?? bid.verification.decisionTraceHash,
           scoreSummary: {
@@ -1216,18 +1405,49 @@ export function createApp({
         }
       });
 
+      if (award.idempotencyConflict) {
+        return reply(
+          409,
+          buildError(
+            "TASK_AWARD_IDEMPOTENCY_CONFLICT",
+            "IDEMPOTENCY",
+            "idempotencyKey was already used with a different award payload",
+            {
+              auditId: "audit_task_award_idempotency_conflict",
+              details: {
+                taskId,
+                bidId: awardRequest.bidId
+              }
+            }
+          )
+        );
+      }
+
+      if (award.alreadyAwarded) {
+        return reply(
+          409,
+          buildError(
+            "TASK_AWARD_PRECONDITION_FAILED",
+            "PRECONDITION",
+            `task ${taskId} has already been awarded`,
+            {
+              auditId: bid.auditRefs?.award ?? "audit_task_award_precondition_failed",
+              details: {
+                taskId,
+                awardedBidId: award.record.bidId
+              }
+            }
+          )
+        );
+      }
+
+      const awardedBid = store.getBid(award.record.bidId);
       return reply(
         200,
-        buildAwardResponse({
-          awardId: award.record.awardId,
-          taskId,
-          bidId: bid.bidId,
-          agentId: bid.agentId,
-          awardedAt: award.record.awardedAt,
-          decisionTraceHash: award.record.award.decisionTraceHash,
-          scoreSummary: award.record.award.scoreSummary,
-          proofSummary: award.record.award.proofSummary,
-          awardReason
+        buildAwardDecisionDetail({
+          task,
+          bid: awardedBid,
+          award: award.record
         })
       );
     }

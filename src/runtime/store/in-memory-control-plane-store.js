@@ -210,6 +210,12 @@ export class InMemoryControlPlaneStore {
     return clone(record);
   }
 
+  listBidsForTask(taskId) {
+    return Array.from(this.bids.values())
+      .filter((record) => record.taskId === taskId)
+      .map((record) => clone(record));
+  }
+
   setBidReveal({ taskId, bidId, agentId, idempotencyKey, reveal, proofId, rankingScore, decisionTraceHash }) {
     const record = this.bids.get(bidId);
     if (!record) {
@@ -353,15 +359,40 @@ export class InMemoryControlPlaneStore {
     };
   }
 
-  createAward({ taskId, bidId, award }) {
+  createAward({ taskId, bidId, idempotencyKey, award }) {
+    const existing = this.findAwardForTask(taskId);
+    const request = {
+      bidId,
+      awardReason: award.awardReason,
+      managerDecisionNote: award.managerDecisionNote ?? null,
+      shortlistAuditId: award.shortlistAuditId,
+      proofAuditId: award.proofAuditId
+    };
+
+    if (existing) {
+      const sameRequest =
+        existing.idempotencyKey === idempotencyKey &&
+        JSON.stringify(existing.request) === JSON.stringify(request);
+
+      return {
+        record: clone(existing),
+        created: false,
+        idempotentReplay: sameRequest,
+        idempotencyConflict: existing.idempotencyKey === idempotencyKey && !sameRequest,
+        alreadyAwarded: existing.idempotencyKey !== idempotencyKey
+      };
+    }
+
     const awardId = this.awardIds.next();
     const awardedAt = award.awardedAt ?? this.now();
     const record = {
       awardId,
       taskId,
       bidId,
+      idempotencyKey,
       status: "AWARDED",
       awardedAt,
+      request,
       award: clone(award)
     };
 
@@ -403,7 +434,11 @@ export class InMemoryControlPlaneStore {
 
     return {
       record: clone(record),
-      auditEvent
+      auditEvent,
+      created: true,
+      idempotentReplay: false,
+      idempotencyConflict: false,
+      alreadyAwarded: false
     };
   }
 
@@ -418,6 +453,16 @@ export class InMemoryControlPlaneStore {
     return this.auditEvents
       .filter((event) => event.bidId === bidId)
       .map((event) => clone(event));
+  }
+
+  findAwardForTask(taskId) {
+    for (const award of this.awards.values()) {
+      if (award.taskId === taskId) {
+        return clone(award);
+      }
+    }
+
+    return null;
   }
 
   findAwardForTaskBid(taskId, bidId) {

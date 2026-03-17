@@ -331,17 +331,10 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
     const replayCommitBody = await replayCommitResponse.json();
     assert.equal(replayCommitBody.result, "RETURNED_EXISTING");
 
-    const blockedAwardResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/award`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-workspace-id": "workspace-kestrel"
-      },
-      body: JSON.stringify({ bidId: reveal.bidId })
-    });
-    assert.equal(blockedAwardResponse.status, 409);
-    const blockedAwardBody = await blockedAwardResponse.json();
-    assert.equal(blockedAwardBody.code, "TASK_AWARD_PROOF_NOT_VERIFIED");
+    const pendingAwardDetailResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/award`);
+    assert.equal(pendingAwardDetailResponse.status, 200);
+    const pendingAwardDetailBody = await pendingAwardDetailResponse.json();
+    assert.equal(pendingAwardDetailBody.status, "PENDING_REVIEW");
 
     const policyResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/proof-policy`, {
       method: "POST",
@@ -394,6 +387,14 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
     assert.equal(verifyBody.policyTraceId, policyBody.policyTraceId);
     assert.equal(verifyBody.reasonCodes.length, 0);
 
+    const awardDetailResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/award`);
+    assert.equal(awardDetailResponse.status, 200);
+    const awardDetailBody = await awardDetailResponse.json();
+    assert.equal(awardDetailBody.status, "READY_TO_AWARD");
+    assert.equal(awardDetailBody.shortlistedBidId, reveal.bidId);
+    assert.match(awardDetailBody.shortlistAuditId, /^audit_/);
+    assert.match(awardDetailBody.proofAuditId, /^audit_/);
+
     const awardResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/award`, {
       method: "POST",
       headers: {
@@ -401,8 +402,13 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
         "x-workspace-id": "workspace-kestrel"
       },
       body: JSON.stringify({
-        bidId: reveal.bidId,
-        awardReason: "Best verified fit for the backend vertical slice."
+        idempotencyKey: "idem-award-001",
+        award: {
+          bidId: reveal.bidId,
+          awardReason: "Best verified fit for the backend vertical slice.",
+          shortlistAuditId: awardDetailBody.shortlistAuditId,
+          proofAuditId: awardDetailBody.proofAuditId
+        }
       })
     });
     assert.equal(awardResponse.status, 200);
@@ -410,6 +416,47 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
     assert.equal(awardBody.status, "AWARDED");
     assert.equal(awardBody.awardedBidId, reveal.bidId);
     assert.equal(awardBody.awardedAgentId, reveal.agentId);
+    assert.equal(awardBody.auditEventId, "audit_00000005");
+
+    const replayAwardResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/award`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-workspace-id": "workspace-kestrel"
+      },
+      body: JSON.stringify({
+        idempotencyKey: "idem-award-001",
+        award: {
+          bidId: reveal.bidId,
+          awardReason: "Best verified fit for the backend vertical slice.",
+          shortlistAuditId: awardDetailBody.shortlistAuditId,
+          proofAuditId: awardDetailBody.proofAuditId
+        }
+      })
+    });
+    assert.equal(replayAwardResponse.status, 200);
+    const replayAwardBody = await replayAwardResponse.json();
+    assert.equal(replayAwardBody.auditEventId, awardBody.auditEventId);
+
+    const conflictingAwardResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/award`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-workspace-id": "workspace-kestrel"
+      },
+      body: JSON.stringify({
+        idempotencyKey: "idem-award-001",
+        award: {
+          bidId: reveal.bidId,
+          awardReason: "Different reason should conflict.",
+          shortlistAuditId: awardDetailBody.shortlistAuditId,
+          proofAuditId: awardDetailBody.proofAuditId
+        }
+      })
+    });
+    assert.equal(conflictingAwardResponse.status, 409);
+    const conflictingAwardBody = await conflictingAwardResponse.json();
+    assert.equal(conflictingAwardBody.code, "TASK_AWARD_IDEMPOTENCY_CONFLICT");
 
     const eventsResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/events`);
     assert.equal(eventsResponse.status, 200);
@@ -617,6 +664,7 @@ test("reveal without a commit and failed verification return stable errors", asy
       })
     });
     assert.equal(revealResponse.status, 200);
+    const revealBody = await revealResponse.json();
 
     const verifyResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/proofs/verify`, {
       method: "POST",
@@ -636,15 +684,28 @@ test("reveal without a commit and failed verification return stable errors", asy
       "HASHCASH_BITS_BELOW_MINIMUM"
     ]);
 
+    const awardDetailResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/award`);
+    assert.equal(awardDetailResponse.status, 200);
+    const awardDetailBody = await awardDetailResponse.json();
+    assert.equal(awardDetailBody.status, "BLOCKED");
+
     const awardResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/award`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
         "x-workspace-id": "workspace-kestrel"
       },
-      body: JSON.stringify({ bidId: failingReveal.bidId })
+      body: JSON.stringify({
+        idempotencyKey: "idem-award-fail-verify",
+        award: {
+          bidId: failingReveal.bidId,
+          awardReason: "Proof failed verification and should not award.",
+          shortlistAuditId: awardDetailBody.shortlistAuditId,
+          proofAuditId: awardDetailBody.proofAuditId
+        }
+      })
     });
-    assert.equal(awardResponse.status, 409);
+    assert.equal(awardResponse.status, 422);
     const awardBody = await awardResponse.json();
     assert.equal(awardBody.code, "TASK_AWARD_PRECONDITION_FAILED");
   } finally {
@@ -661,6 +722,18 @@ test("unknown routes are logged as 404s", async () => {
     assert.equal(response.status, 404);
     assert.equal(logEntries.at(-1)?.path, "/does-not-exist");
     assert.equal(logEntries.at(-1)?.statusCode, 404);
+  } finally {
+    server.close();
+    await once(server, "close");
+  }
+});
+
+test("GET /v1/bids/:bidId/events rejects bid ids shorter than the published contract", async () => {
+  const { server, baseUrl } = await startTestServer();
+
+  try {
+    const response = await fetch(`${baseUrl}/v1/bids/bid_short/events`);
+    assert.equal(response.status, 404);
   } finally {
     server.close();
     await once(server, "close");

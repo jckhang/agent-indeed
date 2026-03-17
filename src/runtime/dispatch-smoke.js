@@ -224,6 +224,13 @@ export async function runDispatchSmoke({ log = console.log } = {}) {
     assert.equal(verified.result, "PASS");
     logStep(log, "proof-verified", verified.result);
 
+    const awardDetail = await expectJson(
+      await fetch(`${baseUrl}/v1/tasks/${created.taskId}/award`),
+      200
+    );
+    assert.equal(awardDetail.status, "READY_TO_AWARD");
+    logStep(log, "award-ready", awardDetail.shortlistedBidId);
+
     const awarded = await expectJson(
       await fetch(`${baseUrl}/v1/tasks/${created.taskId}/award`, {
         method: "POST",
@@ -232,14 +239,19 @@ export async function runDispatchSmoke({ log = console.log } = {}) {
           "x-workspace-id": "workspace-kestrel"
         },
         body: JSON.stringify({
-          bidId: reveal.bidId,
-          awardReason: "Best verified fit for the backend vertical slice."
+          idempotencyKey: "idem-award-smoke-001",
+          award: {
+            bidId: reveal.bidId,
+            awardReason: "Best verified fit for the backend vertical slice.",
+            shortlistAuditId: awardDetail.shortlistAuditId,
+            proofAuditId: awardDetail.proofAuditId
+          }
         })
       }),
       200
     );
     assert.equal(awarded.status, "AWARDED");
-    logStep(log, "task-awarded", awarded.awardId);
+    logStep(log, "task-awarded", awarded.auditEventId);
 
     const events = await expectJson(
       await fetch(`${baseUrl}/v1/tasks/${created.taskId}/events`),
@@ -261,7 +273,7 @@ export async function runDispatchSmoke({ log = console.log } = {}) {
     return {
       taskId: created.taskId,
       bidId: reveal.bidId,
-      awardId: awarded.awardId,
+      awardAuditId: awarded.auditEventId,
       policyTraceId: policy.policyTraceId,
       verificationResult: verified.result,
       eventTypes: events.events.map((event) => event.eventType)
