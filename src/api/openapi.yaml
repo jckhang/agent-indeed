@@ -976,6 +976,7 @@ paths:
                     retryable: false
 
 
+
   /v1/tasks/{taskId}/events:
     get:
       tags: [audit]
@@ -1099,6 +1100,29 @@ paths:
                             result: PASS
                             reasonCodes: []
                             policyTraceId: policytrace_ops_triage_001
+        '400':
+          description: Audit pagination parameters are invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidAuditLimit:
+                  summary: Requested event page size is outside the supported range
+                  value:
+                    code: AUDIT_QUERY_LIMIT_INVALID
+                    category: AUDIT
+                    message: limit must be between 1 and 200
+                    auditId: audit_query_limit_invalid
+                    retryable: false
+                invalidAuditCursor:
+                  summary: Cursor does not match an event in the requested stream
+                  value:
+                    code: AUDIT_CURSOR_INVALID
+                    category: AUDIT
+                    message: cursor aev_missing_00000001 was not found
+                    auditId: audit_query_cursor_invalid
+                    retryable: false
         '404':
           description: Audit stream was not found for the requested task or bid filter
           content:
@@ -1157,6 +1181,12 @@ paths:
                           windowPhase: COMMIT_OPEN
                           commitDeadline: '2026-03-14T13:30:00Z'
                     nextCursor: audit_cursor_bid_alpha_02
+        '400':
+          description: Audit pagination parameters are invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Audit stream was not found for the requested bid
           content:
