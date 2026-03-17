@@ -21,6 +21,7 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
 - Validation-evidence gaps: [runtime PRs that still need pasted command output](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+label%3A%22status%2Fin-review%22)
 - Planning lane: [owner:albatross issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aalbatross%22)
 - Review-requested planning PRs: [owner:albatross PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22owner%3Aalbatross%22)
+- Dated runtime blocker ledger: `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`
 
 ## Merge-train routine
 
