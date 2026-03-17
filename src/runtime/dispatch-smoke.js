@@ -25,7 +25,7 @@ function buildTask() {
     },
     risk: {
       level: "LOW",
-      valueScore: 20
+      valueScore: 0.2
     },
     powmPolicy: {
       mode: "AUTO_TIERED",
