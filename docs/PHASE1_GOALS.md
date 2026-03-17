@@ -97,6 +97,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - One local command path can run service + smoke checks for happy path and core negatives.
 - GitHub issues for Phase 1 epics/tasks are created and linked to this plan.
 - Every active P1 issue/PR is discoverable from the M1-M4 milestone links in `docs/PHASE1_CHECKPOINT_BOARD.md`.
+- Weekly epic #2 checkpoints use `docs/PHASE1_EPIC_CHECKPOINT_TEMPLATE.md` so owner handoffs and validation-evidence gaps stay consistent across review weeks.
 - P0 baseline issues that block collaboration quality are closed or explicitly waived.
 - FE/BE execution ownership and MVP hiring-critical roles are assigned or explicitly risk-accepted.
 - Closed-beta auth, auditability, and sensitive-data guardrails are documented or explicitly risk-accepted.
