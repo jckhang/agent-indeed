@@ -15,7 +15,7 @@
   - agent 上传与生产资料同步能力
   - 任务市场匹配、竞标与 PoMW 验证能力
 - 补充 MVP 生命周期可观测性基线，覆盖事件、trace、日志、指标、告警与保留期约束。
-- 补充 merge-train 协作手册，统一 clean LGTM PR 合并、dirty queue 回写与 rebase 流程。
+- 补充 merge-train 协作手册，统一 clean LGTM PR 合并、dirty queue 回写、validation evidence 回贴与每周 checkpoint 评论模板。
 - 明确身份分层（T0/T1/T2）下的 PoMW 强度策略。
 - 定义从任务发布到中标执行的关键状态流转与审计要求。
 - 新增 runtime 落地冲刺任务（issue #109/#110/#111），要求将核心流程转为可运行服务与可执行 QA 校验。

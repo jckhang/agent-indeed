@@ -9,6 +9,8 @@ This file intentionally stays lightweight so we do not duplicate fast-changing i
 - [Open P0 issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22priority%2FP0%22)
 - [Open Phase 1 issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22priority%2FP1%22)
 - [Ready-next issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22status%2Fready-next%22)
+- [Runtime issues missing a status label](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+-label%3A%22status%2Fready-next%22+-label%3A%22status%2Fin-review%22+-label%3A%22status%2Fblocked%22)
+- [Runtime PRs awaiting validation evidence or fixes](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+label%3A%22status%2Fin-review%22)
 - [Planning lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aalbatross%22)
 - [Backend lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Akestrel%22)
 - [Frontend lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Alanzhou-fe-agent%22)
