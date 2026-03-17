@@ -14,9 +14,9 @@ This fixture pack is intentionally limited to:
 - Current contract baseline on `main`: `src/api/openapi.yaml`, `src/api/contracts.ts`
 - Runtime cutline: `docs/RUNTIME_CUTLINE_2026-03-16.md`
 - Frontend runtime target under review: issue #116 / PR #122
-- Open follow-ups for blocked reads:
-  - open PR #66 for bid or proof status polling
-  - open PR #68 for shortlist and award read models
+- Merged read baseline now available on `main`:
+  - PR #66 added bid/proof status reads via `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}`
+  - PR #68 added the manager award review read via `GET /v1/tasks/{taskId}/award`
 
 ## Flow checklist
 
@@ -26,8 +26,8 @@ This fixture pack is intentionally limited to:
 | 2 | Manager shortlist fetch | `GET /v1/tasks/{taskId}/candidates` | `LOADING -> MATCHED` or retryable pending | Ready |
 | 3 | Agent commit | `POST /v1/tasks/{taskId}/bids/commit` | `COMMITTING -> COMMITTED` | Ready |
 | 4 | Agent reveal | `POST /v1/tasks/{taskId}/bids/reveal` | `REVEALING -> REVEALED` with proof handoff | Ready |
-| 5 | Agent verify-status handoff | No merged read endpoint on `main` | `PENDING_VERIFY` or dependency-blocked refresh | Blocked on open PR #66 |
-| 6 | Manager award-read state | No merged manager award-read endpoint on `main` | explicit award-read blocked note; do not substitute operator audit events | Blocked on open PR #68 |
+| 5 | Agent verify-status read | `GET /v1/tasks/{taskId}/proofs/{proofId}` | queued/verifying/terminal proof states plus refresh metadata | Ready |
+| 6 | Manager award-read state | `GET /v1/tasks/{taskId}/award` | award readiness, proof summary, and handoff detail | Ready |
 
 ## Step 1 - Publish task
 
@@ -330,13 +330,13 @@ Canonical success fixture:
 
 Frontend notes:
 
-- `proofSubmission.verificationStatus` is the only merged frontend-facing verify handoff signal on `main`.
-- Keep commercial proof detail redacted outside the authenticated agent path until read models are merged.
+- `proofSubmission.verificationStatus` is still the reveal handoff, but frontend can now follow it with merged bid/proof status reads on `main`.
+- Keep commercial proof detail redacted outside the authenticated agent path even though the read models are now merged.
 - If reveal fails with a typed precondition or policy error, surface the stable `code` and `details` payload without remapping enums.
 
-## Step 5 - Verify-status handoff state on `main`
+## Step 5 - Verify-status read on `main`
 
-No proof-status read endpoint is merged on `main` yet. Frontend should use the reveal response as the handoff boundary:
+The reveal response is still the first handoff boundary, and frontend can now continue with the merged proof-status or bid-status reads on `main`:
 
 ```json
 {
@@ -350,42 +350,50 @@ No proof-status read endpoint is merged on `main` yet. Frontend should use the r
 }
 ```
 
-Required UI behavior until open PR #66 lands:
+Required UI behavior on the merged proof-status baseline:
 
-- Show `PENDING_VERIFY` as a non-terminal waiting state.
-- Do not fake queued/verifying timestamps, result enums, or refresh metadata.
-- Explain that detailed proof-status polling is blocked on the bid or proof status read contract.
-- Allow a manual refresh of the surrounding task or bid workspace only if the page already has another canonical endpoint to re-read.
+- Show `PENDING_VERIFY`, `QUEUED`, `VERIFYING`, and terminal proof states using the merged proof-status payload.
+- Read refresh metadata from the canonical `refresh` object instead of inventing local polling rules.
+- Use `GET /v1/tasks/{taskId}/proofs/{proofId}` for proof-centric status and `GET /v1/tasks/{taskId}/bids/{bidId}` for bid-centric refresh.
+- Keep verifier-only `POST /v1/tasks/{taskId}/proofs/verify` out of manager and agent UI flows.
 
-## Step 6 - Award-read stays blocked on `main`
+## Step 6 - Award-read on `main`
 
-No merged award-read endpoint is available on `main` yet for the manager runtime flow. The operator audit timeline remains a separate operator-only surface and must not be reused as a manager award-read substitute.
+The manager runtime flow now has a merged award-read endpoint on `main`. The operator audit timeline remains a separate operator-only surface and should complement, not replace, the manager award review payload.
 
-Canonical blocked-state fixture:
+Canonical manager award-read fixture:
 
 ```json
 {
   "awardRead": {
-    "status": "BLOCKED",
-    "reason": "AWARD_READ_MODEL_PENDING",
-    "followUp": "PR #68"
+    "status": "READY_TO_AWARD",
+    "statusMessage": "Proof passed and shortlist evidence is complete.",
+    "shortlistedBidId": "bid_alpha_01",
+    "awardedAgentId": "agent_alpha",
+    "proofSummary": {
+      "proofId": "proof_alpha_01",
+      "result": "PASS"
+    },
+    "handoff": {
+      "status": "READY"
+    }
   }
 }
 ```
 
-Required UI behavior until open PR #68 lands:
+Required UI behavior on the merged baseline:
 
-- Do not call or document `GET /v1/tasks/{taskId}/events` as a merged manager award-read dependency.
-- Treat `GET /v1/tasks/{taskId}/events` as operator-audit-only context, not as winner-summary or award-read evidence for manager flows.
-- Keep award surfaces explicitly blocked even if shortlist, reveal, or proof verification data is present in the current session.
-- Explain that winner summary and award history remain unavailable until the dedicated shortlist/award read model lands.
+- Read manager award detail from `GET /v1/tasks/{taskId}/award`.
+- Treat `GET /v1/tasks/{taskId}/events` as operator-audit context, not as a manager award-read substitute.
+- Render `status`, `statusMessage`, `proofSummary`, and `handoff` from the merged award payload instead of a local blocked placeholder.
+- Keep any remaining gaps tied to runtime data freshness or backend completeness, not to missing manager award-read contracts.
 
 ## Gap ledger
 
 | Gap | What frontend can do now | Follow-up owner |
 | --- | --- | --- |
-| Bid or proof status read model is not merged on `main` | Use reveal handoff state (`PENDING_VERIFY`) and show dependency-blocked refresh copy | open PR #66 |
-| Dedicated award read endpoint is not merged on `main` | Keep award surfaces blocked and link the owning read-model follow-up | open PR #68 |
+| Bid or proof status read model is merged on `main` | Use `GET /v1/tasks/{taskId}/proofs/{proofId}` or `GET /v1/tasks/{taskId}/bids/{bidId}` for refresh-safe queued/verifying/terminal states | merged PR #66 |
+| Manager award read endpoint is merged on `main` | Use `GET /v1/tasks/{taskId}/award` for award readiness, proof summary, and handoff state | merged PR #68 |
 | Runtime wiring narrative in PR #122 is still under review | Keep this fixture pack contract-first and refer to PR #122 only as supporting frontend sequencing context | issue #116 / PR #122 |
 
 ## Validation checklist for future frontend wiring
@@ -393,5 +401,5 @@ Required UI behavior until open PR #68 lands:
 - Publish flow uses only `POST /v1/tasks` fields present on `main`.
 - Shortlist page distinguishes `TASK_MATCH_NOT_READY` from a true empty result.
 - Commit and reveal pages recover countdowns from `window.serverTime`, `commitDeadline`, and `revealDeadline`.
-- Verification page does not claim more than `PENDING_VERIFY` until PR #66 lands.
-- Award or review surfaces keep award-read explicitly blocked until a merged read endpoint exists.
+- Verification page can poll the merged proof-status or bid-status reads for queued/verifying/terminal state changes.
+- Award or review surfaces use the merged manager award-read payload instead of a blocked placeholder.
