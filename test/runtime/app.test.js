@@ -85,7 +85,7 @@ test("POST /v1/tasks persists a task and updates runtime summary", async () => {
           },
           risk: {
             level: "LOW",
-            valueScore: 20
+            valueScore: 0.2
           },
           powmPolicy: {
             mode: "AUTO_TIERED",
@@ -200,7 +200,7 @@ test("GET /v1/tasks/:taskId returns the persisted task payload", async () => {
           },
           risk: {
             level: "LOW",
-            valueScore: 10
+            valueScore: 0.1
           },
           powmPolicy: {
             mode: "AUTO_TIERED",
@@ -274,7 +274,7 @@ test("GET /v1/tasks/:taskId/audit-events returns the runtime audit trail", async
           },
           risk: {
             level: "LOW",
-            valueScore: 10
+            valueScore: 0.1
           },
           powmPolicy: {
             mode: "AUTO_TIERED",

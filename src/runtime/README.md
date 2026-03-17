@@ -35,7 +35,7 @@ curl -s -X POST http://127.0.0.1:3000/v1/tasks \
         "identityTierMin": "T1",
         "requiredSkills": ["backend", "api"]
       },
-      "risk": { "level": "LOW", "valueScore": 20 },
+      "risk": { "level": "LOW", "valueScore": 0.2 },
       "powmPolicy": { "mode": "AUTO_TIERED", "baseDifficulty": 2 },
       "biddingWindow": {
         "commitDeadline": "2026-03-19T00:00:00Z",
