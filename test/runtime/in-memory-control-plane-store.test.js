@@ -29,7 +29,7 @@ test("store assigns deterministic ids across the dispatch lifecycle", () => {
     },
     risk: {
       level: "LOW",
-      valueScore: 20
+      valueScore: 0.2
     },
     powmPolicy: {
       mode: "AUTO_TIERED",

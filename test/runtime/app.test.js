@@ -25,7 +25,7 @@ function buildTask(overrides = {}) {
     },
     risk: {
       level: "LOW",
-      valueScore: 20
+      valueScore: 0.2
     },
     powmPolicy: {
       mode: "AUTO_TIERED",
@@ -495,7 +495,7 @@ test("reveal without a commit and failed verification return stable errors", asy
     const created = await createTaskRecord(baseUrl, buildTask({
       risk: {
         level: "HIGH",
-        valueScore: 88
+        valueScore: 0.88
       }
     }));
     const taskId = created.taskId;
