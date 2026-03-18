@@ -14,10 +14,10 @@ Keep volatile queue state in GitHub. This file should only answer three stable q
 
 | Epic acceptance area | Stable source of truth | Delivery threads | Required evidence before we call it done | Review notes |
 | --- | --- | --- | --- | --- |
-| OpenSpec artifacts, OpenAPI draft, and implementation stay aligned | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts` | issue #109, issue #110, issue #111, issue #11 | `openspec validate --all` passes on the merge-ready branch; any runtime/API diff that changes contract scope updates OpenSpec and both API drafts in the same change | Treat this as a release-wide invariant, not a one-time milestone gate |
-| Happy-path dispatch flow is runnable end to end | `docs/PHASE1_GOALS.md`, `docs/RUNTIME_EXECUTION_HANDOFF.md`, runtime milestone queries in `docs/PHASE1_CHECKPOINT_BOARD.md` | issue #109, issue #110 | A local command path exercises `publish -> match -> commit -> reveal -> verify -> award` and records the evidence bundle expected by `docs/RUNTIME_EXECUTION_HANDOFF.md` | Do not accept doc-only claims for this area |
-| Core negative scenarios are covered by executable checks | `docs/RUNTIME_EXECUTION_HANDOFF.md`, `docs/PHASE1_BETA_READINESS_GATES.md`, QA milestone queries in `docs/PHASE1_CHECKPOINT_BOARD.md` | issue #111, issue #11 | Automated checks cover the blocked reveal, signature failure, and insufficient-proof paths; rerun evidence is linked back into issue #11 | If the check is manual-only, the acceptance area is still open |
-| Audit trail covers key state transitions | `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/PHASE1_BETA_READINESS_GATES.md` | issue #110, issue #111, issue #11 | Runtime evidence shows audit output for task creation, bid commit, bid reveal, proof verification, and award; the emitted fields remain traceable to the published contracts | Audit docs without runtime evidence are preparatory, not sufficient |
+| OpenSpec artifacts, OpenAPI draft, and implementation stay aligned | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts` | merged runtime baseline from issues #109/#110/#111, plus issue #11 and issue #120 for follow-through evidence | `openspec validate --all` passes on the merge-ready branch; any runtime/API diff that changes contract scope updates OpenSpec and both API drafts in the same change | Treat this as a release-wide invariant, not a one-time milestone gate |
+| Happy-path dispatch flow is runnable end to end | `docs/PHASE1_GOALS.md`, `docs/RUNTIME_EXECUTION_HANDOFF.md`, runtime milestone queries in `docs/PHASE1_CHECKPOINT_BOARD.md` | merged runtime baseline from issues #109/#110, with issue #11 owning the current evidence chain | A local command path exercises `publish -> match -> commit -> reveal -> verify -> award` and records the evidence bundle expected by `docs/RUNTIME_EXECUTION_HANDOFF.md` | Do not accept doc-only claims for this area |
+| Core negative scenarios are covered by executable checks | `docs/RUNTIME_EXECUTION_HANDOFF.md`, `docs/PHASE1_BETA_READINESS_GATES.md`, QA milestone queries in `docs/PHASE1_CHECKPOINT_BOARD.md` | issue #120 and issue #11 on top of the merged issue #111 baseline | Automated checks cover the blocked reveal, signature failure, and insufficient-proof paths; rerun evidence is linked back into issue #11 | If the check is manual-only, the acceptance area is still open |
+| Audit trail covers key state transitions | `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/PHASE1_BETA_READINESS_GATES.md` | merged runtime baseline from issues #110/#111, with issue #11 and issue #120 carrying the live evidence follow-through | Runtime evidence shows audit output for task creation, bid commit, bid reveal, proof verification, and award; the emitted fields remain traceable to the published contracts | Audit docs without runtime evidence are preparatory, not sufficient |
 
 ## Milestone handoff rules
 
@@ -38,7 +38,7 @@ Use M2 review to answer:
 ### M3: verify, audit, and smoke durability
 
 Use M3 review to answer:
-- does issue #111 convert the smoke matrix into runnable checks
+- do issue #120 and issue #11 keep the merged smoke matrix runnable against current `main`
 - do verify and audit outputs show up in the same evidence packet as the happy-path run
 - is issue #11 receiving the replayable command output needed for final sign-off
 
