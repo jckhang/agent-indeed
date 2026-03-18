@@ -1,6 +1,6 @@
 # Phase 1 Beta Readiness Gates
 
-Last updated: 2026-03-17
+Last updated: 2026-03-18
 
 This document turns epic #2 (`[Phase 1 Epic] Agent Dispatch Foundation MVP`) into a small set of
 reviewable release gates for closed-beta readiness. It complements:
@@ -15,7 +15,7 @@ reviewable release gates for closed-beta readiness. It complements:
 
 | Gate | Status | Ready when | Active dependencies | Evidence to collect |
 | --- | --- | --- | --- | --- |
-| Contract convergence | In progress | Active runtime and handoff PRs stay inside the merged OpenSpec/OpenAPI/TypeScript baseline and carry reviewable validation evidence in the PR body. | PR #129 (merge-ready), PR #133 (doc alignment), PR #140, PR #141, merged PR #83, merged PR #92, merged PR #126, merged PR #127, merged PR #139 | `openspec validate --all`, runtime/OpenAPI diff review, synced `src/api/openapi.yaml` + `src/api/contracts.ts`, pasted validation output in PR templates |
+| Contract convergence | In progress | Active runtime and handoff PRs stay inside the merged OpenSpec/OpenAPI/TypeScript baseline and carry reviewable validation evidence in the PR body. | issue #120, PR #129 (merge-ready), PR #133 (doc alignment), PR #140, PR #141, merged PR #83, merged PR #92, merged PR #126, merged PR #127, merged PR #139 | `openspec validate --all`, `npm run check:contract-drift`, runtime/OpenAPI diff review, synced `src/api/openapi.yaml` + `src/api/contracts.ts`, pasted validation output in PR templates |
 | Runtime happy-path execution | Blocked | One runnable `publish -> match -> commit -> reveal -> verify -> award` flow can be executed against a local service without manual interpretation. | issue #115, PR #129, merged PR #127 baseline, issue #111, issue #11 | Service run command, executable smoke/E2E output, linked request/response evidence |
 | Negative-scenario coverage | Blocked | QA can execute core failures (`invalid signature`, `reveal without commit`, `proof FAIL`, `award blocked`) with stable expected outcomes. | issue #120, issue #111, issue #11, merged PR #127 baseline, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/CLOSED_BETA_SECURITY_READINESS.md` | Runnable assertions, expected error/result matrix, regression evidence |
 | Audit evidence trail | In progress | Audit outputs expose key lifecycle transitions and award/proof context for operator review and beta sign-off. | merged PR #127, merged PR #92, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/OBSERVABILITY_BASELINE.md` | Audit event names, award trace fields, telemetry handoff checklist |
@@ -29,6 +29,7 @@ This remains the prerequisite for durable runtime behavior and executable QA che
 
 - Verifier terminal vocabulary and award-trace expectations now come from merged PR #83 and merged PR #92.
 - The merged runtime/frontend baseline is on `main` through PR #126 and PR #139; PR #127 merged on 2026-03-17 at 13:54:46Z, so the active convergence risk is now keeping merge-ready PR #129 plus the doc queue (`#133`, `#140`, `#141`) synced to the published contract vocabulary.
+- The dated QA sweep in `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` now records which runtime routes are actually published on `main`, so reviewers can distinguish proof-enum drift from still-pending read-model routes.
 - PR #140 is the planning guardrail that keeps those threads tied to one dated blocker ledger instead of duplicating stale snapshots across long-lived docs.
 
 Release note: if any active runtime branch changes enum names, required fields, route shapes, or error-code wording, the same update must land in OpenSpec plus both API drafts before the gate can be marked ready.
@@ -58,7 +59,7 @@ Minimum scenarios to keep visible:
 - proof verification returns `FAIL`
 - award attempt blocked before prerequisite verification is complete
 
-Expected output for each scenario must cite a stable error code or terminal status/result from the merged contract vocabulary.
+Expected output for each scenario must cite a stable error code or terminal status/result from the merged contract vocabulary. Use `npm run check:contract-drift` when a PR claims a route or proof-verification enum is already on `main`.
 
 ### 4. Audit evidence trail
 

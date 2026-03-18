@@ -1,6 +1,6 @@
 # Phase 1 Epic Status
 
-Last updated: 2026-03-17
+Last updated: 2026-03-18
 
 This document is the execution snapshot for epic #2 (`[Phase 1 Epic] Agent Dispatch Foundation MVP`).
 It complements `docs/PHASE1_GOALS.md` by mapping epic acceptance criteria to the current runtime issues and PR gates.
@@ -14,7 +14,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 
 | Epic acceptance area | Current status | Source of truth | Next gate |
 | --- | --- | --- | --- |
-| OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts`, issue #137, PRs #140 and #141 | Keep the active runtime/doc threads (`#129`, `#133`, `#140`, `#141`) aligned to merged `main` contracts while the remaining review queue is worked down to the last concrete blockers. |
+| OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts`, issue #120, issue #137, PRs #140 and #141 | Keep the active runtime/doc threads aligned to merged `main` contracts, using `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` as the dated QA baseline for proof enums and currently published runtime routes. |
 | End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, issues #11, #111, #115, merged PR #127, and PR #129 | Finish the remaining open runtime follow-through and let issue #111 execute the smoke/E2E path against the stable local runtime before unblocking issue #11. |
 | Core negative scenarios are covered | Blocked | issues #11 and #111, `docs/CLOSED_BETA_SECURITY_READINESS.md`, `docs/ERROR_CODE_RETRY_POLICY.md`, and merged PR #127 baseline | Turn the documented failure cases into executable assertions tied to the vertical-slice runtime and capture evidence back on issue #11. |
 | Audit events cover key state transitions | In progress | merged PR #127, `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md` | Keep the award/proof/audit surfaces contract-aligned while the open runtime follow-through proves the emitted trail and QA consumes it in issue #111. |
@@ -46,9 +46,10 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 - Issue #11 remains blocked until merged PR #127 is backed by PR #129's bootstrap evidence and issue #111 converts the QA matrix into executable checks.
 - PR #129 is now mergeable on the latest `main`, the PR body already includes the literal validation output for `npm test`, `npm run smoke:bootstrap`, OpenSpec validation, diff-check, and the pre-push guard, and the latest review thread already records `LGTM`; the remaining work is queue movement/merge.
 - PR #127 merged on 2026-03-17 at 13:54:46Z, so the remaining backend queue risk is concentrated in PR #129 rather than the vertical-slice branch.
-- PR #140 and PR #141 remain open until the blocker ledger and epic/beta rollups match the live post-merge queue (`#129`, `#133`, `#140`, and `#141` open; `#126`, `#127`, and `#139` merged).
+- The 2026-03-18 QA sweep now has a repo-local baseline in `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md`, so review comments can point at one dated contract snapshot instead of restating route/enum availability from memory.
+- PR #140 and PR #141 remain open until the blocker ledger and epic/beta rollups match the live post-merge queue and reference the same contract baseline (`#129`, `#133`, `#140`, and `#141` open; `#126`, `#127`, and `#139` merged).
 
-## Runtime Execution Queue (2026-03-17)
+## Runtime Execution Queue (2026-03-18)
 
 | Thread | Current disposition | Why | Next owner / next action |
 | --- | --- | --- | --- |
@@ -56,7 +57,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | PR #141 `docs: refresh phase 1 epic runtime rollup` | In review | The epic and beta readiness rollups need to describe the current queue (`#129` merge-ready, `#133` still needs contract-source citations, `#140`/`#141` in review) instead of stale blocked snapshots. | `albatross-dev-agent`: refresh the epic/beta docs from live GitHub state and close the re-review thread. |
 | PR #129 `feat: add runtime bootstrap smoke command` | Ready to merge | The smoke harness work is on the latest `main`, literal validation output is already pasted in the PR body, and the latest review thread records `LGTM`. | `kestrel` + maintainer: keep the posted evidence intact and move the PR through the queue. |
 | PR #127 `[P1-38] Implement runnable MVP dispatch vertical slice` | Merged | The runnable dispatch vertical slice merged on 2026-03-17 at 13:54:46Z and now serves as the backend runtime baseline for follow-on smoke and QA work. | `kestrel`: keep follow-on bootstrap and QA threads aligned to the merged runtime path. |
-| Issue #120 / issue #111 | Waiting on runtime | QA cannot close the weekly sweep until the backend runtime path becomes stable and reproducible from one documented command path. | `avery`: convert the matrices into executable checks as soon as PR #127 and PR #129 settle. |
+| Issue #120 / issue #111 | QA sweep in progress | QA now has a dated contract-drift guard plus a 2026-03-18 route/enum baseline, but issue #11 still waits on the final runtime smoke/E2E evidence handoff. | `avery`: use `npm run check:contract-drift` plus the sweep doc while reviewing runtime/doc PRs, then keep issue #11 focused on executable smoke/E2E evidence. |
 
 ## Checkpoint Rollup
 
