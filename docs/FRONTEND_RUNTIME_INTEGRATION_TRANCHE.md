@@ -38,8 +38,8 @@ Issue [#150](https://github.com/jckhang/agent-indeed/issues/150) re-checks the m
 | Agent verification timeline | `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md` | `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` on `main` | Poll only from backend `refresh.*`; if projection data is absent in a local stack, render unavailable-runtime copy instead of invented progress. |
 
 Result:
-- ready to consume for frontend documentation on the current `main` baseline
-- no new contract blocker found in the linked manager/agent docs during this pass
+- published contract surfaces verified for frontend documentation on the current `main` baseline
+- no new published-contract blocker found in the linked manager/agent docs during this pass
 - remaining risk stays in runtime execution readiness from issues [#110](https://github.com/jckhang/agent-indeed/issues/110), [#115](https://github.com/jckhang/agent-indeed/issues/115), and QA evidence from [#111](https://github.com/jckhang/agent-indeed/issues/111), not in the published field names or fallback rules
 
 ## Canonical handoff status
@@ -62,6 +62,8 @@ These frontend handoff claims are backed by the current API sources of truth on 
 | Proof status read | `src/api/openapi.yaml` -> `/v1/tasks/{taskId}/proofs/{proofId}` + `ProofStatusResponse` | `src/api/contracts.ts` -> `ProofStatusResponse` |
 
 If a local runtime instance does not return those reads yet, treat that as runtime implementation lag from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) / [#115](https://github.com/jckhang/agent-indeed/issues/115), not as permission for frontend docs to downgrade the merged contract baseline.
+
+When this document says a surface is "on `main`", it means the path and response type are published in both API drafts on `main`; it does not mean every local runtime environment already serves populated projection data.
 
 ## Scope
 
