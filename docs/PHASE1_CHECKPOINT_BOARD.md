@@ -34,12 +34,14 @@ Sprint pivot dated 2026-03-16 keeps these issue anchors as the default execution
 
 1. Open milestone issue and PR links instead of editing status snapshots in-repo.
 2. Use labels such as `status/ready-next`, `status/in-review`, and owner labels to decide next merge or rebase action.
-3. Run the metadata hygiene queries and clear any missing milestone or priority gaps before posting the checkpoint.
-4. Use `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` for the dated owner/blocker ledger instead of copying that volatile table into this guide.
-5. Run the merge-evidence sweep from issue #146 before the checkpoint comment so blocker notes, clean-order updates, and validation gaps all have a same-day GitHub trail.
-6. Treat missing validation evidence in a PR body/comment as a real blocker, even when the code diff looks complete.
-7. Capture only durable planning changes in repo docs; keep comments, review notes, and volatile state in GitHub threads.
-8. If merge-train triage uncovers a new durable blocker, open or link a follow-up issue instead of adding a status snapshot here.
+<<<<<<< HEAD
+3. Use `docs/PHASE1_ACCEPTANCE_TRACE.md` to map the checkpoint back to the epic acceptance area and evidence expectation it is meant to close.
+4. Run the metadata hygiene queries and clear any missing milestone or priority gaps before posting the checkpoint.
+5. Use `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` for the dated owner/blocker ledger instead of copying that volatile table into this guide.
+6. Run the merge-evidence sweep from issue #146 before the checkpoint comment so blocker notes, clean-order updates, and validation gaps all have a same-day GitHub trail.
+7. Treat missing validation evidence in a PR body/comment as a real blocker, even when the code diff looks complete.
+8. Capture only durable planning changes in repo docs; keep comments, review notes, and volatile state in GitHub threads.
+9. If merge-train triage uncovers a new durable blocker, open or link a follow-up issue instead of adding a status snapshot here.
 
 ## When to edit this file
 

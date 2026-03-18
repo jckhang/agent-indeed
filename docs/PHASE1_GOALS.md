@@ -91,6 +91,7 @@ Ship the first usable agent dispatch loop for closed beta:
 
 ## Definition of Done
 
+- `docs/PHASE1_ACCEPTANCE_TRACE.md` remains the canonical acceptance-to-evidence map for epic #2 and milestone reviews.
 - OpenSpec change remains valid and synchronized with implementation.
 - API draft and TypeScript contracts are consistent for `AgentBundle`, `TaskSpec`, `Bid`, `ProofPack`.
 - Implementation-scoped issues are closed only when runtime code or executable test coverage is merged.

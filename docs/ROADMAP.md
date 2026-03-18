@@ -66,6 +66,7 @@ Exit criteria:
 - End-to-end scenario passes: publish task -> commit -> reveal -> verify -> award.
 - All critical state transitions produce audit events.
 - Beta guardrails for auth, secrets, and sensitive data handling are documented and owned.
+- Epic acceptance reviews use `docs/PHASE1_ACCEPTANCE_TRACE.md` so each milestone closes against executable evidence instead of doc-only status claims.
 
 ## Current Sprint Pivot (2026-03-16 to 2026-03-27)
 
@@ -115,6 +116,7 @@ Scope:
 
 Checkpoint status board:
 - Review `docs/PHASE1_CHECKPOINT_BOARD.md` for milestone links, target owners, and checkpoint review prompts.
+- Use `docs/PHASE1_ACCEPTANCE_TRACE.md` to decide which acceptance area the current milestone evidence is supposed to satisfy.
 - Use `docs/PHASE1_EPIC_CHECKPOINT_TEMPLATE.md` when posting the weekly epic #2 checkpoint so the comment keeps the same Done/Blocked/Ready next/Validation evidence gaps shape plus owner handoff table.
 
 ## Phase 1 KPIs
