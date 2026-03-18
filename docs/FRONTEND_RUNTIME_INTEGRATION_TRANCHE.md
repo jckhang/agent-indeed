@@ -42,6 +42,8 @@ Result:
 - no new published-contract blocker found in the linked manager/agent docs during this pass
 - remaining risk stays in runtime execution readiness from issues [#110](https://github.com/jckhang/agent-indeed/issues/110), [#115](https://github.com/jckhang/agent-indeed/issues/115), and QA evidence from [#111](https://github.com/jckhang/agent-indeed/issues/111), not in the published field names or fallback rules
 
+Issue [#157](https://github.com/jckhang/agent-indeed/issues/157) narrows the review rule for this pass: if the docs say a read is on `main`, reviewers should be able to find the exact path plus response type in both `src/api/openapi.yaml` and `src/api/contracts.ts`. A local stack still returning empty or lagging projection data is a runtime readiness gap, not proof that the contract path is unpublished.
+
 ## Canonical handoff status
 
 This tranche supersedes the overlapping open frontend runtime docs queue:
@@ -61,7 +63,7 @@ These frontend handoff claims are backed by the current API sources of truth on 
 | Bid status read | `src/api/openapi.yaml` -> `/v1/tasks/{taskId}/bids/{bidId}` + `BidStatusResponse` | `src/api/contracts.ts` -> `BidStatusResponse` |
 | Proof status read | `src/api/openapi.yaml` -> `/v1/tasks/{taskId}/proofs/{proofId}` + `ProofStatusResponse` | `src/api/contracts.ts` -> `ProofStatusResponse` |
 
-If a local runtime instance does not return those reads yet, treat that as runtime implementation lag from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) / [#115](https://github.com/jckhang/agent-indeed/issues/115), not as permission for frontend docs to downgrade the merged contract baseline.
+If a local runtime instance does not return those reads yet, treat that as runtime implementation lag from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) / [#115](https://github.com/jckhang/agent-indeed/issues/115), not as permission for frontend docs to downgrade the merged contract baseline or relabel a published path as pending.
 
 When this document says a surface is "on `main`", it means the path and response type are published in both API drafts on `main`; it does not mean every local runtime environment already serves populated projection data.
 
