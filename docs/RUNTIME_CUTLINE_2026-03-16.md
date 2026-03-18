@@ -2,11 +2,11 @@
 
 This cutline defines which current contract-convergence deltas block runtime work now versus which ones are additive-safe follow-ups for the current execution pivot.
 
-Primary runtime threads:
+Primary runtime threads at the time of the pivot:
 
-- issue #109: runnable control-plane backend skeleton
-- issue #110: runnable `publish -> match -> commit -> reveal -> verify -> award` vertical slice
-- issue #111: executable smoke/E2E conversion using the command/evidence contract in `docs/RUNTIME_EXECUTION_HANDOFF.md`
+- issue #109: runnable control-plane backend skeleton (now merged baseline)
+- issue #110: runnable `publish -> match -> commit -> reveal -> verify -> award` vertical slice (now merged baseline)
+- issue #111: executable smoke/E2E conversion using the command/evidence contract in `docs/RUNTIME_EXECUTION_HANDOFF.md` (now handed off to issue #11, with `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` as the dated QA baseline)
 
 Reference contract threads:
 
