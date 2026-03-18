@@ -13,6 +13,7 @@ Thanks for contributing. This repository is currently API/spec-first, so most ch
   - `docs/PHASE1_GOALS.md`
   - `docs/ROADMAP.md`
   - `docs/issues/PHASE1_ISSUES.md`
+  - `docs/PLANNING_REFERENCE_RULES.md`
   - Prefer GitHub issue links or milestone queries over copying live issue/PR status into repo docs.
 
 ## Branch and PR Flow
@@ -51,6 +52,7 @@ When planning-owner PRs or cross-lane dependency PRs pile up:
 2. Merge only the clean tranche first, in dependency-aware order.
 3. For dirty PRs, leave a signed blocker/rebase note on the PR thread instead of copying transient state into repo docs.
 4. Keep `docs/issues/PHASE1_ISSUES.md` and `docs/PHASE1_CHECKPOINT_BOARD.md` focused on durable links/structure, not day-to-day queue status.
+5. When a blocker thread closes but leaves behind a durable artifact, cite the surviving repo artifact path instead of continuing to describe the closed issue as active work.
 
 ## Multi-Agent Commit Identity Isolation
 
