@@ -15,8 +15,8 @@ reviewable release gates for closed-beta readiness. It complements:
 
 | Gate | Status | Ready when | Active dependencies | Evidence to collect |
 | --- | --- | --- | --- | --- |
-| Contract convergence | In progress | Active runtime and handoff PRs stay inside the merged OpenSpec/OpenAPI/TypeScript baseline and carry reviewable validation evidence in the PR body. | issue #120, PR #129 (merge-ready), PR #133 (doc alignment), PR #140, PR #141, merged PR #83, merged PR #92, merged PR #126, merged PR #127, merged PR #139 | `openspec validate --all`, `npm run check:contract-drift`, runtime/OpenAPI diff review, synced `src/api/openapi.yaml` + `src/api/contracts.ts`, pasted validation output in PR templates |
-| Runtime happy-path execution | Blocked | One runnable `publish -> match -> commit -> reveal -> verify -> award` flow can be executed against a local service without manual interpretation. | issue #115, PR #129, merged PR #127 baseline, issue #111, issue #11 | Service run command, executable smoke/E2E output, linked request/response evidence |
+| Contract convergence | In progress | Active runtime and handoff PRs stay inside the merged OpenSpec/OpenAPI/TypeScript baseline and carry reviewable validation evidence in the PR body. | issue #120, PR #159, PR #133, PR #152, PR #153, PR #164, PR #165, merged PR #83, merged PR #92, merged PR #126, merged PR #127, merged PR #129, merged PR #139, merged PR #140, merged PR #141 | `openspec validate --all`, `npm run check:contract-drift`, runtime/OpenAPI diff review, synced `src/api/openapi.yaml` + `src/api/contracts.ts`, pasted validation output in PR templates |
+| Runtime happy-path execution | Blocked | One runnable `publish -> match -> commit -> reveal -> verify -> award` flow can be executed against a local service without manual interpretation. | issue #115, merged PR #129, merged PR #127 baseline, issue #111, issue #11 | Service run command, executable smoke/E2E output, linked request/response evidence |
 | Negative-scenario coverage | Blocked | QA can execute core failures (`invalid signature`, `reveal without commit`, `proof FAIL`, `award blocked`) with stable expected outcomes. | issue #120, issue #111, issue #11, merged PR #127 baseline, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/CLOSED_BETA_SECURITY_READINESS.md` | Runnable assertions, expected error/result matrix, regression evidence |
 | Audit evidence trail | In progress | Audit outputs expose key lifecycle transitions and award/proof context for operator review and beta sign-off. | merged PR #127, merged PR #92, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/OBSERVABILITY_BASELINE.md` | Audit event names, award trace fields, telemetry handoff checklist |
 | Execution + handoff hygiene | In progress | Roadmap/goals/epic/checkpoint docs and the live runtime queue all describe the same blockers and next actions. | issue #137, PR #140, PR #141, issue #115, PR #129, issue #120, issue #111, issue #11 | `docs/PHASE1_CHECKPOINT_BOARD.md`, `docs/PHASE1_EPIC_STATUS.md`, `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`, milestone/label queries stay aligned |
@@ -28,9 +28,9 @@ reviewable release gates for closed-beta readiness. It complements:
 This remains the prerequisite for durable runtime behavior and executable QA checks.
 
 - Verifier terminal vocabulary and award-trace expectations now come from merged PR #83 and merged PR #92.
-- The merged runtime/frontend baseline is on `main` through PR #126 and PR #139; PR #127 merged on 2026-03-17 at 13:54:46Z, so the active convergence risk is now keeping merge-ready PR #129 plus the doc queue (`#133`, `#140`, `#141`) synced to the published contract vocabulary.
+- The merged runtime/frontend baseline is on `main` through PR #126 and PR #139; PR #127 merged on 2026-03-17 at 13:54:46Z and PRs #129, #140, and #141 all merged later that day, so the active convergence risk is now keeping the live review queue (`#159`, `#133`, `#152`, `#153`, `#164`, `#165`) synced to the published contract vocabulary.
 - The dated QA sweep in `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` now records which runtime routes are actually published on `main`, so reviewers can distinguish proof-enum drift from still-pending read-model routes.
-- PR #140 is the planning guardrail that keeps those threads tied to one dated blocker ledger instead of duplicating stale snapshots across long-lived docs.
+- Merged PR #140 is the planning guardrail for the dated blocker ledger; the current doc queue should reuse that merged baseline instead of reopening stale snapshots across long-lived docs.
 
 Release note: if any active runtime branch changes enum names, required fields, route shapes, or error-code wording, the same update must land in OpenSpec plus both API drafts before the gate can be marked ready.
 
@@ -85,7 +85,7 @@ At minimum, these must stay in lockstep:
 - `docs/PHASE1_GOALS.md`
 - `docs/ROADMAP.md`
 - `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`
-- runtime delivery threads (`#115`, merge-ready `#129`, doc-alignment `#133`, `#120`, `#111`, and blocked follow-through `#11`)
+- runtime delivery threads (`#115`, `#159`, `#164`, `#165`, `#153`, `#152`, `#133`, `#120`, `#111`, and blocked follow-through `#11`)
 
 ## Review Routine
 

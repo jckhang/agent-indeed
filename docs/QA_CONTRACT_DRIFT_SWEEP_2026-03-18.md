@@ -59,10 +59,13 @@ Proof verification enums confirmed aligned between OpenAPI and TypeScript contra
 
 Use the snapshot above when reviewing the current queue:
 
-- PR #149: runtime behavior may emit proof reason codes, but reviewer comments should distinguish
-  "enum exists in contract" from "runtime implementation already returns the same field everywhere"
+- PR #159: merge this guard first so later review threads can cite one executable route/enum baseline
+  instead of restating contract availability from memory
 - PR #133 and PR #152: docs can cite the verified proof enums above plus the exact OpenAPI anchors
-  for shortlist/award/bid/proof reads, but must still avoid inventing extra fields or enum members
-  that are not in the API drafts
-- planning rollups should reference this sweep or the API source files rather than paraphrasing
-  route availability from memory
+  for shortlist/award/bid/proof reads, but must still avoid inventing extra fields, terminal states,
+  or enum members that are not in the API drafts
+- PR #164: backend API example payloads should stay inside the same published route set and verifier
+  vocabulary captured by the guard output, especially for award/proof examples copied from smoke runs
+- PR #153 and PR #165: planning rollups should reference this sweep or the API source files rather
+  than paraphrasing route availability from memory, and should treat merged PRs #129, #140, and #141
+  as baseline rather than active blockers
