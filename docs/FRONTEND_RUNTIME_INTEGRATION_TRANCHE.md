@@ -22,6 +22,27 @@ Execution dependencies remain explicit:
 - runtime service baseline: [#115](https://github.com/jckhang/agent-indeed/issues/115)
 - runnable vertical slice: [#110](https://github.com/jckhang/agent-indeed/issues/110)
 - QA runtime checks: [#111](https://github.com/jckhang/agent-indeed/issues/111)
+- frontend consumer verification pass: [#150](https://github.com/jckhang/agent-indeed/issues/150)
+
+## Consumer verification pass (2026-03-18)
+
+Issue [#150](https://github.com/jckhang/agent-indeed/issues/150) re-checks the merged-baseline handoff against the current manager and agent docs so frontend consumption does not drift back to stale payload assumptions.
+
+### Verified consumer surfaces
+
+| Surface | Canonical doc | Runtime-backed contract truth | Consumer note |
+| --- | --- | --- | --- |
+| Manager task composer | `docs/MANAGER_TASK_COMPOSER_UI_SLICE.md` | `POST /v1/tasks` with `CreateTaskRequest.task` and `CreateTaskResponse.taskId/status/commitDeadline/revealDeadline` | Publish stays aligned to `TaskSpec`; task-create idempotency is still a follow-up, not baseline reality. |
+| Manager shortlist + award-readiness | `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` | `GET /v1/tasks/{taskId}/candidates` -> `CandidateMatchListResponse` and `GET /v1/tasks/{taskId}/award` -> `AwardDecisionDetail` are both published in `src/api/openapi.yaml` and `src/api/contracts.ts` on the current `main` baseline. | Treat `TASK_MATCH_NOT_READY` as retryable loading and use award `status/statusMessage/proofSummary/handoff` directly from the published read model. |
+| Agent bid workspace | `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` | `POST /v1/tasks/{taskId}/bids/commit` and `POST /v1/tasks/{taskId}/bids/reveal` | Commit/reveal shell stays server-authored via `window.*`; reveal success hands off `proofSubmission.proofId` into the status reads. |
+| Agent verification timeline | `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md` | `GET /v1/tasks/{taskId}/bids/{bidId}` -> `BidStatusResponse` and `GET /v1/tasks/{taskId}/proofs/{proofId}` -> `ProofStatusResponse` are both published in `src/api/openapi.yaml` and `src/api/contracts.ts` on the current `main` baseline. | Poll only from backend `refresh.*`; if projection data is absent in a local stack, render unavailable-runtime copy instead of invented progress. |
+
+Result:
+- published contract surfaces verified for frontend documentation on the current `main` baseline
+- no new published-contract blocker found in the linked manager/agent docs during this pass
+- remaining risk stays in runtime execution readiness from issues [#110](https://github.com/jckhang/agent-indeed/issues/110), [#115](https://github.com/jckhang/agent-indeed/issues/115), and QA evidence from [#111](https://github.com/jckhang/agent-indeed/issues/111), not in the published field names or fallback rules
+
+Issue [#157](https://github.com/jckhang/agent-indeed/issues/157) narrows the review rule for this pass: if the docs say a read is on `main`, reviewers should be able to find the exact path plus response type in both `src/api/openapi.yaml` and `src/api/contracts.ts`. A local stack still returning empty or lagging projection data is a runtime readiness gap, not proof that the contract path is unpublished.
 
 ## Canonical handoff status
 
@@ -31,19 +52,24 @@ This tranche supersedes the overlapping open frontend runtime docs queue:
 - PR [#132](https://github.com/jckhang/agent-indeed/pull/132) demo payload replay pack
 
 Keep only this document plus `docs/FRONTEND_MVP_SURFACE.md` as the durable repo handoff for runtime-backed manager and agent flows. Any surviving PR from the older queue should either point here as the canonical source or be closed as superseded by issue [#145](https://github.com/jckhang/agent-indeed/issues/145).
-
 ## Canonical contract anchors on `main`
 
 These frontend handoff claims are backed by the current API sources of truth on `main`, not by a still-pending side branch:
 
 | Runtime surface | OpenAPI anchor | TypeScript contract anchor |
 | --- | --- | --- |
-| Shortlist read | `src/api/openapi.yaml` -> `/v1/tasks/{taskId}/candidates` + `CandidateMatchListResponse` | `src/api/contracts.ts` -> `CandidateMatchListResponse` |
-| Award-readiness read | `src/api/openapi.yaml` -> `/v1/tasks/{taskId}/award` + `AwardDecisionDetail` | `src/api/contracts.ts` -> `AwardDecisionDetail` |
-| Bid status read | `src/api/openapi.yaml` -> `/v1/tasks/{taskId}/bids/{bidId}` + `BidStatusResponse` | `src/api/contracts.ts` -> `BidStatusResponse` |
-| Proof status read | `src/api/openapi.yaml` -> `/v1/tasks/{taskId}/proofs/{proofId}` + `ProofStatusResponse` | `src/api/contracts.ts` -> `ProofStatusResponse` |
+| Shortlist read | `src/api/openapi.yaml:355` -> `/v1/tasks/{taskId}/candidates` + `CandidateMatchListResponse` | `src/api/contracts.ts:539` -> `CandidateMatchListResponse` |
+| Award-readiness read | `src/api/openapi.yaml:522` -> `/v1/tasks/{taskId}/award` + `AwardDecisionDetail` | `src/api/contracts.ts:759` -> `AwardDecisionDetail` |
+| Bid status read | `src/api/openapi.yaml:763` -> `/v1/tasks/{taskId}/bids/{bidId}` + `BidStatusResponse` | `src/api/contracts.ts:1002` -> `BidStatusResponse` |
+| Proof status read | `src/api/openapi.yaml:1207` -> `/v1/tasks/{taskId}/proofs/{proofId}` + `ProofStatusResponse` | `src/api/contracts.ts:1024` -> `ProofStatusResponse` |
 
-If a local runtime instance does not return those reads yet, treat that as runtime implementation lag from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) / [#115](https://github.com/jckhang/agent-indeed/issues/115), not as permission for frontend docs to downgrade the merged contract baseline.
+Reviewer quick-check on a fresh `origin/main` sync:
+- `git show origin/main:src/api/openapi.yaml | rg -n "/v1/tasks/\\{taskId\\}/(candidates|award|bids/\\{bidId\\}|proofs/\\{proofId\\})"`
+- `git show origin/main:src/api/contracts.ts | rg -n "interface (CandidateMatchListResponse|AwardDecisionDetail|BidStatusResponse|ProofStatusResponse)"`
+
+If a local runtime instance does not return those reads yet, treat that as runtime implementation lag from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) / [#115](https://github.com/jckhang/agent-indeed/issues/115), not as permission for frontend docs to downgrade the merged contract baseline or relabel a published path as pending.
+
+When this document says a surface is "on `main`", it means the path and response type are published in both API drafts on `main`; it does not mean every local runtime environment already serves populated projection data.
 
 ## Scope
 
