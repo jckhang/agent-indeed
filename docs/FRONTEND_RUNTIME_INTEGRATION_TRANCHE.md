@@ -44,6 +44,14 @@ Result:
 
 Issue [#157](https://github.com/jckhang/agent-indeed/issues/157) narrows the review rule for this pass: if the docs say a read is on `main`, reviewers should be able to find the exact path plus response type in both `src/api/openapi.yaml` and `src/api/contracts.ts`. A local stack still returning empty or lagging projection data is a runtime readiness gap, not proof that the contract path is unpublished.
 
+## Remaining frontend runtime gaps
+
+Keep the post-merge follow-up list short and tied to currently published contracts:
+
+1. Runtime parity for award and verification refresh still depends on the running service from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) and [#115](https://github.com/jckhang/agent-indeed/issues/115), even though the read contracts are already published on `main`.
+2. QA still needs executable evidence that the publish -> shortlist -> commit -> reveal -> verification -> award path behaves the same under runtime conditions, tracked in issue [#111](https://github.com/jckhang/agent-indeed/issues/111) and the smoke evidence umbrella issue [#11](https://github.com/jckhang/agent-indeed/issues/11).
+3. Frontend docs should only describe a surface as `on main` when reviewers can find both the exact path and the response type in `src/api/openapi.yaml` and `src/api/contracts.ts`; otherwise, record the gap as a follow-up instead of broadening runtime scope.
+
 ## Canonical handoff status
 
 This tranche supersedes the overlapping open frontend runtime docs queue:

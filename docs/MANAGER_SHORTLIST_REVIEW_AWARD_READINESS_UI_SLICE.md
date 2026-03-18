@@ -102,7 +102,7 @@ Render for the selected row:
 
 Fallback behavior:
 - Missing proof summary: render `Verification detail pending`.
-- Missing shortlist audit id: render `Audit reference pending contract merge`.
+- Missing shortlist audit id: render `Audit reference pending runtime materialization`.
 - Missing decision trace: keep the candidate visible and note that trace linkage is not yet returned.
 
 ## Loading, empty, and error states
@@ -166,6 +166,14 @@ P1-20 keeps three runtime-consumer gaps explicit instead of burying them inside 
    - The UI should not infer that a visible winner summary means the current local runtime already executes the award write path successfully.
 
 These gaps should stay tied to issue #58, issue #110, and downstream audit work, not copied into ad hoc frontend-only payload guesses.
+
+## Residual follow-ups on the current baseline
+
+After the shortlist and award reads merged on `main`, this slice keeps only three explicit follow-ups:
+
+1. Runtime execution parity: local and shared runtime environments still need to serve the merged shortlist/award read surfaces consistently with issue #110.
+2. Evidence parity: QA still needs executable proof that the manager review shell behaves correctly through the runtime stack, tracked in issue #111 and issue #11.
+3. Award action readiness: `POST /v1/tasks/{taskId}/award` can stay contract-ready while the UI keeps the CTA secondary or disabled until the runtime environment confirms the write path is actually available.
 
 ## Acceptance criteria mapping
 
