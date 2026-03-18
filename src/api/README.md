@@ -7,5 +7,5 @@
 - `GET /v1/tasks/{taskId}/candidates` is the canonical shortlist read path; downstream manager-review work should extend that response additively, keep `limit` as the shared query parameter, and use additive toggles such as `includeScoreBreakdown` instead of a parallel shortlist path/shape.
 - Ranked candidates always carry `rank`; filtered-out candidates stay visible with `eligible=false` and no synthetic rank. `scoreBreakdown` remains optional behind `includeScoreBreakdown`.
 - Bid/proof status polling contracts now include typed read projections for async verification refresh.
-- `docs/BACKEND_API_EXAMPLE_PACKET.md`: canonical `publish -> match -> commit -> reveal -> verify -> award` request/response packet plus negative-path examples for issue #11 handoff.
+- `docs/BACKEND_API_EXAMPLE_PACKET.md`: canonical `publish -> match -> commit -> reveal -> verify -> award` request/response packet, minimal JavaScript SDK snippets, and negative-path examples for issue #11 handoff.
 - `docs/ONBOARDING_PIPELINE.md`: deterministic onboarding pipeline, skill indexing contract, and retry guidance for bundle upload.
