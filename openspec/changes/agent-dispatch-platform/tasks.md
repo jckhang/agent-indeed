@@ -49,3 +49,4 @@
 - [x] 5.9 跟进前端 consumer contract claim trim（issue #157），把 shortlist/award/bid/proof 读路径的 `main` 基线解释收敛到 OpenAPI/TS draft anchors，避免把 runtime 数据缺口误写成 contract 缺口。
 - [x] 5.10 补充前端 consumer contract reviewer quick-check 锚点，给出 `origin/main` 的行号与 grep 校验命令，减少对已发布读路径的重复误判。
 - [x] 5.11 输出 `docs/BACKEND_API_EXAMPLE_PACKET.md`，把 merged `smoke:dispatch` 路径固化为 issue #11 / QA / beta consumer 可复用的请求响应示例包。
+- [x] 5.12 刷新稳定 issue 索引与 beta-readiness 锚点，改用当前 planning sweep 查询与 issue #11 证据线程承接同日 blocker/evidence 回写，避免继续引用已关闭的 issue #146。

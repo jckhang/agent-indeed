@@ -16,8 +16,9 @@ This file intentionally stays lightweight so we do not duplicate fast-changing i
 - [Runtime PRs missing priority](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+-label%3A%22priority%2FP0%22+-label%3A%22priority%2FP1%22)
 - [Planning lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aalbatross%22)
 - [Planning PR review queue](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22owner%3Aalbatross%22)
-- [Merge evidence umbrella issue](https://github.com/jckhang/agent-indeed/issues/146)
+- [Current planning sweep issue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22owner%3Aalbatross%22+label%3A%22stream%2Freview-burndown%22)
 - [Architecture unblocker control issue](https://github.com/jckhang/agent-indeed/issues/137)
+- [Issue #11 executable evidence thread](https://github.com/jckhang/agent-indeed/issues/11)
 - [Backend lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Akestrel%22)
 - [Frontend lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Alanzhou-fe-agent%22)
 - [QA lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aavery%22)
@@ -45,7 +46,7 @@ review history, and linked PRs, open the GitHub issue directly.
 
 ### Phase 1 delivery
 
-- Weekly merge evidence and blocker sweep: [#146](https://github.com/jckhang/agent-indeed/issues/146)
+- Planning sweep / blocker review query: [current open owner:albatross + stream/review-burndown issue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22owner%3Aalbatross%22+label%3A%22stream%2Freview-burndown%22)
 - Weekly architecture runtime unblocker control: [#137](https://github.com/jckhang/agent-indeed/issues/137)
 - P1-01 Define AgentBundle contract and validation rules: [#3](https://github.com/jckhang/agent-indeed/issues/3)
 - P1-02 Implement onboarding pipeline (signature/schema/index): [#4](https://github.com/jckhang/agent-indeed/issues/4)
