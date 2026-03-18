@@ -39,10 +39,13 @@ Exit criteria:
 Goal: deliver a runnable MVP control-plane and event trail to run closed-beta tasks end-to-end.
 
 Scope:
-- Runtime sprint pivot (2026-03-16) is execution-first:
-  - #109 bootstrap runnable backend skeleton
-  - #110 implement runnable dispatch vertical slice (`publish -> match -> commit -> reveal -> verify -> award`)
-  - #111 convert QA smoke/E2E matrices into executable checks
+- Runtime sprint pivot (2026-03-16) has now landed its control-plane baseline:
+  - issue #109 bootstrap runnable backend skeleton is merged via PR #126
+  - issue #110 runnable dispatch vertical slice is merged via PRs #127, #129, #140, and #141
+  - issue #111 executable smoke/E2E conversion is closed, so the remaining proof point is the final evidence thread on issue #11
+- Post-runtime follow-through now centers on keeping the merged baseline trustworthy:
+  - PRs #152, #159, and #164 merged on 2026-03-18 and set the current frontend, contract-drift, and API-example baseline
+  - open PRs #133, #153, #154, #161, #165, and #166 still need to converge on that same merged state
 - Treat the proof-status and award-read contracts from PRs #66 and #68 as merged baseline work; the remaining frontend follow-through is to keep the runtime handoff docs aligned to `main` and collapse stale queue branches through issue #145.
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
@@ -70,16 +73,17 @@ Exit criteria:
 ## Current Sprint Pivot (2026-03-16 to 2026-03-27)
 
 Focus:
-- Deliver executable backend runtime slices first (#109, #110).
-- Convert QA readiness docs into runnable checks tied to runtime behavior (#111, issue #11).
+- Keep issue #11 focused on final runnable E2E/API evidence against the merged runtime baseline instead of re-opening the bootstrap or vertical-slice threads.
+- Land the remaining planning/verification queue in a clean order: PRs #154 and #165 first, then PRs #161 and #166 after reviewer ack, then PR #153 and PR #133.
 - Keep OpenSpec/OpenAPI/contracts synchronized while implementation PRs land.
 - Use `docs/RUNTIME_CUTLINE_2026-03-16.md` as the sprint-level rule for which open contract PRs are true runtime blockers versus additive-safe follow-ups.
-- Use `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` plus issue #137 as the daily owner/blocker ledger for the 2026-03-20 runtime push.
+- Treat PR #152 (merged 2026-03-18 15:04 UTC) plus PRs #159 and #164 (merged 2026-03-18 15:24 UTC) as the current contract/runtime doc baseline.
+- Use `docs/PHASE1_EPIC_STATUS.md` plus the live milestone PR views as the 24h merge-sequencing source of truth for the remaining queue.
 
 De-scoped from current sprint:
 - Planning-only follow-ups #106, #107, #108 were closed to avoid additional doc-layer churn.
 - Planning-sync PRs #82, #95, #96, #102, #103, and #105 were closed for the same reason.
-- QA prewrite-only threads (#87, PR #84, PR #104) are treated as superseded by runtime execution issue #111.
+- QA prewrite-only threads (#87, PR #84, PR #104) are treated as superseded by the merged issue #111 baseline and the remaining evidence handoff on issue #11.
 
 ### Phase 2: Execution & Trust Loop (Target: 2026-05 to 2026-06)
 
@@ -105,10 +109,10 @@ Scope:
 
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
-- M1 (2026-03-20): absorb the merged runtime read-model baseline into one frontend handoff doc, then land runnable backend skeleton (#109).
-- Runtime work may proceed ahead of full contract convergence when the cutline marks a delta additive-safe; verifier payload/result vocabulary is now merged, so the remaining near-term review risk is contract drift on the additive read surfaces and frontend wiring handoff.
-- M2 (2026-03-27): land runnable publish/match/commit/reveal/verify/award vertical slice (#110).
-- M3 (2026-04-03): stabilize verify/award/audit runtime behavior and run executable smoke checks (#111).
+- M1 (2026-03-20): hold the merged runtime/control baseline steady while PRs #133, #153, #154, #161, #165, and #166 converge on the same post-2026-03-18 state.
+- Runtime work may proceed ahead of full contract convergence when the cutline marks a delta additive-safe; verifier payload/result vocabulary plus the frontend/QA/API example addenda are now merged, so the remaining near-term risk is stale planning or verify/award guidance drifting away from `main`.
+- M2 (2026-03-27): keep the merged publish/match/commit/reveal/verify/award slice reviewable while issue #11 gathers final runnable evidence and frontend residuals collapse through PR #170.
+- M3 (2026-04-03): stabilize verify/award/audit follow-through and keep issue #11 evidence plus beta gates reviewable.
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
 - M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, and `docs/CLOSED_BETA_SECURITY_READINESS.md` so telemetry owners plus auth, secret-handling, and redaction follow-ons stay reviewable.
 - Review `docs/PHASE1_BETA_READINESS_GATES.md` as the compact release-gate checklist for the remaining Phase 1 contract, QA, audit, and planning blockers.
