@@ -42,3 +42,4 @@
 - [ ] 5.3 将 smoke/E2E 文档矩阵转为可执行校验（issue #111），并把验证证据回写 issue #11。
 - [x] 5.4 输出前端 runtime 集成 tranche 与本地 runbook（issue #136），串联 manager publish / shortlist / award-readiness 与 agent commit / reveal / status-refresh 路径。
 - [x] 5.5 收敛前端 runtime 文档队列（issue #145），把 wiring target、fixture pack 与 demo payload pack 合并进单一 mainline handoff。
+- [x] 5.6 输出 `docs/RUNTIME_EXECUTION_HANDOFF.md`，统一 runtime sprint 的本地命令契约、证据包与 issue #11 回写规则。

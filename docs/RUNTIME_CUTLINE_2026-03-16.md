@@ -6,6 +6,7 @@ Primary runtime threads:
 
 - issue #109: runnable control-plane backend skeleton
 - issue #110: runnable `publish -> match -> commit -> reveal -> verify -> award` vertical slice
+- issue #111: executable smoke/E2E conversion using the command/evidence contract in `docs/RUNTIME_EXECUTION_HANDOFF.md`
 
 Reference contract threads:
 
@@ -34,6 +35,7 @@ Go now:
 - create service entrypoint, config loading, request logging, and `/healthz`
 - add persistence abstractions for task, bid, proof, award, and audit records
 - add one namespaced API route plus a documented local run command
+- publish the exact service/reset/smoke command path once the skeleton becomes runnable
 
 Do not block #109 on:
 
@@ -65,6 +67,7 @@ Safe to defer from the first #110 merge:
 - bid/proof polling reads from PR #66
 - shortlist and award detail read surfaces from PR #68
 - audit timeline query endpoints from PR #92
+- final issue #11 evidence aggregation, as long as the branch already exposes the command path and trace identifiers required by `docs/RUNTIME_EXECUTION_HANDOFF.md`
 
 ## Beta-readiness wording
 
@@ -72,4 +75,5 @@ Contract convergence still matters for M1/M4 readiness, but the runtime sprint i
 
 - M1 runtime progress may continue while additive-safe contract PRs remain open.
 - M1 cannot declare the verify/award path stable until PR #83 is merged or an equivalent verifier contract lands.
+- M1/M4 checkpoints should treat `docs/RUNTIME_EXECUTION_HANDOFF.md` as the source of truth for what counts as an executable local run claim.
 - M4 beta sign-off still requires the full contract stack to converge, including the additive-safe read surfaces deferred from the first runtime merge.
