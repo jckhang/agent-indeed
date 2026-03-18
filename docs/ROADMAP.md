@@ -74,7 +74,7 @@ Exit criteria:
 
 Focus:
 - Keep issue #11 focused on final runnable E2E/API evidence against the merged runtime baseline instead of re-opening the bootstrap or vertical-slice threads.
-- Land the remaining planning/verification queue in a clean order: PRs #154 and #165 first, then PRs #161 and #166 after reviewer ack, then PR #153 and PR #133.
+- Land the remaining planning/verification queue by clearing active review blockers first: refresh PRs #154, #165, #166, and #133 to the current post-runtime baseline, then merge clean follow-ons such as PR #161 once reviewer acknowledgement lands, and only then carry PR #153 through its rebase rerun.
 - Keep OpenSpec/OpenAPI/contracts synchronized while implementation PRs land.
 - Use `docs/RUNTIME_CUTLINE_2026-03-16.md` as the sprint-level rule for which open contract PRs are true runtime blockers versus additive-safe follow-ups.
 - Treat PR #152 (merged 2026-03-18 15:04 UTC) plus PRs #159 and #164 (merged 2026-03-18 15:24 UTC) as the current contract/runtime doc baseline.
