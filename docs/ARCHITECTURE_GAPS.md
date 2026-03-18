@@ -26,7 +26,7 @@ Identify the smallest set of missing decisions that block delivery of the Phase 
 
 ## Frontend-Specific Gaps
 
-- Manager-side publish/award baseline is documented in `docs/MANAGER_CONSOLE_BASELINE.md`, and the current `main` baseline now publishes `GET /v1/tasks/{taskId}/candidates` plus `GET /v1/tasks/{taskId}/award`; the remaining gap is runtime parity and validation evidence.
+- Manager-side publish/award baseline is documented in `docs/MANAGER_CONSOLE_BASELINE.md`, and the current API draft in `src/api/openapi.yaml` plus `src/api/contracts.ts` includes both `GET /v1/tasks/{taskId}/candidates` and `GET /v1/tasks/{taskId}/award`; the remaining gap is runtime parity and validation evidence.
 - Manager task authoring is documented in `docs/MANAGER_TASK_COMPOSER_UI_SLICE.md`, and shortlist/award visibility has dedicated read-model follow-through; the remaining work is to keep the runtime-backed review shell aligned with the merged contracts.
 - Manager shortlist/award-readiness guidance exists in `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`; follow-up work should stay focused on runtime behavior, QA evidence, and award-action readiness rather than reopening contract ambiguity.
 - Agent-side bidding baseline is now documented in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, while the focused commit/reveal and verification follow-through are captured in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` and `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`; merged async status-read contracts are still missing.
