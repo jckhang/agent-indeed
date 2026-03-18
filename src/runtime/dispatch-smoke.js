@@ -5,7 +5,7 @@ import { once } from "node:events";
 import { pathToFileURL } from "node:url";
 import { createApp } from "./app.js";
 
-function buildTask() {
+function buildTask(overrides = {}) {
   return {
     title: "Dispatch smoke task",
     description: "Exercise the runtime publish to award flow in one command",
@@ -34,26 +34,27 @@ function buildTask() {
     biddingWindow: {
       commitDeadline: "2026-03-19T00:00:00Z",
       revealDeadline: "2026-03-20T00:00:00Z"
-    }
+    },
+    ...overrides
   };
 }
 
-function buildProof({ taskId }) {
+function buildProof({ taskId, proofId = "proof_00000001", agentId = "agent_kestrel_alpha", signerDid, signature = "sig-proof-001", qualityScore = 0.9, credentialLevel = "T1", antiSybil } = {}) {
   return {
     proofSchemaVersion: "1.0",
-    proofId: "proof_00000001",
+    proofId,
     taskId,
-    agentId: "agent_kestrel_alpha",
+    agentId,
     capturedAt: "2026-03-19T00:30:00Z",
     identityProof: {
-      credentialLevel: "T1",
-      signerDid: "did:key:agent_kestrel_alpha",
-      signature: "sig-proof-001"
+      credentialLevel,
+      signerDid: signerDid ?? `did:key:${agentId}`,
+      signature
     },
     sampleWork: {
       sampleTaskDigest: "sha256:sample-task-001",
       outputDigest: "sha256:sample-output-001",
-      qualityScore: 0.9,
+      qualityScore,
       runtimeMs: 1200
     },
     executionTrace: {
@@ -61,7 +62,8 @@ function buildProof({ taskId }) {
       traceUri: "s3://proofs/trace-001.json",
       traceSignature: "sig-trace-001",
       toolCallCount: 4
-    }
+    },
+    ...(antiSybil ? { antiSybil } : {})
   };
 }
 
@@ -86,7 +88,7 @@ async function expectJson(response, expectedStatus) {
   return response.json();
 }
 
-export async function runDispatchSmoke({ log = console.log } = {}) {
+async function withRuntime(logic) {
   let currentTime = "2026-03-16T00:00:00.000Z";
   const app = createApp({
     config: {
@@ -105,33 +107,153 @@ export async function runDispatchSmoke({ log = console.log } = {}) {
   const baseUrl = `http://127.0.0.1:${address.port}`;
 
   try {
-    const created = await expectJson(
-      await fetch(`${baseUrl}/v1/tasks`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-workspace-id": "workspace-kestrel"
-        },
-        body: JSON.stringify({ task: buildTask() })
-      }),
-      201
-    );
+    return await logic({
+      baseUrl,
+      getCurrentTime: () => currentTime,
+      setCurrentTime(value) {
+        currentTime = value;
+      }
+    });
+  } finally {
+    server.close();
+    await once(server, "close");
+  }
+}
+
+async function createTask(baseUrl, task = buildTask()) {
+  return expectJson(
+    await fetch(`${baseUrl}/v1/tasks`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-workspace-id": "workspace-kestrel"
+      },
+      body: JSON.stringify({ task })
+    }),
+    201
+  );
+}
+
+async function shortlistTask(baseUrl, taskId) {
+  const blockedMatch = await expectJson(
+    await fetch(`${baseUrl}/v1/tasks/${taskId}/candidates?limit=2`),
+    409
+  );
+  assert.equal(blockedMatch.code, "TASK_MATCH_NOT_READY");
+
+  const shortlist = await expectJson(
+    await fetch(`${baseUrl}/v1/tasks/${taskId}/candidates?limit=2&includeScoreBreakdown=false`),
+    200
+  );
+  assert.equal(shortlist.status, "MATCHED");
+  return {
+    blockedMatch,
+    shortlist
+  };
+}
+
+async function createCommit(baseUrl, reveal, idempotencyKey, committedAt = "2026-03-16T00:10:00.000Z") {
+  return expectJson(
+    await fetch(`${baseUrl}/v1/tasks/${reveal.taskId}/bids/commit`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        idempotencyKey,
+        commit: {
+          bidId: reveal.bidId,
+          taskId: reveal.taskId,
+          agentId: reveal.agentId,
+          bidHash: buildRevealHash(reveal),
+          committedAt
+        }
+      })
+    }),
+    202
+  );
+}
+
+async function createPolicy(baseUrl, { taskId, agentId, identityTier = "T1", trustScore = 0.84 }) {
+  return expectJson(
+    await fetch(`${baseUrl}/v1/tasks/${taskId}/proof-policy`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        agentId,
+        identityTier,
+        trustScore
+      })
+    }),
+    200
+  );
+}
+
+async function revealBid(baseUrl, reveal, idempotencyKey, expectedStatus = 200) {
+  return expectJson(
+    await fetch(`${baseUrl}/v1/tasks/${reveal.taskId}/bids/reveal`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        idempotencyKey,
+        reveal
+      })
+    }),
+    expectedStatus
+  );
+}
+
+async function verifyProof(baseUrl, { taskId, policyTraceId, proof, expectedStatus = 200 }) {
+  return expectJson(
+    await fetch(`${baseUrl}/v1/tasks/${taskId}/proofs/verify`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        policyTraceId,
+        proof
+      })
+    }),
+    expectedStatus
+  );
+}
+
+async function getAwardDetail(baseUrl, taskId) {
+  return expectJson(
+    await fetch(`${baseUrl}/v1/tasks/${taskId}/award`),
+    200
+  );
+}
+
+async function awardTask(baseUrl, taskId, award, idempotencyKey, expectedStatus = 200) {
+  return expectJson(
+    await fetch(`${baseUrl}/v1/tasks/${taskId}/award`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-workspace-id": "workspace-kestrel"
+      },
+      body: JSON.stringify({
+        idempotencyKey,
+        award
+      })
+    }),
+    expectedStatus
+  );
+}
+
+export async function runDispatchSmoke({ log = console.log } = {}) {
+  return withRuntime(async ({ baseUrl, setCurrentTime }) => {
+    const created = await createTask(baseUrl);
     logStep(log, "task-created", created.taskId);
 
-    const blockedMatch = await expectJson(
-      await fetch(`${baseUrl}/v1/tasks/${created.taskId}/candidates?limit=2`),
-      409
-    );
-    assert.equal(blockedMatch.code, "TASK_MATCH_NOT_READY");
+    const { blockedMatch, shortlist } = await shortlistTask(baseUrl, created.taskId);
     logStep(log, "first-match-blocked", blockedMatch.code);
-
-    const shortlist = await expectJson(
-      await fetch(
-        `${baseUrl}/v1/tasks/${created.taskId}/candidates?limit=2&includeScoreBreakdown=false`
-      ),
-      200
-    );
-    assert.equal(shortlist.status, "MATCHED");
     logStep(log, "candidates-ranked", `${shortlist.candidates.length} candidates`);
 
     const proof = buildProof({ taskId: created.taskId });
@@ -152,103 +274,44 @@ export async function runDispatchSmoke({ log = console.log } = {}) {
       proof
     };
 
-    const commit = await expectJson(
-      await fetch(`${baseUrl}/v1/tasks/${created.taskId}/bids/commit`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json"
-        },
-        body: JSON.stringify({
-          idempotencyKey: "idem-commit-smoke-001",
-          commit: {
-            bidId: reveal.bidId,
-            taskId: reveal.taskId,
-            agentId: reveal.agentId,
-            bidHash: buildRevealHash(reveal),
-            committedAt: "2026-03-16T00:10:00.000Z"
-          }
-        })
-      }),
-      202
-    );
+    const commit = await createCommit(baseUrl, reveal, "idem-commit-smoke-001");
     assert.equal(commit.result, "COMMITTED");
     logStep(log, "bid-committed", commit.result);
 
-    const policy = await expectJson(
-      await fetch(`${baseUrl}/v1/tasks/${created.taskId}/proof-policy`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json"
-        },
-        body: JSON.stringify({
-          agentId: reveal.agentId,
-          identityTier: "T1",
-          trustScore: 0.84
-        })
-      }),
-      200
-    );
+    const policy = await createPolicy(baseUrl, {
+      taskId: created.taskId,
+      agentId: reveal.agentId
+    });
     logStep(log, "proof-policy-issued", policy.policyTraceId);
 
-    currentTime = "2026-03-19T00:10:00.000Z";
+    setCurrentTime("2026-03-19T00:10:00.000Z");
 
-    const revealResult = await expectJson(
-      await fetch(`${baseUrl}/v1/tasks/${created.taskId}/bids/reveal`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json"
-        },
-        body: JSON.stringify({
-          idempotencyKey: "idem-reveal-smoke-001",
-          reveal
-        })
-      }),
-      200
-    );
+    const revealResult = await revealBid(baseUrl, reveal, "idem-reveal-smoke-001");
     assert.equal(revealResult.status, "REVEALED");
     logStep(log, "bid-revealed", revealResult.proofSubmission.verificationStatus);
 
-    const verified = await expectJson(
-      await fetch(`${baseUrl}/v1/tasks/${created.taskId}/proofs/verify`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json"
-        },
-        body: JSON.stringify({
-          policyTraceId: policy.policyTraceId,
-          proof
-        })
-      }),
-      200
-    );
+    const verified = await verifyProof(baseUrl, {
+      taskId: created.taskId,
+      policyTraceId: policy.policyTraceId,
+      proof
+    });
     assert.equal(verified.result, "PASS");
     logStep(log, "proof-verified", verified.result);
 
-    const awardDetail = await expectJson(
-      await fetch(`${baseUrl}/v1/tasks/${created.taskId}/award`),
-      200
-    );
+    const awardDetail = await getAwardDetail(baseUrl, created.taskId);
     assert.equal(awardDetail.status, "READY_TO_AWARD");
     logStep(log, "award-ready", awardDetail.shortlistedBidId);
 
-    const awarded = await expectJson(
-      await fetch(`${baseUrl}/v1/tasks/${created.taskId}/award`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-workspace-id": "workspace-kestrel"
-        },
-        body: JSON.stringify({
-          idempotencyKey: "idem-award-smoke-001",
-          award: {
-            bidId: reveal.bidId,
-            awardReason: "Best verified fit for the backend vertical slice.",
-            shortlistAuditId: awardDetail.shortlistAuditId,
-            proofAuditId: awardDetail.proofAuditId
-          }
-        })
-      }),
-      200
+    const awarded = await awardTask(
+      baseUrl,
+      created.taskId,
+      {
+        bidId: reveal.bidId,
+        awardReason: "Best verified fit for the backend vertical slice.",
+        shortlistAuditId: awardDetail.shortlistAuditId,
+        proofAuditId: awardDetail.proofAuditId
+      },
+      "idem-award-smoke-001"
     );
     assert.equal(awarded.status, "AWARDED");
     logStep(log, "task-awarded", awarded.auditEventId);
@@ -278,14 +341,244 @@ export async function runDispatchSmoke({ log = console.log } = {}) {
       verificationResult: verified.result,
       eventTypes: events.events.map((event) => event.eventType)
     };
-  } finally {
-    server.close();
-    await once(server, "close");
-  }
+  });
+}
+
+async function runInvalidSignatureScenario({ log = console.log } = {}) {
+  return withRuntime(async ({ baseUrl, setCurrentTime }) => {
+    const created = await createTask(baseUrl, buildTask({
+      title: "Dispatch invalid signature smoke task"
+    }));
+    await shortlistTask(baseUrl, created.taskId);
+
+    const proof = buildProof({
+      taskId: created.taskId,
+      proofId: "proof_00000011",
+      agentId: "agent_kestrel_alpha",
+      signerDid: "did:key:agent_kestrel_tampered"
+    });
+    const reveal = {
+      bidId: "bid_00000011",
+      taskId: created.taskId,
+      agentId: "agent_kestrel_alpha",
+      nonce: "nonce-invalid-signature",
+      price: {
+        currency: "USD",
+        amount: 180
+      },
+      executionPlan: {
+        summary: "Attempt verify with a tampered signerDid",
+        etaSeconds: 240,
+        requiredTools: ["node"]
+      },
+      proof
+    };
+
+    await createCommit(baseUrl, reveal, "idem-commit-invalid-signature");
+    const policy = await createPolicy(baseUrl, {
+      taskId: created.taskId,
+      agentId: reveal.agentId
+    });
+    setCurrentTime("2026-03-19T00:10:00.000Z");
+    await revealBid(baseUrl, reveal, "idem-reveal-invalid-signature");
+
+    const failedVerification = await verifyProof(baseUrl, {
+      taskId: created.taskId,
+      policyTraceId: policy.policyTraceId,
+      proof,
+      expectedStatus: 422
+    });
+    assert.equal(failedVerification.code, "PROOF_VERIFY_FAILED");
+    assert.deepEqual(failedVerification.details.reasonCodes, ["TRACE_SIGNATURE_INVALID"]);
+    logStep(log, "invalid-signature-rejected", failedVerification.code);
+
+    const proofStatus = await expectJson(
+      await fetch(`${baseUrl}/v1/tasks/${created.taskId}/proofs/${proof.proofId}`),
+      200
+    );
+    assert.equal(proofStatus.verificationState, "FAIL");
+    assert.deepEqual(proofStatus.reasonCodes, ["PROOF_VERIFY_FAILED"]);
+
+    return {
+      scenario: "invalid-signature",
+      taskId: created.taskId,
+      bidId: reveal.bidId,
+      proofId: proof.proofId,
+      result: failedVerification.code,
+      reasonCodes: failedVerification.details.reasonCodes
+    };
+  });
+}
+
+async function runNegativeScenarioSuite({ log = console.log } = {}) {
+  return withRuntime(async ({ baseUrl, setCurrentTime }) => {
+    const created = await createTask(baseUrl, buildTask({
+      title: "Dispatch negative smoke task",
+      risk: {
+        level: "HIGH",
+        valueScore: 0.88
+      }
+    }));
+    await shortlistTask(baseUrl, created.taskId);
+
+    setCurrentTime("2026-03-19T00:10:00.000Z");
+
+    const missingCommitProof = buildProof({
+      taskId: created.taskId,
+      proofId: "proof_00000077",
+      agentId: "agent_kestrel_beta",
+      qualityScore: 0.4,
+      credentialLevel: "T2"
+    });
+    const missingCommitReveal = {
+      bidId: "bid_00000077",
+      taskId: created.taskId,
+      agentId: "agent_kestrel_beta",
+      nonce: "nonce-missing-commit",
+      price: {
+        currency: "USD",
+        amount: 260
+      },
+      executionPlan: {
+        summary: "Attempt reveal without a prior commit",
+        etaSeconds: 420
+      },
+      proof: missingCommitProof
+    };
+
+    const missingCommitResponse = await revealBid(
+      baseUrl,
+      missingCommitReveal,
+      "idem-reveal-missing-commit",
+      400
+    );
+    assert.equal(missingCommitResponse.code, "BID_REVEAL_COMMIT_NOT_FOUND");
+    logStep(log, "reveal-without-commit-rejected", missingCommitResponse.code);
+
+    setCurrentTime("2026-03-16T00:10:00.000Z");
+
+    const failingProof = buildProof({
+      taskId: created.taskId,
+      proofId: "proof_00000002",
+      agentId: "agent_kestrel_gamma",
+      qualityScore: 0.4,
+      credentialLevel: "T2"
+    });
+    const failingReveal = {
+      bidId: "bid_00000002",
+      taskId: created.taskId,
+      agentId: "agent_kestrel_gamma",
+      nonce: "nonce-fail-verify",
+      price: {
+        currency: "USD",
+        amount: 250
+      },
+      executionPlan: {
+        summary: "High-risk candidate path",
+        etaSeconds: 360,
+        requiredTools: ["node"]
+      },
+      proof: failingProof
+    };
+
+    await createCommit(baseUrl, failingReveal, "idem-commit-fail-verify");
+    const policy = await createPolicy(baseUrl, {
+      taskId: created.taskId,
+      agentId: failingReveal.agentId,
+      identityTier: "T2",
+      trustScore: 0.55
+    });
+    assert.equal(policy.requiredProofStrength, "VERY_HIGH");
+
+    setCurrentTime("2026-03-19T00:10:00.000Z");
+    await revealBid(baseUrl, failingReveal, "idem-reveal-fail-verify");
+
+    const verifyResponse = await verifyProof(baseUrl, {
+      taskId: created.taskId,
+      policyTraceId: policy.policyTraceId,
+      proof: failingProof,
+      expectedStatus: 422
+    });
+    assert.equal(verifyResponse.code, "PROOF_VERIFY_FAILED");
+    assert.deepEqual(verifyResponse.details.reasonCodes, [
+      "QUALITY_SCORE_BELOW_MINIMUM",
+      "HASHCASH_BITS_BELOW_MINIMUM"
+    ]);
+    logStep(log, "proof-fail-rejected", verifyResponse.code);
+
+    const awardDetail = await getAwardDetail(baseUrl, created.taskId);
+    assert.equal(awardDetail.status, "BLOCKED");
+    logStep(log, "award-blocked", awardDetail.status);
+
+    const awardResponse = await awardTask(
+      baseUrl,
+      created.taskId,
+      {
+        bidId: failingReveal.bidId,
+        awardReason: "Proof failed verification and should not award.",
+        shortlistAuditId: awardDetail.shortlistAuditId,
+        proofAuditId: awardDetail.proofAuditId
+      },
+      "idem-award-fail-verify",
+      422
+    );
+    assert.equal(awardResponse.code, "TASK_AWARD_PRECONDITION_FAILED");
+
+    return {
+      scenario: "negative-paths",
+      taskId: created.taskId,
+      revealWithoutCommit: missingCommitResponse.code,
+      proofFail: verifyResponse.code,
+      awardBlocked: awardResponse.code,
+      proofFailReasonCodes: verifyResponse.details.reasonCodes
+    };
+  });
+}
+
+export async function runDispatchSmokeSuite({ log = console.log } = {}) {
+  const happyPath = await runDispatchSmoke({
+    log: (line) => log(`[happy-path] ${line}`)
+  });
+  const invalidSignature = await runInvalidSignatureScenario({
+    log: (line) => log(`[invalid-signature] ${line}`)
+  });
+  const negativePaths = await runNegativeScenarioSuite({
+    log: (line) => log(`[negative-paths] ${line}`)
+  });
+
+  return {
+    status: "ok",
+    command: "npm run smoke:dispatch",
+    scenarios: [
+      {
+        name: "happy-path",
+        status: "PASS",
+        verificationResult: happyPath.verificationResult,
+        taskId: happyPath.taskId,
+        bidId: happyPath.bidId
+      },
+      {
+        name: "invalid-signature",
+        status: "PASS",
+        result: invalidSignature.result,
+        reasonCodes: invalidSignature.reasonCodes,
+        taskId: invalidSignature.taskId,
+        proofId: invalidSignature.proofId
+      },
+      {
+        name: "negative-paths",
+        status: "PASS",
+        revealWithoutCommit: negativePaths.revealWithoutCommit,
+        proofFail: negativePaths.proofFail,
+        awardBlocked: negativePaths.awardBlocked,
+        taskId: negativePaths.taskId
+      }
+    ]
+  };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  runDispatchSmoke()
+  runDispatchSmokeSuite()
     .then((result) => {
       console.log(JSON.stringify(result, null, 2));
     })

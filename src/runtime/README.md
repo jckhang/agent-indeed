@@ -6,7 +6,7 @@ This directory holds the first runnable backend control-plane scaffold for Agent
 
 - Start the service: `npm start`
 - Start with file watching: `npm run dev`
-- Run the end-to-end dispatch smoke path: `npm run smoke:dispatch`
+- Run the end-to-end dispatch smoke suite: `npm run smoke:dispatch`
 - Run the built-in runtime tests: `npm test`
 - Run the bootstrap smoke flow: `npm run smoke:bootstrap`
 
@@ -45,13 +45,13 @@ curl -s -X POST http://127.0.0.1:3000/v1/tasks   -H 'content-type: application/j
 curl -s http://127.0.0.1:3000/v1/tasks/task_00000001/audit-events
 ```
 
-To exercise the runnable vertical slice in one command without managing a long-lived server process:
+To exercise the runnable vertical slice and its minimum QA regression checks in one command without managing a long-lived server process:
 
 ```bash
 npm run smoke:dispatch
 ```
 
-The smoke command boots the runtime on an ephemeral port, publishes a task, materializes candidates, commits and reveals a bid, resolves proof policy, checks award readiness, awards the task with the contract-shaped idempotent payload, and confirms the task/bid audit timelines before printing the resulting ids as JSON.
+The smoke command boots the runtime on ephemeral ports and runs three bounded scenarios: the happy path (`publish -> match -> commit -> reveal -> verify -> award`), an invalid-signature verification failure, and the minimum negative-path regression checks for `reveal without commit`, `proof FAIL`, and `award blocked`. It prints prefixed PASS lines for human review and a final JSON summary that QA can link back to issue `#11`.
 
 Or run the bootstrap path end-to-end with one command:
 
