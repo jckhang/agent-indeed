@@ -50,6 +50,26 @@ function extractOpenApiEnum(source, schemaName) {
   return [...block[1].matchAll(/^ {8}- (.+)$/gm)].map((entry) => entry[1]);
 }
 
+function extractTsTypeAnchor(source, typeName) {
+  const match = source.match(new RegExp(`^export type ${typeName} =`, "m"));
+  if (!match || match.index === undefined) {
+    throw new Error(`Unable to find TypeScript type anchor for ${typeName}`);
+  }
+
+  const lineNumber = source.slice(0, match.index).split("\n").length;
+  return `src/api/contracts.ts:${lineNumber}`;
+}
+
+function extractOpenApiSchemaAnchor(source, schemaName) {
+  const match = source.match(new RegExp(`^\\s{4}${schemaName}:$`, "m"));
+  if (!match || match.index === undefined) {
+    throw new Error(`Unable to find OpenAPI schema anchor for ${schemaName}`);
+  }
+
+  const lineNumber = source.slice(0, match.index).split("\n").length;
+  return `src/api/openapi.yaml:${lineNumber}`;
+}
+
 function extractOpenApiPaths(source) {
   return unique([...source.matchAll(/^  (\/[^\s:]+):$/gm)].map((entry) => entry[1])).sort();
 }
@@ -84,10 +104,14 @@ function buildSnapshot() {
     },
     enums: {
       proofVerificationReasonCode: {
+        openapiAnchor: extractOpenApiSchemaAnchor(openapiSource, "ProofVerificationReasonCode"),
+        contractsAnchor: extractTsTypeAnchor(contractsSource, "ProofVerificationReasonCode"),
         openapi: extractOpenApiEnum(openapiSource, "ProofVerificationReasonCode"),
         contracts: extractTsStringUnion(contractsSource, "ProofVerificationReasonCode")
       },
       proofVerifyErrorCode: {
+        openapiAnchor: extractOpenApiSchemaAnchor(openapiSource, "ProofVerifyErrorCode"),
+        contractsAnchor: extractTsTypeAnchor(contractsSource, "ProofVerifyErrorCode"),
         openapi: extractOpenApiEnum(openapiSource, "ProofVerifyErrorCode"),
         contracts: extractTsStringUnion(contractsSource, "ProofVerifyErrorCode")
       }

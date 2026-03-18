@@ -22,9 +22,9 @@ The command fails when:
 - `src/api/openapi.yaml` and `src/api/contracts.ts` disagree on `ProofVerifyErrorCode`
 - a required published runtime route disappears from OpenAPI
 
-The JSON output also includes `src/api/openapi.yaml` line anchors for every required route so
-review comments can cite the exact source-of-truth path definition instead of paraphrasing route
-availability from memory.
+The JSON output also includes `src/api/openapi.yaml` line anchors for every required route plus
+OpenAPI/TypeScript anchors for both proof-verification enums, so review comments can cite the exact
+source-of-truth definition instead of paraphrasing route or enum availability from memory.
 
 ## 2026-03-18 snapshot
 
@@ -47,10 +47,12 @@ Published runtime routes confirmed by the guard:
 Proof verification enums confirmed aligned between OpenAPI and TypeScript contracts:
 
 - `ProofVerificationReasonCode`:
+  `src/api/openapi.yaml:2448` / `src/api/contracts.ts:579`
   `IDENTITY_TIER_MISMATCH`, `SAMPLE_COUNT_BELOW_MINIMUM`, `QUALITY_SCORE_BELOW_MINIMUM`,
   `RUNTIME_EXCEEDED`, `TRACE_SIGNATURE_INVALID`, `HASHCASH_BITS_BELOW_MINIMUM`,
   `STAKE_AMOUNT_BELOW_MINIMUM`, `DEVICE_ATTESTATION_MISSING`, `MANUAL_REVIEW_REQUIRED`
 - `ProofVerifyErrorCode`:
+  `src/api/openapi.yaml:2405` / `src/api/contracts.ts:327`
   `PROOF_POLICY_INPUT_INVALID`, `PROOF_POLICY_TRACE_MISSING`, `PROOF_POLICY_TRACE_NOT_FOUND`,
   `PROOF_VERIFY_PAYLOAD_INVALID`, `PROOF_VERIFY_POLICY_INVALID`, `PROOF_VERIFY_FAILED`,
   `PROOF_VERIFY_NEEDS_REVIEW`
@@ -66,6 +68,6 @@ Use the snapshot above when reviewing the current queue:
   or enum members that are not in the API drafts
 - PR #164: backend API example payloads should stay inside the same published route set and verifier
   vocabulary captured by the guard output, especially for award/proof examples copied from smoke runs
-- PR #153 and PR #165: planning rollups should reference this sweep or the API source files rather
-  than paraphrasing route availability from memory, and should treat merged PRs #129, #140, and #141
-  as baseline rather than active blockers
+- PRs #153, #154, #161, #165, and #166: planning rollups should reference this sweep or the API
+  source files rather than paraphrasing route availability from memory, and should treat merged
+  PRs #129, #140, and #141 as baseline rather than active blockers
