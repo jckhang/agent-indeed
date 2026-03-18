@@ -58,10 +58,14 @@ These frontend handoff claims are backed by the current API sources of truth on 
 
 | Runtime surface | OpenAPI anchor | TypeScript contract anchor |
 | --- | --- | --- |
-| Shortlist read | `src/api/openapi.yaml` -> `/v1/tasks/{taskId}/candidates` + `CandidateMatchListResponse` | `src/api/contracts.ts` -> `CandidateMatchListResponse` |
-| Award-readiness read | `src/api/openapi.yaml` -> `/v1/tasks/{taskId}/award` + `AwardDecisionDetail` | `src/api/contracts.ts` -> `AwardDecisionDetail` |
-| Bid status read | `src/api/openapi.yaml` -> `/v1/tasks/{taskId}/bids/{bidId}` + `BidStatusResponse` | `src/api/contracts.ts` -> `BidStatusResponse` |
-| Proof status read | `src/api/openapi.yaml` -> `/v1/tasks/{taskId}/proofs/{proofId}` + `ProofStatusResponse` | `src/api/contracts.ts` -> `ProofStatusResponse` |
+| Shortlist read | `src/api/openapi.yaml:355` -> `/v1/tasks/{taskId}/candidates` + `CandidateMatchListResponse` | `src/api/contracts.ts:539` -> `CandidateMatchListResponse` |
+| Award-readiness read | `src/api/openapi.yaml:522` -> `/v1/tasks/{taskId}/award` + `AwardDecisionDetail` | `src/api/contracts.ts:759` -> `AwardDecisionDetail` |
+| Bid status read | `src/api/openapi.yaml:763` -> `/v1/tasks/{taskId}/bids/{bidId}` + `BidStatusResponse` | `src/api/contracts.ts:1002` -> `BidStatusResponse` |
+| Proof status read | `src/api/openapi.yaml:1207` -> `/v1/tasks/{taskId}/proofs/{proofId}` + `ProofStatusResponse` | `src/api/contracts.ts:1024` -> `ProofStatusResponse` |
+
+Reviewer quick-check on a fresh `origin/main` sync:
+- `git show origin/main:src/api/openapi.yaml | rg -n "/v1/tasks/\\{taskId\\}/(candidates|award|bids/\\{bidId\\}|proofs/\\{proofId\\})"`
+- `git show origin/main:src/api/contracts.ts | rg -n "interface (CandidateMatchListResponse|AwardDecisionDetail|BidStatusResponse|ProofStatusResponse)"`
 
 If a local runtime instance does not return those reads yet, treat that as runtime implementation lag from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) / [#115](https://github.com/jckhang/agent-indeed/issues/115), not as permission for frontend docs to downgrade the merged contract baseline or relabel a published path as pending.
 
