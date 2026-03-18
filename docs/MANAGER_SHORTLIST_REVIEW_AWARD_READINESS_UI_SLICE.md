@@ -10,7 +10,7 @@ Define the manager-side shortlist review and award-readiness slice that starts a
 
 This slice stays explicit about current repo reality:
 - `docs/MANAGER_CONSOLE_BASELINE.md` already captures the broader manager baseline.
-- the published API drafts on `main` include the shortlist and award read contracts for `GET /v1/tasks/{taskId}/candidates` and `GET /v1/tasks/{taskId}/award`.
+- the published API drafts on `main` include `GET /v1/tasks/{taskId}/candidates` -> `CandidateMatchListResponse` and `GET /v1/tasks/{taskId}/award` -> `AwardDecisionDetail`; treat those file anchors as the source of truth when reviewing this slice.
 - `POST /v1/tasks/{taskId}/award` is contract-ready on `main`, but live runtime execution still depends on the runnable dispatch implementation from issue [#110](https://github.com/jckhang/agent-indeed/issues/110).
 - The UI must remain fallback-first for missing runtime data or unavailable handlers; it should not invent hidden fields or pretend local environments are more complete than the running stack actually is.
 
