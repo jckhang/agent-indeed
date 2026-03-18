@@ -74,9 +74,7 @@ planning docs.
 
 The backend-owned reusable API packet for that final handoff lives in
 `docs/BACKEND_API_EXAMPLE_PACKET.md`; issue #11 and future QA runs should point at that
-doc instead of reconstructing payloads from PR review threads. That packet now also
-includes a minimal JavaScript client helper so downstream QA/beta consumers can rerun
-the same flow without inventing a separate local SDK wrapper.
+doc instead of reconstructing payloads from PR review threads.
 
 ## Ownership handshake
 
