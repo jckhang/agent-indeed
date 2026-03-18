@@ -64,7 +64,7 @@ Exit criteria:
 Focus:
 - Treat issues #109, #110, and #111 as merged runtime baseline work.
 - Clear the planning/reference review blockers on PR #174 and PR #176 so post-runtime docs stop pointing at closed issues.
-- Land one surviving planning rollup for issue #167; use PR #171 as the preferred branch to absorb the refresh and close or supersede overlapping older planning PRs (#154, #165, #166, #161, #153).
+- Land one surviving planning rollup for issue #167; use PR #179 as the preferred branch to absorb the refresh and close or supersede overlapping older planning PRs (#171, #154, #165, #166, #161, #153).
 - Keep PR #133 aligned to the published verify/award contract vocabulary after the planning refresh settles.
 - Move QA evidence forward through issue #177, issue #178, and issue #11 instead of reopening closed issue #120.
 
@@ -77,8 +77,8 @@ De-scoped from current sprint:
 
 1. Merge PR #174 (`docs: refresh runtime handoff baseline`) after removing the last stale references to closed issue #120.
 2. Merge PR #176 (`docs: codify planning reference rules`) so contributor guidance matches the post-runtime review workflow.
-3. Refresh and merge PR #171 (`[P1-167] Refresh planning docs to post-runtime baseline`) as the single surviving planning rollup for issue #167.
-4. Close, restack, or fold overlapping planning refresh PRs (#154, #165, #166, #161, #153) behind the merged #167 rollup instead of keeping multiple conflicting status snapshots open.
+3. Refresh and merge PR #179 (`[P1-167] Refresh planning docs to post-runtime baseline`) as the single surviving planning rollup for issue #167.
+4. Close, restack, or fold overlapping planning refresh PRs (#171, #154, #165, #166, #161, #153) behind the merged #167 rollup instead of keeping multiple conflicting status snapshots open.
 5. Revisit PR #133 once the planning baseline is stable, then hand the canonical smoke evidence path to issue #177, issue #178, and issue #11.
 
 ### Phase 2: Execution & Trust Loop (Target: 2026-05 to 2026-06)
