@@ -9,6 +9,7 @@
 - [x] 0.7 收敛 `docs/issues/PHASE1_ISSUES.md` 与 `docs/PHASE1_CHECKPOINT_BOARD.md` 为稳定索引，改用 GitHub 查询承载高频 issue / PR 状态。
 - [x] 0.8 输出 `docs/MVP_STATE_MODEL.md`，冻结 MVP 状态机与关键写入时序约束。
 - [x] 0.9 输出 `docs/MERGE_TRAIN_PLAYBOOK.md`，统一 clean LGTM merge train、dirty queue 回写与 rebase 协作流程。
+- [x] 0.10 输出 `docs/PHASE1_ACCEPTANCE_TRACE.md`，把 epic #2 的验收项、里程碑 handoff 与证据要求收敛为稳定索引，避免把高频队列状态写回仓库文档。
 
 ## 1. OpenSpec 基础落地
 
