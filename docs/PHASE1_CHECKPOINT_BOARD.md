@@ -7,9 +7,9 @@ This document keeps only the stable checkpoint structure and links to the live m
 
 | Checkpoint | Target date | Owners | Live issues | Live PRs | Review focus |
 | --- | --- | --- | --- | --- | --- |
-| M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | Contract convergence kickoff + runnable service bootstrap gate (#109, PR #90). |
-| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | Runnable publish/match/commit/reveal path plus merged proof/award reads and the collapsed frontend runtime handoff (#110, #136, #145). |
-| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | Verify/audit runtime durability plus executable QA conversion (#111, PR #83, PR #92). |
+| M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | Post-runtime planning/reference cleanup plus verify/award contract adoption (#167, PR #174, PR #176, PR #133). |
+| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | Hold the merged runtime slice steady while backend publishes canonical smoke formatting and evidence (#177, PR #175). |
+| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | Formatter-backed smoke pass, QA packet updates, and final issue #11 evidence handoff (#178, PR #172, issue #11). |
 | M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | Final E2E evidence, audit trail sign-off, and security readiness closure (issue #11). |
 
 ## Metadata hygiene queries
@@ -19,24 +19,25 @@ Use these GitHub queries before a checkpoint comment so milestone views and runt
 - [Runtime issues missing milestones](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+no%3Amilestone)
 - [Runtime PRs missing milestones](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+no%3Amilestone)
 - [Runtime PRs missing priority](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+-label%3A%22priority%2FP0%22+-label%3A%22priority%2FP1%22)
+- [Planning review-burndown queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22owner%3Aalbatross%22+label%3A%22stream%2Freview-burndown%22)
 
 ## Runtime pivot anchors
 
-Sprint pivot dated 2026-03-16 keeps these issue anchors as the default execution path:
+Sprint pivot dated 2026-03-16 now uses these anchors by default:
 
-- `#109`: runnable backend skeleton
-- `#110`: runnable dispatch vertical slice
-- `#111`: executable smoke/E2E conversion
-- `#11`: blocked final E2E sign-off thread
-- `#137`: architecture unblocker control for the 2026-03-20 runtime push (`docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`)
+- Closed runtime baseline: `#109`, `#110`, `#111`
+- Live planning refresh: `#167`
+- Live backend formatter handoff: `#177`
+- Live QA smoke handoff: `#178`
+- Final evidence gate: `#11`
 
 ## Review routine
 
 1. Open milestone issue and PR links instead of editing status snapshots in-repo.
 2. Use labels such as `status/ready-next`, `status/in-review`, and owner labels to decide next merge or rebase action.
 3. Run the metadata hygiene queries and clear any missing milestone or priority gaps before posting the checkpoint.
-4. Use `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` for the dated owner/blocker ledger instead of copying that volatile table into this guide.
-5. Run the merge-evidence sweep from issue #146 before the checkpoint comment so blocker notes, clean-order updates, and validation gaps all have a same-day GitHub trail.
+4. Use `docs/RUNTIME_EXECUTION_HANDOFF.md` and `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` for dated runtime evidence context instead of copying those volatile notes into this guide.
+5. Run the same-day planning sweep from issue #167 or the owner:`albatross` + `stream/review-burndown` query before the checkpoint comment so blocker notes, clean-order updates, and validation gaps all have a live GitHub trail.
 6. Treat missing validation evidence in a PR body/comment as a real blocker, even when the code diff looks complete.
 7. Capture only durable planning changes in repo docs; keep comments, review notes, and volatile state in GitHub threads.
 8. If merge-train triage uncovers a new durable blocker, open or link a follow-up issue instead of adding a status snapshot here.
@@ -53,7 +54,7 @@ Do not edit this file just to reflect day-to-day issue or PR movement.
 
 ## Epic checkpoint comment shape
 
-When posting the weekly checkpoint comment on epic #2, keep it in GitHub, start from the same-day issue #146 sweep, and use four buckets:
+When posting the weekly checkpoint comment on epic #2, keep it in GitHub, start from the same-day planning sweep, and use four buckets:
 
 - `Done`: merged items that changed the runtime baseline this week
 - `Blocked`: active issue/PR plus the concrete blocker and current owner
@@ -61,5 +62,3 @@ When posting the weekly checkpoint comment on epic #2, keep it in GitHub, start 
 - `Validation evidence gaps`: any PR that still needs pasted command output before review can close
 
 When a checkpoint calls out a blocker, prefer a GitHub issue or PR link plus the owner label already on that thread rather than copying queue snapshots into this document.
-
-Issue #146 should keep the shorter sweep ledger (`clean tranche`, `dirty follow-ons`, `validation evidence gaps`), while epic #2 keeps the broader checkpoint rollup for cross-lane handoff.
