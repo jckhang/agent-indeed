@@ -48,3 +48,4 @@
 - [x] 5.8 完成前端 runtime consumer verification pass（issue #150），校准 task composer、shortlist/award、bid workspace、verification timeline 对当前 `main` runtime 字段与 fallback 语义的引用。
 - [x] 5.9 跟进前端 consumer contract claim trim（issue #157），把 shortlist/award/bid/proof 读路径的 `main` 基线解释收敛到 OpenAPI/TS draft anchors，避免把 runtime 数据缺口误写成 contract 缺口。
 - [x] 5.10 补充前端 consumer contract reviewer quick-check 锚点，给出 `origin/main` 的行号与 grep 校验命令，减少对已发布读路径的重复误判。
+- [x] 5.11 输出 `docs/BACKEND_API_EXAMPLE_PACKET.md`，把 merged `smoke:dispatch` 路径固化为 issue #11 / QA / beta consumer 可复用的请求响应示例包。

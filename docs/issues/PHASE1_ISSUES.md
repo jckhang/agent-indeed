@@ -87,6 +87,7 @@ review history, and linked PRs, open the GitHub issue directly.
 - P1-39 Execute runtime smoke/E2E checks from QA matrices: [#111](https://github.com/jckhang/agent-indeed/issues/111)
 - P1-40 Frontend runtime integration tranche: [#136](https://github.com/jckhang/agent-indeed/issues/136)
 - P1-41 Frontend runtime mainline sync tranche: [#145](https://github.com/jckhang/agent-indeed/issues/145)
+- P1-42 Backend API example packet from merged smoke flow: [#163](https://github.com/jckhang/agent-indeed/issues/163)
 
 ## Working rule
 
