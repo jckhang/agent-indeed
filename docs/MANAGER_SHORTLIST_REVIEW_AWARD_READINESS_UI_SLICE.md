@@ -172,7 +172,7 @@ These gaps should stay tied to issue #58, issue #110, and downstream audit work,
 After `GET /v1/tasks/{taskId}/candidates` and `GET /v1/tasks/{taskId}/award` merged on `main`, this slice keeps only three explicit follow-ups:
 
 1. Runtime execution parity: local and shared runtime environments still need to serve the merged shortlist/award read surfaces consistently with issue #110.
-2. Evidence parity: QA still needs executable proof that the manager review shell behaves correctly through the runtime stack, with the latest drift sweep recorded in issue #120 and the remaining smoke evidence tracked in issue #11.
+2. Evidence parity: QA still needs executable proof that the manager review shell behaves correctly through the runtime stack; issue #120 is the closed drift-sweep baseline, and issue #11 is the live smoke-evidence follow-through.
 3. Award action readiness: `POST /v1/tasks/{taskId}/award` can stay contract-ready while the UI keeps the CTA secondary or disabled until the runtime environment confirms the write path is actually available.
 
 ## Acceptance criteria mapping
