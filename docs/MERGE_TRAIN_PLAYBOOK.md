@@ -21,8 +21,7 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
 - Validation-evidence gaps: [runtime PRs that still need pasted command output](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+label%3A%22status%2Fin-review%22)
 - Planning lane: [owner:albatross issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aalbatross%22)
 - Review-requested planning PRs: [owner:albatross PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22owner%3Aalbatross%22)
-- Planning sweep query: [open planning follow-through](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22owner%3Aalbatross%22)
-- QA evidence anchor: [issue #11](https://github.com/jckhang/agent-indeed/issues/11)
+- Merge-evidence umbrella: [current open planning sweep issue query](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22owner%3Aalbatross%22+label%3A%22stream%2Freview-burndown%22)
 - Dated runtime blocker ledger: `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`
 
 ## Merge-train routine
@@ -42,7 +41,7 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
    - the exact next step (`rebase origin/main`, rerun validation, or address the named review comment)
    - whether a new blocker issue should be opened instead of growing the PR thread further
 6. Post the same-day sweep output in GitHub:
-   - reply on the affected PR or live owner issue when the queue meaningfully changes
+   - add the evidence/blocker sweep note to the current open planning sweep issue when the queue meaningfully changes
    - add or refresh the four-bucket checkpoint comment on epic #2 when the sweep changes merge order, blockers, or validation gaps
 7. Only update repo docs when the planning structure changes. Do not copy day-to-day issue/PR state into `docs/issues/PHASE1_ISSUES.md` or `docs/PHASE1_CHECKPOINT_BOARD.md`.
 
@@ -61,9 +60,9 @@ Use this rubric for frontend, backend, QA, and planning lanes so reviewers can s
 
 Keep the volatile merge-evidence record in GitHub, not in repo docs:
 
-1. Use the live planning sweep query plus issue #11 as the same-day sources for queue sweeps, reviewer-follow-up burndown, and validation-evidence collection.
+1. Use the current open planning sweep issue from the `owner:albatross` + `stream/review-burndown` query as the umbrella note for same-day queue sweeps, reviewer-follow-up burndown, and validation-evidence collection.
 2. When the sweep changes the clean tranche, blocker ownership, or validation-gap list, mirror the result into epic #2 using the weekly checkpoint template below.
-3. If a blocker is resolved entirely inside one PR thread, reply on that PR with the signed validation rerun note first, then summarize the net queue change on epic #2 instead of copying the whole thread history into repo docs.
+3. If a blocker is resolved entirely inside one PR thread, reply on that PR with the signed validation rerun note first, then summarize the net queue change in the current planning sweep issue and epic #2 instead of copying the whole thread history.
 
 ## Validation gates
 
@@ -121,10 +120,9 @@ Validation evidence gaps
 --<agent-name>
 ```
 
-## Queue sweep note template
+## Merge-evidence sweep note template
 
-Use this on epic #2 or the current live planning follow-through issue after the
-current queue review or review-burndown pass:
+Use this on the current planning sweep issue after the current queue review or review-burndown pass:
 
 ```text
 Sweep <YYYY-MM-DD>
