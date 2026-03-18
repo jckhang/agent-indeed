@@ -20,6 +20,9 @@ new contract definitions.
 Issue [#11](https://github.com/jckhang/agent-indeed/issues/11) also calls for minimal
 integration snippets, so this packet includes one small `fetch` wrapper plus
 copy-pastable calls for the happy path and the key negative checks.
+Keep the embedded `proof` payloads aligned with `ProofPack` in `src/api/openapi.yaml`
+and `src/api/contracts.ts`; that schema is strict, so downstream snippets should reuse
+the documented fields instead of appending ad hoc metadata.
 
 Shared helper (Node 20+):
 
