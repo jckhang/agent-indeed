@@ -336,6 +336,7 @@ export async function runDispatchSmoke({ log = console.log } = {}) {
     return {
       taskId: created.taskId,
       bidId: reveal.bidId,
+      proofId: proof.proofId,
       awardAuditId: awarded.auditEventId,
       policyTraceId: policy.policyTraceId,
       verificationResult: verified.result,
@@ -527,6 +528,9 @@ async function runNegativeScenarioSuite({ log = console.log } = {}) {
     return {
       scenario: "negative-paths",
       taskId: created.taskId,
+      bidId: failingReveal.bidId,
+      proofId: failingProof.proofId,
+      policyTraceId: policy.policyTraceId,
       revealWithoutCommit: missingCommitResponse.code,
       proofFail: verifyResponse.code,
       awardBlocked: awardResponse.code,
@@ -535,7 +539,10 @@ async function runNegativeScenarioSuite({ log = console.log } = {}) {
   });
 }
 
-export async function runDispatchSmokeSuite({ log = console.log } = {}) {
+export async function runDispatchSmokeSuite({
+  log = console.log,
+  command = "npm run smoke:dispatch"
+} = {}) {
   const happyPath = await runDispatchSmoke({
     log: (line) => log(`[happy-path] ${line}`)
   });
@@ -548,14 +555,18 @@ export async function runDispatchSmokeSuite({ log = console.log } = {}) {
 
   return {
     status: "ok",
-    command: "npm run smoke:dispatch",
+    command,
     scenarios: [
       {
         name: "happy-path",
         status: "PASS",
         verificationResult: happyPath.verificationResult,
         taskId: happyPath.taskId,
-        bidId: happyPath.bidId
+        bidId: happyPath.bidId,
+        proofId: happyPath.proofId,
+        policyTraceId: happyPath.policyTraceId,
+        awardAuditId: happyPath.awardAuditId,
+        eventTypes: happyPath.eventTypes
       },
       {
         name: "invalid-signature",
@@ -571,15 +582,58 @@ export async function runDispatchSmokeSuite({ log = console.log } = {}) {
         revealWithoutCommit: negativePaths.revealWithoutCommit,
         proofFail: negativePaths.proofFail,
         awardBlocked: negativePaths.awardBlocked,
-        taskId: negativePaths.taskId
+        taskId: negativePaths.taskId,
+        bidId: negativePaths.bidId,
+        proofId: negativePaths.proofId,
+        policyTraceId: negativePaths.policyTraceId,
+        proofFailReasonCodes: negativePaths.proofFailReasonCodes
       }
     ]
   };
 }
 
+
+export function formatIssue11Comment(summary) {
+  const happyPath = summary.scenarios.find((scenario) => scenario.name === "happy-path");
+  const invalidSignature = summary.scenarios.find((scenario) => scenario.name === "invalid-signature");
+  const negativePaths = summary.scenarios.find((scenario) => scenario.name === "negative-paths");
+
+  return [
+    "Issue #11 executable smoke evidence",
+    "",
+    "Validation command:",
+    `- \`${summary.command}\``,
+    "",
+    "| Scenario | Status | Key evidence |",
+    "| --- | --- | --- |",
+    `| happy path | ${happyPath.status} | task \`${happyPath.taskId}\`, bid \`${happyPath.bidId}\`, proof \`${happyPath.proofId}\`, policy \`${happyPath.policyTraceId}\`, award audit \`${happyPath.awardAuditId}\` |`,
+    `| invalid signature | ${invalidSignature.status} | proof \`${invalidSignature.proofId}\`, result \`${invalidSignature.result}\`, reason codes \`${invalidSignature.reasonCodes.join("`, `")}\` |`,
+    `| negative paths | ${negativePaths.status} | reveal \`${negativePaths.revealWithoutCommit}\`, proof \`${negativePaths.proofFail}\`, award \`${negativePaths.awardBlocked}\`, reason codes \`${negativePaths.proofFailReasonCodes.join("`, `")}\` |`,
+    "",
+    "Happy-path audit events:",
+    ...happyPath.eventTypes.map((eventType) => `- \`${eventType}\``),
+    "",
+    "JSON summary:",
+    "```json",
+    JSON.stringify(summary, null, 2),
+    "```"
+  ].join("\n");
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  runDispatchSmokeSuite()
+  const emitIssue11Comment = process.argv.includes("--issue11-comment");
+  const command = emitIssue11Comment
+    ? "npm run smoke:dispatch:issue11"
+    : "npm run smoke:dispatch";
+  const log = emitIssue11Comment ? () => {} : console.log;
+
+  runDispatchSmokeSuite({ command, log })
     .then((result) => {
+      if (emitIssue11Comment) {
+        console.log(formatIssue11Comment(result));
+        return;
+      }
+
       console.log(JSON.stringify(result, null, 2));
     })
     .catch((error) => {

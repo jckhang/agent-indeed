@@ -7,6 +7,7 @@ This directory holds the first runnable backend control-plane scaffold for Agent
 - Start the service: `npm start`
 - Start with file watching: `npm run dev`
 - Run the end-to-end dispatch smoke suite: `npm run smoke:dispatch`
+- Render the issue-ready smoke evidence block for issue `#11`: `npm run smoke:dispatch:issue11`
 - Run the built-in runtime tests: `npm test`
 - Run the bootstrap smoke flow: `npm run smoke:bootstrap`
 
@@ -52,6 +53,14 @@ npm run smoke:dispatch
 ```
 
 The smoke command boots the runtime on ephemeral ports and runs three bounded scenarios: the happy path (`publish -> match -> commit -> reveal -> verify -> award`), an invalid-signature verification failure, and the minimum negative-path regression checks for `reveal without commit`, `proof FAIL`, and `award blocked`. It prints prefixed PASS lines for human review and a final JSON summary that QA can link back to issue `#11`.
+
+To render the same smoke evidence as a paste-ready Markdown block for issue `#11`, run:
+
+```bash
+npm run smoke:dispatch:issue11
+```
+
+That formatter keeps the actual invoked command, happy-path ids (`taskId`, `bidId`, `proofId`, `policyTraceId`, `awardAuditId`), audit event list, and negative-path reason codes in one reproducible block for QA handoff comments.
 
 Or run the bootstrap path end-to-end with one command:
 

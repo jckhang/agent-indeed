@@ -6,6 +6,7 @@
     "start": "node src/runtime/server.js",
     "dev": "node --watch src/runtime/server.js",
     "smoke:dispatch": "node src/runtime/dispatch-smoke.js",
+    "smoke:dispatch:issue11": "node src/runtime/dispatch-smoke.js --issue11-comment",
     "smoke:bootstrap": "node src/runtime/bootstrap-smoke.js",
     "check:contract-drift": "node scripts/check-runtime-contract-drift.js --assert",
     "test": "node --test"

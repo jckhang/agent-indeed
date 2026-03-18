@@ -75,6 +75,10 @@ planning docs.
 The backend-owned reusable API packet for that final handoff lives in
 `docs/BACKEND_API_EXAMPLE_PACKET.md`; issue #11 and future QA runs should point at that
 doc instead of reconstructing payloads from PR review threads.
+When QA needs the bounded runtime smoke result in issue-comment form, use
+`npm run smoke:dispatch:issue11` so the posted block includes the true command string,
+happy-path ids, audit event list, and negative-path reason codes without manual
+reformatting.
 
 ## Ownership handshake
 
