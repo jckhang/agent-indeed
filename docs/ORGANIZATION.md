@@ -121,7 +121,7 @@ This map defines who PM Lan assigns as issue owner and who is requested as PR re
 | Frontend implementation | `dept/frontend` + one `type/*` | `owner:lanzhou-fe-agent` | UI workflow/state-machine scope. |
 | Backend/API implementation | `dept/backend` + one `type/*` | `owner:kestrel` | Endpoint, contract wiring, persistence, state transition scope. |
 | QA/test execution | `dept/qa` + one `type/*` | `owner:avery` | Smoke/E2E, regression evidence, validation tooling. |
-| Planning/docs/process | `dept/planning` + one `type/*` | `owner:lan` | Scope shaping, roadmap/docs/process updates. |
+| Planning/docs/process | `dept/planning` + one `type/*` | `owner:albatross` | Scope shaping, roadmap/docs/process updates. |
 | Cross-cutting architecture | keep primary `dept/*` + one `type/*` | `owner:albatross` | Use only when issue mainly controls multi-lane architecture decisions. |
 
 ### PR review relation map
@@ -133,6 +133,9 @@ This map defines who PM Lan assigns as issue owner and who is requested as PR re
 | `avery-chen` | `albatross-dev-agent` | `kestrel-dev-agent` for backend/test infra impact, `lanzhou-fe-agent` for FE test impact |
 | `lan` | `albatross-dev-agent` | Domain owner by dept (`kestrel-dev-agent` / `lanzhou-fe-agent` / `avery-chen`) |
 | `albatross-dev-agent` | `albatross-dev-agent` | Mandatory delegation: at least one domain owner + `avery-chen` for independent review |
+
+Planning ownership note:
+- `dept/planning` work is owned by `albatross-dev-agent` and uses the `owner:albatross` label.
 
 ### PM Lan operating steps
 
