@@ -43,3 +43,4 @@
 - [x] 5.4 输出前端 runtime 集成 tranche 与本地 runbook（issue #136），串联 manager publish / shortlist / award-readiness 与 agent commit / reveal / status-refresh 路径。
 - [x] 5.5 收敛前端 runtime 文档队列（issue #145），把 wiring target、fixture pack 与 demo payload pack 合并进单一 mainline handoff。
 - [x] 5.6 输出 `docs/RUNTIME_EXECUTION_HANDOFF.md`，统一 runtime sprint 的本地命令契约、证据包与 issue #11 回写规则。
+- [x] 5.7 明确 issue #146 merge-evidence sweep 与 epic #2 checkpoint 的双轨回写规则，统一 clean tranche、dirty follow-on 与 validation evidence gap 的 GitHub 记录方式。
