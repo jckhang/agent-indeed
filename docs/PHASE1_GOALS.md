@@ -17,6 +17,7 @@ Ship the first usable agent dispatch loop for closed beta:
 
 - Current sprint focus moves from planning-doc expansion to runnable implementation slices.
 - Runtime cutline decisions for open contract PRs live in `docs/RUNTIME_CUTLINE_2026-03-16.md`; use that table to decide which deltas block runtime merge versus which are additive-safe follow-ups.
+- Runtime command/evidence expectations live in `docs/RUNTIME_EXECUTION_HANDOFF.md`; use that handoff contract when issue #109, issue #110, issue #111, or issue #11 claims executable progress.
 - Architecture coordination for the 2026-03-17 to 2026-03-20 unblocker window lives in `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` and issue #137.
 - Active implementation issues for this pivot:
   - #109 backend runtime skeleton
@@ -95,6 +96,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Implementation-scoped issues are closed only when runtime code or executable test coverage is merged.
 - End-to-end happy path + key negative paths are covered by automated tests.
 - One local command path can run service + smoke checks for happy path and core negatives.
+- The canonical command path and evidence handoff into issue #11 are documented in `docs/RUNTIME_EXECUTION_HANDOFF.md`.
 - GitHub issues for Phase 1 epics/tasks are created and linked to this plan.
 - Every active P1 issue/PR is discoverable from the M1-M4 milestone links in `docs/PHASE1_CHECKPOINT_BOARD.md`.
 - Weekly epic #2 checkpoints use `docs/PHASE1_EPIC_CHECKPOINT_TEMPLATE.md` so owner handoffs and validation-evidence gaps stay consistent across review weeks.
