@@ -79,7 +79,7 @@ Focus:
 De-scoped from current sprint:
 - Planning-only follow-ups #106, #107, #108 were closed to avoid additional doc-layer churn.
 - Planning-sync PRs #82, #95, #96, #102, #103, and #105 were closed for the same reason.
-- QA prewrite-only threads (#87, PR #84, PR #104) are treated as superseded by runtime execution issue #111.
+- QA prewrite-only threads (#87, PR #84, PR #104) are treated as superseded by the merged runtime evidence baseline; issue #11 and issue #120 now carry the remaining executable follow-through.
 
 ### Phase 2: Execution & Trust Loop (Target: 2026-05 to 2026-06)
 
@@ -105,10 +105,10 @@ Scope:
 
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
-- M1 (2026-03-20): absorb the merged runtime read-model baseline into one frontend handoff doc, then land runnable backend skeleton (#109).
-- Runtime work may proceed ahead of full contract convergence when the cutline marks a delta additive-safe; verifier payload/result vocabulary is now merged, so the remaining near-term review risk is contract drift on the additive read surfaces and frontend wiring handoff.
-- M2 (2026-03-27): land runnable publish/match/commit/reveal/verify/award vertical slice (#110).
-- M3 (2026-04-03): stabilize verify/award/audit runtime behavior and run executable smoke checks (#111).
+- M1 (2026-03-20): keep the merged runtime/bootstrap/handoff baseline stable on `main`, use merged PR #152 as the consumer-baseline reference, and close the remaining planning review queue (`#133`, `#153`).
+- Runtime work may proceed ahead of full contract convergence when the cutline marks a delta additive-safe; verifier payload/result vocabulary, the bootstrap/runtime handoff baseline, the executable smoke suite (PR #149), and the consumer-baseline follow-through (PR #152) are now merged, so the remaining near-term review risk is contract drift in the still-open planning/doc queue.
+- M2 (2026-03-27): keep the merged publish/match/commit/reveal/verify/award path healthy on `main` and turn the already-merged executable dispatch smoke suite (PR #149) into current QA evidence on issue #120 / issue #11.
+- M3 (2026-04-03): stabilize verify/award/audit runtime behavior and post executable smoke/E2E evidence back to issue #120 and issue #11.
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
 - M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, and `docs/CLOSED_BETA_SECURITY_READINESS.md` so telemetry owners plus auth, secret-handling, and redaction follow-ons stay reviewable.
 - Review `docs/PHASE1_BETA_READINESS_GATES.md` as the compact release-gate checklist for the remaining Phase 1 contract, QA, audit, and planning blockers.
