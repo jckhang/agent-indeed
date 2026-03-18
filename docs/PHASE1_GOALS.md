@@ -25,6 +25,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - #111 executable QA smoke/E2E checks
 - Active post-runtime follow-through for this pivot:
   - issue #11 final E2E/API evidence thread
+  - `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` as the closed-but-still-canonical QA contract snapshot for review comments
   - PRs #133, #153, #154, #161, #165, and #166 to keep planning and verify/award docs aligned with the merged baseline from PRs #152, #159, and #164
 - Planning-only follow-ups (#106, #107, #108) were closed to keep sprint bandwidth on runtime delivery.
 - QA prewrite-only tracks (#87, PR #84, PR #104) were superseded first by runtime execution issue #111 and now roll into final evidence follow-through on issue #11.
