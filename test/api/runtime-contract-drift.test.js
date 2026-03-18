@@ -34,4 +34,30 @@ test("runtime contract drift guard keeps OpenAPI and contracts aligned", () => {
     snapshot.enums.proofVerifyErrorCode.openapi,
     snapshot.enums.proofVerifyErrorCode.contracts
   );
+  assert.match(snapshot.shapes.proofPack.openapiAnchor, /^src\/api\/openapi\.yaml:\d+$/);
+  assert.match(snapshot.shapes.proofPack.contractsAnchor, /^src\/api\/contracts\.ts:\d+$/);
+  assert.equal(snapshot.shapes.proofPack.openapiHasProofSchemaVersion, true);
+  assert.equal(snapshot.shapes.proofPack.openapiHasCapturedAt, true);
+  assert.equal(snapshot.shapes.proofPack.contractsHasProofSchemaVersion, true);
+  assert.equal(snapshot.shapes.proofPack.contractsHasCapturedAt, true);
+  assert.match(
+    snapshot.shapes.proofVerificationResponse.openapiAnchor,
+    /^src\/api\/openapi\.yaml:\d+$/
+  );
+  assert.match(
+    snapshot.shapes.proofVerificationResponse.contractsAnchor,
+    /^src\/api\/contracts\.ts:\d+$/
+  );
+  assert.equal(snapshot.shapes.proofVerificationResponse.openapiHasDecisionTraceHash, true);
+  assert.equal(snapshot.shapes.proofVerificationResponse.contractsHasDecisionTraceHash, true);
+  assert.match(
+    snapshot.shapes.proofVerifyErrorResponse.openapiAnchor,
+    /^src\/api\/openapi\.yaml:\d+$/
+  );
+  assert.match(
+    snapshot.shapes.proofVerifyErrorResponse.contractsAnchor,
+    /^src\/api\/contracts\.ts:\d+$/
+  );
+  assert.equal(snapshot.shapes.proofVerifyErrorResponse.openapiHasDecisionTraceHash, true);
+  assert.equal(snapshot.shapes.proofVerifyErrorResponse.contractsHasDecisionTraceHash, true);
 });
