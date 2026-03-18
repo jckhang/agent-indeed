@@ -1,6 +1,6 @@
 # Manager Shortlist Review and Award-Readiness UI Slice (P1-20)
 
-Last updated: 2026-03-18
+Last updated: 2026-03-19
 
 Related issue: [#62](https://github.com/jckhang/agent-indeed/issues/62)
 
@@ -10,8 +10,8 @@ Define the manager-side shortlist review and award-readiness slice that starts a
 
 This slice stays explicit about current repo reality:
 - `docs/MANAGER_CONSOLE_BASELINE.md` already captures the broader manager baseline.
-- the published API drafts on `main` include `GET /v1/tasks/{taskId}/candidates` -> `CandidateMatchListResponse` and `GET /v1/tasks/{taskId}/award` -> `AwardDecisionDetail`; treat `src/api/openapi.yaml:355`, `src/api/openapi.yaml:522`, `src/api/contracts.ts:539`, and `src/api/contracts.ts:759` as the source-of-truth anchors when reviewing this slice.
-- `POST /v1/tasks/{taskId}/award` is contract-ready on `main`, but live runtime execution still depends on the runnable dispatch implementation from issue [#110](https://github.com/jckhang/agent-indeed/issues/110).
+- the checked-in API drafts define `GET /v1/tasks/{taskId}/candidates` -> `CandidateMatchListResponse` and `GET /v1/tasks/{taskId}/award` -> `AwardDecisionDetail`; treat `src/api/openapi.yaml:355`, `src/api/openapi.yaml:522`, `src/api/contracts.ts:539`, and `src/api/contracts.ts:759` as the source-of-truth anchors when reviewing this slice.
+- `POST /v1/tasks/{taskId}/award` is contract-ready in the checked-in API drafts, but live runtime execution still depends on the runnable dispatch implementation from issue [#110](https://github.com/jckhang/agent-indeed/issues/110).
 - The UI must remain fallback-first for missing runtime data or unavailable handlers; it should not invent hidden fields or pretend local environments are more complete than the running stack actually is.
 
 Related planning context:
@@ -52,7 +52,7 @@ The shell should always keep three elements visible:
 
 | Step | Manager intent | UI behavior | Contract dependency |
 | --- | --- | --- | --- |
-| 1 | Open review after publish | Restore task summary and fetch shortlist/award-readiness data | merged shortlist + award reads on `main` |
+| 1 | Open review after publish | Restore task summary and fetch shortlist/award-readiness data | shortlist + award reads defined in the checked-in API drafts |
 | 2 | Understand ranking quality | Show ranked candidates, score breakdown, and missing-data states without collapsing rows | shortlist read model |
 | 3 | Inspect a candidate | Expand proof status, trace refs, and blocker explanation for one candidate | shortlist detail fields |
 | 4 | Check whether award is possible | Render readiness state, current blockers, and follow-up dependency notes | award summary read model |
@@ -144,7 +144,7 @@ Fallback behavior:
 
 ## API-to-UI mapping
 
-| Review shell surface | Contract/input | Status on `main` | Notes |
+| Review shell surface | Contract/input | Draft status | Notes |
 | --- | --- | --- | --- |
 | Task summary | task state + shortlist freshness | Partial | State exists today; freshness still depends on shortlist read support. |
 | Candidate shortlist table | `GET /v1/tasks/{taskId}/candidates` | Ready | Render `TASK_MATCH_NOT_READY` as a retryable shortlist-loading state, not as an empty result. |
@@ -152,14 +152,14 @@ Fallback behavior:
 | Award-readiness rail | `GET /v1/tasks/{taskId}/award` | Ready | Use `status`, `statusMessage`, `proofSummary`, `handoff`, and trace fields directly from the merged read model. |
 | Award handoff CTA | `POST /v1/tasks/{taskId}/award` | Contract-ready | Keep the call-to-action disabled or secondary when the current runtime stack does not yet execute the write path. |
 
-The shortlist and award-readiness rows above refer to the published contract anchors on `main`; local runtime behavior can still lag until issue [#110](https://github.com/jckhang/agent-indeed/issues/110) serves the same shapes consistently.
+The shortlist and award-readiness rows above refer to the checked-in contract anchors in `src/api/openapi.yaml` and `src/api/contracts.ts`; local runtime behavior can still lag until issue [#110](https://github.com/jckhang/agent-indeed/issues/110) serves the same shapes consistently.
 
 ## Backend dependency feedback
 
 P1-20 keeps three runtime-consumer gaps explicit instead of burying them inside frontend assumptions:
 
 1. Shortlist freshness and retry semantics still need to stay stable in the running stack.
-   - Minimum UI-safe fields already exist on `main`: ranked rows, hard-filter outcome, score breakdown, proof readiness, shortlist freshness metadata, and `TASK_MATCH_NOT_READY` as a retryable loading path.
+   - Minimum UI-safe fields already exist in the checked-in API drafts: ranked rows, hard-filter outcome, score breakdown, proof readiness, shortlist freshness metadata, and `TASK_MATCH_NOT_READY` as a retryable loading path.
 2. Award-readiness reads must stay the source of truth for blockers.
    - Use `status`, `statusMessage`, `proofSummary`, `handoff`, and decision/audit references from the merged read model instead of reconstructing award readiness in the client.
 3. Award command support must remain distinguishable from award-readiness visibility.
@@ -169,7 +169,7 @@ These gaps should stay tied to issue #58, issue #110, and downstream audit work,
 
 ## Residual follow-ups on the current baseline
 
-After `GET /v1/tasks/{taskId}/candidates` and `GET /v1/tasks/{taskId}/award` merged on `main`, this slice keeps only three explicit follow-ups:
+With `GET /v1/tasks/{taskId}/candidates` and `GET /v1/tasks/{taskId}/award` documented in the checked-in API drafts, this slice keeps only three explicit follow-ups:
 
 1. Runtime execution parity: local and shared runtime environments still need to serve the merged shortlist/award read surfaces consistently with issue #110.
 2. Evidence parity: QA still needs executable proof that the manager review shell behaves correctly through the runtime stack; issue #120 is the closed drift-sweep baseline, and issue #11 is the live smoke-evidence follow-through.

@@ -1,6 +1,6 @@
 # Frontend Runtime Integration Tranche (P1-40)
 
-Last updated: 2026-03-18
+Last updated: 2026-03-19
 
 Related issue: [#136](https://github.com/jckhang/agent-indeed/issues/136)
 Mainline sync issue: [#145](https://github.com/jckhang/agent-indeed/issues/145)
@@ -9,9 +9,9 @@ Mainline sync issue: [#145](https://github.com/jckhang/agent-indeed/issues/145)
 
 Capture the first runtime-backed frontend handoff slice for this week's execution sprint so the MVP can be demonstrated through real manager and agent flows instead of static-fixture-only wiring.
 
-This document is now the single surviving frontend runtime handoff against the merged backend baseline on `main`. It absorbs the still-open frontend runtime doc queue from PRs [#122](https://github.com/jckhang/agent-indeed/pull/122), [#125](https://github.com/jckhang/agent-indeed/pull/125), and [#132](https://github.com/jckhang/agent-indeed/pull/132) so wiring guidance, fixture vocabulary, and QA replay payloads stop drifting independently.
+This document is now the single surviving frontend runtime handoff against the current checked-in backend API baseline. It absorbs the still-open frontend runtime doc queue from PRs [#122](https://github.com/jckhang/agent-indeed/pull/122), [#125](https://github.com/jckhang/agent-indeed/pull/125), and [#132](https://github.com/jckhang/agent-indeed/pull/132) so wiring guidance, fixture vocabulary, and QA replay payloads stop drifting independently.
 
-This tranche is intentionally grounded in the current `main` baseline:
+This tranche is intentionally grounded in the current checked-in API baseline:
 - manager publish uses `POST /v1/tasks`
 - manager shortlist and award-readiness use `GET /v1/tasks/{taskId}/candidates` and `GET /v1/tasks/{taskId}/award`
 - agent commit/reveal uses `POST /v1/tasks/{taskId}/bids/commit` and `POST /v1/tasks/{taskId}/bids/reveal`
@@ -34,24 +34,24 @@ Issue [#150](https://github.com/jckhang/agent-indeed/issues/150) re-checks the m
 | Surface | Canonical doc | Runtime-backed contract truth | Consumer note |
 | --- | --- | --- | --- |
 | Manager task composer | `docs/MANAGER_TASK_COMPOSER_UI_SLICE.md` | `POST /v1/tasks` with `CreateTaskRequest.task` and `CreateTaskResponse.taskId/status/commitDeadline/revealDeadline` | Publish stays aligned to `TaskSpec`; task-create idempotency is still a follow-up, not baseline reality. |
-| Manager shortlist + award-readiness | `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` | `GET /v1/tasks/{taskId}/candidates` -> `CandidateMatchListResponse` and `GET /v1/tasks/{taskId}/award` -> `AwardDecisionDetail` are both published in `src/api/openapi.yaml` and `src/api/contracts.ts` on the current `main` baseline. | Treat `TASK_MATCH_NOT_READY` as retryable loading and use award `status/statusMessage/proofSummary/handoff` directly from the published read model. |
+| Manager shortlist + award-readiness | `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` | `GET /v1/tasks/{taskId}/candidates` -> `CandidateMatchListResponse` and `GET /v1/tasks/{taskId}/award` -> `AwardDecisionDetail` are both defined in the checked-in API drafts (`src/api/openapi.yaml` and `src/api/contracts.ts`). | Treat `TASK_MATCH_NOT_READY` as retryable loading and use award `status/statusMessage/proofSummary/handoff` directly from the checked-in read model. |
 | Agent bid workspace | `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` | `POST /v1/tasks/{taskId}/bids/commit` and `POST /v1/tasks/{taskId}/bids/reveal` | Commit/reveal shell stays server-authored via `window.*`; reveal success hands off `proofSubmission.proofId` into the status reads. |
-| Agent verification timeline | `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md` | `GET /v1/tasks/{taskId}/bids/{bidId}` -> `BidStatusResponse` and `GET /v1/tasks/{taskId}/proofs/{proofId}` -> `ProofStatusResponse` are both published in `src/api/openapi.yaml` and `src/api/contracts.ts` on the current `main` baseline. | Poll only from backend `refresh.*`; if projection data is absent in a local stack, render unavailable-runtime copy instead of invented progress. |
+| Agent verification timeline | `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md` | `GET /v1/tasks/{taskId}/bids/{bidId}` -> `BidStatusResponse` and `GET /v1/tasks/{taskId}/proofs/{proofId}` -> `ProofStatusResponse` are both defined in the checked-in API drafts (`src/api/openapi.yaml` and `src/api/contracts.ts`). | Poll only from backend `refresh.*`; if projection data is absent in a local stack, render unavailable-runtime copy instead of invented progress. |
 
 Result:
-- published contract surfaces verified for frontend documentation on the current `main` baseline
+- checked-in contract surfaces verified for frontend documentation against the current API drafts
 - no new published-contract blocker found in the linked manager/agent docs during this pass
 - remaining risk stays in runtime execution readiness from issues [#110](https://github.com/jckhang/agent-indeed/issues/110), [#115](https://github.com/jckhang/agent-indeed/issues/115), plus the still-open smoke evidence follow-through in [#11](https://github.com/jckhang/agent-indeed/issues/11); closed issue [#120](https://github.com/jckhang/agent-indeed/issues/120) now serves only as the contract-drift baseline, not an active blocker
 
-Issue [#157](https://github.com/jckhang/agent-indeed/issues/157) narrows the review rule for this pass: if the docs say a read is on `main`, reviewers should be able to find the exact path plus response type in both `src/api/openapi.yaml` and `src/api/contracts.ts`. A local stack still returning empty or lagging projection data is a runtime readiness gap, not proof that the contract path is unpublished.
+Issue [#157](https://github.com/jckhang/agent-indeed/issues/157) narrows the review rule for this pass: if the docs say a read is part of the checked-in API baseline, reviewers should be able to find the exact path plus response type in both `src/api/openapi.yaml` and `src/api/contracts.ts`. A local stack still returning empty or lagging projection data is a runtime readiness gap, not proof that the contract path is unpublished.
 
 ## Remaining frontend runtime gaps
 
 Keep the post-merge follow-up list short and tied to currently published contracts:
 
-1. Runtime parity for award and verification refresh still depends on the running service from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) and [#115](https://github.com/jckhang/agent-indeed/issues/115), even though the read contracts are already published on `main`.
+1. Runtime parity for award and verification refresh still depends on the running service from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) and [#115](https://github.com/jckhang/agent-indeed/issues/115), even though the read contracts are already present in the checked-in API drafts.
 2. QA still needs executable evidence that the publish -> shortlist -> commit -> reveal -> verification -> award path behaves the same under runtime conditions; closed issue [#120](https://github.com/jckhang/agent-indeed/issues/120) is the last drift-sweep baseline, while issue [#11](https://github.com/jckhang/agent-indeed/issues/11) is the live smoke-evidence thread.
-3. Frontend docs should only describe a surface as `on main` when reviewers can find both the exact path and the response type in `src/api/openapi.yaml` and `src/api/contracts.ts`; otherwise, record the gap as a follow-up instead of broadening runtime scope.
+3. Frontend docs should only describe a surface as part of the checked-in API baseline when reviewers can find both the exact path and the response type in `src/api/openapi.yaml` and `src/api/contracts.ts`; otherwise, record the gap as a follow-up instead of broadening runtime scope.
 
 ## Canonical handoff status
 
@@ -61,9 +61,9 @@ This tranche supersedes the overlapping open frontend runtime docs queue:
 - PR [#132](https://github.com/jckhang/agent-indeed/pull/132) demo payload replay pack
 
 Keep only this document plus `docs/FRONTEND_MVP_SURFACE.md` as the durable repo handoff for runtime-backed manager and agent flows. Any surviving PR from the older queue should either point here as the canonical source or be closed as superseded by issue [#145](https://github.com/jckhang/agent-indeed/issues/145).
-## Canonical contract anchors on `main`
+## Canonical contract anchors in the checked-in API drafts
 
-These frontend handoff claims are backed by the current API sources of truth on `main`, not by a still-pending side branch:
+These frontend handoff claims are backed by the current API sources of truth in `src/api/openapi.yaml` and `src/api/contracts.ts`, not by a still-pending side branch:
 
 | Runtime surface | OpenAPI anchor | TypeScript contract anchor |
 | --- | --- | --- |
@@ -76,9 +76,9 @@ Reviewer quick-check on a fresh `origin/main` sync:
 - `git show origin/main:src/api/openapi.yaml | rg -n "/v1/tasks/\\{taskId\\}/(candidates|award|bids/\\{bidId\\}|proofs/\\{proofId\\})"`
 - `git show origin/main:src/api/contracts.ts | rg -n "interface (CandidateMatchListResponse|AwardDecisionDetail|BidStatusResponse|ProofStatusResponse)"`
 
-If a local runtime instance does not return those reads yet, treat that as runtime implementation lag from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) / [#115](https://github.com/jckhang/agent-indeed/issues/115), not as permission for frontend docs to downgrade the merged contract baseline or relabel a published path as pending.
+If a local runtime instance does not return those reads yet, treat that as runtime implementation lag from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) / [#115](https://github.com/jckhang/agent-indeed/issues/115), not as permission for frontend docs to downgrade the checked-in contract baseline or relabel a published path as pending.
 
-When this document says a surface is "on `main`", it means the path and response type are published in both API drafts on `main`; it does not mean every local runtime environment already serves populated projection data.
+When this document says a surface is part of the checked-in API baseline, it means the path and response type are present in both checked-in API drafts; it does not mean every local runtime environment already serves populated projection data.
 
 ## Scope
 
