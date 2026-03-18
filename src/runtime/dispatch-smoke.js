@@ -336,8 +336,10 @@ export async function runDispatchSmoke({ log = console.log } = {}) {
     return {
       taskId: created.taskId,
       bidId: reveal.bidId,
+      proofId: proof.proofId,
       awardAuditId: awarded.auditEventId,
       policyTraceId: policy.policyTraceId,
+      decisionTraceHash: verified.decisionTraceHash,
       verificationResult: verified.result,
       eventTypes: events.events.map((event) => event.eventType)
     };
@@ -527,10 +529,14 @@ async function runNegativeScenarioSuite({ log = console.log } = {}) {
     return {
       scenario: "negative-paths",
       taskId: created.taskId,
+      bidId: failingReveal.bidId,
+      proofId: failingProof.proofId,
+      policyTraceId: policy.policyTraceId,
       revealWithoutCommit: missingCommitResponse.code,
       proofFail: verifyResponse.code,
       awardBlocked: awardResponse.code,
-      proofFailReasonCodes: verifyResponse.details.reasonCodes
+      proofFailReasonCodes: verifyResponse.details.reasonCodes,
+      decisionTraceHash: verifyResponse.details.decisionTraceHash
     };
   });
 }
@@ -555,7 +561,12 @@ export async function runDispatchSmokeSuite({ log = console.log } = {}) {
         status: "PASS",
         verificationResult: happyPath.verificationResult,
         taskId: happyPath.taskId,
-        bidId: happyPath.bidId
+        bidId: happyPath.bidId,
+        proofId: happyPath.proofId,
+        policyTraceId: happyPath.policyTraceId,
+        awardAuditId: happyPath.awardAuditId,
+        decisionTraceHash: happyPath.decisionTraceHash,
+        eventTypes: happyPath.eventTypes
       },
       {
         name: "invalid-signature",
@@ -571,7 +582,12 @@ export async function runDispatchSmokeSuite({ log = console.log } = {}) {
         revealWithoutCommit: negativePaths.revealWithoutCommit,
         proofFail: negativePaths.proofFail,
         awardBlocked: negativePaths.awardBlocked,
-        taskId: negativePaths.taskId
+        taskId: negativePaths.taskId,
+        bidId: negativePaths.bidId,
+        proofId: negativePaths.proofId,
+        policyTraceId: negativePaths.policyTraceId,
+        proofFailReasonCodes: negativePaths.proofFailReasonCodes,
+        decisionTraceHash: negativePaths.decisionTraceHash
       }
     ]
   };

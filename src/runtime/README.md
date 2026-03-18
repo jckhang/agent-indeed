@@ -52,7 +52,7 @@ To exercise the runnable vertical slice and its minimum QA regression checks in 
 npm run smoke:dispatch
 ```
 
-The smoke command boots the runtime on ephemeral ports and runs three bounded scenarios: the happy path (`publish -> match -> commit -> reveal -> verify -> award`), an invalid-signature verification failure, and the minimum negative-path regression checks for `reveal without commit`, `proof FAIL`, and `award blocked`. It prints prefixed PASS lines for human review and a final JSON summary that QA can link back to issue `#11`.
+The smoke command boots the runtime on ephemeral ports and runs three bounded scenarios: the happy path (`publish -> match -> commit -> reveal -> verify -> award`), an invalid-signature verification failure, and the minimum negative-path regression checks for `reveal without commit`, `proof FAIL`, and `award blocked`. It prints prefixed PASS lines for human review and a final JSON summary that QA can link back to issue `#11`, including the stable `taskId`/`bidId`/`proofId`, `policyTraceId`, `decisionTraceHash`, and failure reason codes referenced by `docs/BACKEND_API_EXAMPLE_PACKET.md`.
 
 To print the same smoke coverage as a ready-to-paste issue comment for issue `#11`:
 

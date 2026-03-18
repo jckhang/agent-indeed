@@ -22,6 +22,7 @@
 - 增补 runtime 执行 handoff 契约，统一本地服务命令、smoke 命令与 issue #11 证据回写要求。
 - 增补 merge-evidence sweep 回写规则，要求 issue #146 承接同日队列巡检，epic #2 保留跨 lane checkpoint 汇总。
 - 新增 backend API example packet，把 merged `smoke:dispatch` happy/negative path 产物整理成 issue #11 可直接引用的请求响应样例。
+- 为 issue #11 补充最小 SDK 片段与 smoke 输出标识符，减少 QA / beta consumer 从 PR 评论人工回填 `proofId`、`policyTraceId`、reason code 的摩擦。
 
 ## Capabilities
 
