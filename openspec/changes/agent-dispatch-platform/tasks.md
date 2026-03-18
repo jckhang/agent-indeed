@@ -44,7 +44,7 @@
 - [x] 5.4 输出前端 runtime 集成 tranche 与本地 runbook（issue #136），串联 manager publish / shortlist / award-readiness 与 agent commit / reveal / status-refresh 路径。
 - [x] 5.5 收敛前端 runtime 文档队列（issue #145），把 wiring target、fixture pack 与 demo payload pack 合并进单一 mainline handoff。
 - [x] 5.6 输出 `docs/RUNTIME_EXECUTION_HANDOFF.md`，统一 runtime sprint 的本地命令契约、证据包与 issue #11 回写规则。
-- [x] 5.7 明确 issue #146 merge-evidence sweep 与 epic #2 checkpoint 的双轨回写规则，统一 clean tranche、dirty follow-on 与 validation evidence gap 的 GitHub 记录方式。
+- [x] 5.7 补齐 merge queue / milestone hygiene：让所有 open P1 PR 都能从 milestone 视图发现，并把 clean-first merge 顺序与 lane 负载规则回写到 epic/checkpoint 索引。
 - [x] 5.8 完成前端 runtime consumer verification pass（issue #150），校准 task composer、shortlist/award、bid workspace、verification timeline 对当前 `main` runtime 字段与 fallback 语义的引用。
 - [x] 5.9 跟进前端 consumer contract claim trim（issue #157），把 shortlist/award/bid/proof 读路径的 `main` 基线解释收敛到 OpenAPI/TS draft anchors，避免把 runtime 数据缺口误写成 contract 缺口。
 - [x] 5.10 补充前端 consumer contract reviewer quick-check 锚点，给出 `origin/main` 的行号与 grep 校验命令，减少对已发布读路径的重复误判。
