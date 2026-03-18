@@ -54,10 +54,21 @@ function extractOpenApiPaths(source) {
   return unique([...source.matchAll(/^  (\/[^\s:]+):$/gm)].map((entry) => entry[1])).sort();
 }
 
+function extractOpenApiPathAnchors(source) {
+  return new Map(
+    [...source.matchAll(/^  (\/[^\s:]+):$/gm)].map((entry) => {
+      const lineNumber = source.slice(0, entry.index).split("\n").length;
+      return [entry[1], `src/api/openapi.yaml:${lineNumber}`];
+    })
+  );
+}
+
 function buildSnapshot() {
   const openapiSource = readFileSync(openapiPath, "utf8");
   const contractsSource = readFileSync(contractsPath, "utf8");
   const openapiPaths = extractOpenApiPaths(openapiSource);
+  const openapiPathAnchors = extractOpenApiPathAnchors(openapiSource);
+  const publishedRoutes = REQUIRED_RUNTIME_ROUTES.filter((route) => openapiPaths.includes(route));
 
   return {
     generatedFrom: {
@@ -65,7 +76,10 @@ function buildSnapshot() {
       contractsPath: "src/api/contracts.ts"
     },
     runtimeRoutes: {
-      published: REQUIRED_RUNTIME_ROUTES.filter((route) => openapiPaths.includes(route)),
+      published: publishedRoutes,
+      anchors: Object.fromEntries(
+        publishedRoutes.map((route) => [route, openapiPathAnchors.get(route)])
+      ),
       missingRequired: REQUIRED_RUNTIME_ROUTES.filter((route) => !openapiPaths.includes(route))
     },
     enums: {

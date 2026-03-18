@@ -12,6 +12,7 @@ test("runtime contract drift guard keeps OpenAPI and contracts aligned", () => {
 
   assert.doesNotThrow(() => assertNoDrift(snapshot));
   assert.deepEqual(snapshot.runtimeRoutes.published, REQUIRED_RUNTIME_ROUTES);
+  assert.deepEqual(Object.keys(snapshot.runtimeRoutes.anchors), REQUIRED_RUNTIME_ROUTES);
   assert.deepEqual(
     snapshot.enums.proofVerificationReasonCode.openapi,
     snapshot.enums.proofVerificationReasonCode.contracts
