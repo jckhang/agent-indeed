@@ -21,7 +21,8 @@ This tranche is intentionally grounded in the current `main` baseline:
 Execution dependencies remain explicit:
 - runtime service baseline: [#115](https://github.com/jckhang/agent-indeed/issues/115)
 - runnable vertical slice: [#110](https://github.com/jckhang/agent-indeed/issues/110)
-- QA runtime checks: [#111](https://github.com/jckhang/agent-indeed/issues/111)
+- QA contract-drift sweep: [#120](https://github.com/jckhang/agent-indeed/issues/120)
+- smoke evidence umbrella: [#11](https://github.com/jckhang/agent-indeed/issues/11)
 - frontend consumer verification pass: [#150](https://github.com/jckhang/agent-indeed/issues/150)
 
 ## Consumer verification pass (2026-03-18)
@@ -40,7 +41,7 @@ Issue [#150](https://github.com/jckhang/agent-indeed/issues/150) re-checks the m
 Result:
 - published contract surfaces verified for frontend documentation on the current `main` baseline
 - no new published-contract blocker found in the linked manager/agent docs during this pass
-- remaining risk stays in runtime execution readiness from issues [#110](https://github.com/jckhang/agent-indeed/issues/110), [#115](https://github.com/jckhang/agent-indeed/issues/115), and QA evidence from [#111](https://github.com/jckhang/agent-indeed/issues/111), not in the published field names or fallback rules
+- remaining risk stays in runtime execution readiness from issues [#110](https://github.com/jckhang/agent-indeed/issues/110), [#115](https://github.com/jckhang/agent-indeed/issues/115), plus QA follow-through recorded in [#120](https://github.com/jckhang/agent-indeed/issues/120) and [#11](https://github.com/jckhang/agent-indeed/issues/11), not in the published field names or fallback rules
 
 Issue [#157](https://github.com/jckhang/agent-indeed/issues/157) narrows the review rule for this pass: if the docs say a read is on `main`, reviewers should be able to find the exact path plus response type in both `src/api/openapi.yaml` and `src/api/contracts.ts`. A local stack still returning empty or lagging projection data is a runtime readiness gap, not proof that the contract path is unpublished.
 
@@ -49,7 +50,7 @@ Issue [#157](https://github.com/jckhang/agent-indeed/issues/157) narrows the rev
 Keep the post-merge follow-up list short and tied to currently published contracts:
 
 1. Runtime parity for award and verification refresh still depends on the running service from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) and [#115](https://github.com/jckhang/agent-indeed/issues/115), even though the read contracts are already published on `main`.
-2. QA still needs executable evidence that the publish -> shortlist -> commit -> reveal -> verification -> award path behaves the same under runtime conditions, tracked in issue [#111](https://github.com/jckhang/agent-indeed/issues/111) and the smoke evidence umbrella issue [#11](https://github.com/jckhang/agent-indeed/issues/11).
+2. QA still needs executable evidence that the publish -> shortlist -> commit -> reveal -> verification -> award path behaves the same under runtime conditions, with the latest contract-drift sweep captured in issue [#120](https://github.com/jckhang/agent-indeed/issues/120) and the remaining smoke evidence tracked in issue [#11](https://github.com/jckhang/agent-indeed/issues/11).
 3. Frontend docs should only describe a surface as `on main` when reviewers can find both the exact path and the response type in `src/api/openapi.yaml` and `src/api/contracts.ts`; otherwise, record the gap as a follow-up instead of broadening runtime scope.
 
 ## Canonical handoff status
@@ -526,7 +527,7 @@ Record the following in issue [#136](https://github.com/jckhang/agent-indeed/iss
 - task id, bid id, and proof id used in the smoke path
 - whether manager shortlist and award-readiness reads returned runtime data
 - whether agent bid/proof status reads returned queued/verifying/terminal states correctly
-- any blockers from #110, #115, or #111 that prevented full execution
+- any blockers from #110, #115, #120, or #11 that prevented full execution
 
 ## Validation evidence expectations
 
