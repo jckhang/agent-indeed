@@ -72,6 +72,10 @@ Issue #11 remains the aggregation point for final beta-readiness evidence. Runti
 should link their evidence there rather than duplicating large transcripts across multiple
 planning docs.
 
+The backend-owned reusable API packet for that final handoff lives in
+`docs/BACKEND_API_EXAMPLE_PACKET.md`; issue #11 and future QA runs should point at that
+doc instead of reconstructing payloads from PR review threads.
+
 ## Ownership handshake
 
 | Lane | Required handoff output | Consumes from |

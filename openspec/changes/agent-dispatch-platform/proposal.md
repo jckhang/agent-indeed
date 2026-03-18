@@ -21,6 +21,7 @@
 - 新增 runtime 落地冲刺任务（issue #109/#110/#111），要求将核心流程转为可运行服务与可执行 QA 校验。
 - 增补 runtime 执行 handoff 契约，统一本地服务命令、smoke 命令与 issue #11 证据回写要求。
 - 增补 merge-evidence sweep 回写规则，要求 issue #146 承接同日队列巡检，epic #2 保留跨 lane checkpoint 汇总。
+- 新增 backend API example packet，把 merged `smoke:dispatch` happy/negative path 产物整理成 issue #11 可直接引用的请求响应样例。
 
 ## Capabilities
 
