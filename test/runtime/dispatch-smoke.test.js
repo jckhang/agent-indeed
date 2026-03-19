@@ -53,10 +53,22 @@ test("runDispatchSmokeSuite executes happy-path and negative smoke scenarios", a
     result.scenarios.map((scenario) => scenario.status),
     ["PASS", "PASS", "PASS"]
   );
+  assert.equal(result.scenarios[0].proofId, "proof_00000001");
+  assert.match(result.scenarios[0].policyTraceId, /^policytrace_/);
+  assert.match(result.scenarios[0].decisionTraceHash, /^sha256:/);
+  assert.match(result.scenarios[0].awardAuditId, /^audit_/);
+  assert.equal(result.scenarios[1].bidId, "bid_00000011");
   assert.deepEqual(result.scenarios[1].reasonCodes, ["TRACE_SIGNATURE_INVALID"]);
+  assert.match(result.scenarios[1].decisionTraceHash, /^sha256:/);
   assert.equal(result.scenarios[2].revealWithoutCommit, "BID_REVEAL_COMMIT_NOT_FOUND");
   assert.equal(result.scenarios[2].proofFail, "PROOF_VERIFY_FAILED");
   assert.equal(result.scenarios[2].awardBlocked, "TASK_AWARD_PRECONDITION_FAILED");
+  assert.equal(result.scenarios[2].bidId, "bid_00000002");
+  assert.equal(result.scenarios[2].proofId, "proof_00000002");
+  assert.deepEqual(result.scenarios[2].proofFailReasonCodes, [
+    "QUALITY_SCORE_BELOW_MINIMUM",
+    "HASHCASH_BITS_BELOW_MINIMUM"
+  ]);
   assert.ok(logLines.some((line) => line.includes("[happy-path] PASS task-awarded")));
   assert.ok(
     logLines.some((line) => line.includes("[invalid-signature] PASS invalid-signature-rejected"))

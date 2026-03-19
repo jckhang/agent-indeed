@@ -5,6 +5,16 @@ function findScenario(summary, name) {
   return summary.scenarios.find((scenario) => scenario.name === name);
 }
 
+function formatReasonCodes(reasonCodes = []) {
+  return reasonCodes.length > 0 ? reasonCodes.join(", ") : "n/a";
+}
+
+function buildCommandLabel(signature) {
+  return signature
+    ? `npm run --silent smoke:issue11 -- --signature ${signature}`
+    : "npm run --silent smoke:issue11";
+}
+
 export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
   const happyPath = findScenario(summary, "happy-path");
   const invalidSignature = findScenario(summary, "invalid-signature");
@@ -15,7 +25,8 @@ export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
   return [
     "## Issue #11 executable smoke evidence",
     "",
-    `- Command: \`${summary.command}\``,
+    `- Evidence command: \`${buildCommandLabel(signature)}\``,
+    `- Underlying smoke suite: \`${summary.command}\``,
     "- API examples: `docs/BACKEND_API_EXAMPLE_PACKET.md`",
     "- Handoff contract: `docs/RUNTIME_EXECUTION_HANDOFF.md`",
     "",
@@ -24,13 +35,17 @@ export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
     `- status: ${happyPath.status}`,
     `- taskId: \`${happyPath.taskId}\``,
     `- bidId: \`${happyPath.bidId}\``,
+    `- proofId: \`${happyPath.proofId}\``,
+    `- policyTraceId: \`${happyPath.policyTraceId}\``,
+    `- decisionTraceHash: \`${happyPath.decisionTraceHash}\``,
+    `- awardAuditId: \`${happyPath.awardAuditId}\``,
     `- verificationResult: \`${happyPath.verificationResult}\``,
     "",
     "### Negative checks",
     "",
-    `- invalid signature: \`${invalidSignature.result}\` (${invalidSignature.reasonCodes.join(", ")})`,
+    `- invalid signature: \`${invalidSignature.result}\` (${formatReasonCodes(invalidSignature.reasonCodes)})`,
     `- reveal without commit: \`${negativePaths.revealWithoutCommit}\``,
-    `- proof fail: \`${negativePaths.proofFail}\``,
+    `- proof fail: \`${negativePaths.proofFail}\` (${formatReasonCodes(negativePaths.proofFailReasonCodes)})`,
     `- award blocked: \`${negativePaths.awardBlocked}\``,
     "",
     "### Smoke log",
@@ -51,6 +66,7 @@ export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
 export async function runIssue11Evidence({ log = console.log, signature } = {}) {
   const logLines = [];
   const summary = await runDispatchSmokeSuite({
+    command: "npm run smoke:dispatch",
     log: (line) => {
       logLines.push(line);
     }

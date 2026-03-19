@@ -336,8 +336,10 @@ export async function runDispatchSmoke({ log = console.log } = {}) {
     return {
       taskId: created.taskId,
       bidId: reveal.bidId,
+      proofId: proof.proofId,
       awardAuditId: awarded.auditEventId,
       policyTraceId: policy.policyTraceId,
+      decisionTraceHash: verified.decisionTraceHash,
       verificationResult: verified.result,
       eventTypes: events.events.map((event) => event.eventType)
     };
@@ -404,6 +406,8 @@ async function runInvalidSignatureScenario({ log = console.log } = {}) {
       taskId: created.taskId,
       bidId: reveal.bidId,
       proofId: proof.proofId,
+      policyTraceId: policy.policyTraceId,
+      decisionTraceHash: failedVerification.details.decisionTraceHash,
       result: failedVerification.code,
       reasonCodes: failedVerification.details.reasonCodes
     };
@@ -527,6 +531,10 @@ async function runNegativeScenarioSuite({ log = console.log } = {}) {
     return {
       scenario: "negative-paths",
       taskId: created.taskId,
+      bidId: failingReveal.bidId,
+      proofId: failingProof.proofId,
+      policyTraceId: policy.policyTraceId,
+      decisionTraceHash: verifyResponse.details.decisionTraceHash,
       revealWithoutCommit: missingCommitResponse.code,
       proofFail: verifyResponse.code,
       awardBlocked: awardResponse.code,
@@ -535,7 +543,7 @@ async function runNegativeScenarioSuite({ log = console.log } = {}) {
   });
 }
 
-export async function runDispatchSmokeSuite({ log = console.log } = {}) {
+export async function runDispatchSmokeSuite({ log = console.log, command = "npm run smoke:dispatch" } = {}) {
   const happyPath = await runDispatchSmoke({
     log: (line) => log(`[happy-path] ${line}`)
   });
@@ -548,14 +556,18 @@ export async function runDispatchSmokeSuite({ log = console.log } = {}) {
 
   return {
     status: "ok",
-    command: "npm run smoke:dispatch",
+    command,
     scenarios: [
       {
         name: "happy-path",
         status: "PASS",
         verificationResult: happyPath.verificationResult,
         taskId: happyPath.taskId,
-        bidId: happyPath.bidId
+        bidId: happyPath.bidId,
+        proofId: happyPath.proofId,
+        policyTraceId: happyPath.policyTraceId,
+        decisionTraceHash: happyPath.decisionTraceHash,
+        awardAuditId: happyPath.awardAuditId
       },
       {
         name: "invalid-signature",
@@ -563,7 +575,10 @@ export async function runDispatchSmokeSuite({ log = console.log } = {}) {
         result: invalidSignature.result,
         reasonCodes: invalidSignature.reasonCodes,
         taskId: invalidSignature.taskId,
-        proofId: invalidSignature.proofId
+        bidId: invalidSignature.bidId,
+        proofId: invalidSignature.proofId,
+        policyTraceId: invalidSignature.policyTraceId,
+        decisionTraceHash: invalidSignature.decisionTraceHash
       },
       {
         name: "negative-paths",
@@ -571,7 +586,12 @@ export async function runDispatchSmokeSuite({ log = console.log } = {}) {
         revealWithoutCommit: negativePaths.revealWithoutCommit,
         proofFail: negativePaths.proofFail,
         awardBlocked: negativePaths.awardBlocked,
-        taskId: negativePaths.taskId
+        taskId: negativePaths.taskId,
+        bidId: negativePaths.bidId,
+        proofId: negativePaths.proofId,
+        policyTraceId: negativePaths.policyTraceId,
+        decisionTraceHash: negativePaths.decisionTraceHash,
+        proofFailReasonCodes: negativePaths.proofFailReasonCodes
       }
     ]
   };
