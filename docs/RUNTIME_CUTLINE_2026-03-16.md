@@ -7,6 +7,7 @@ Primary runtime threads:
 - issue #109: runnable control-plane backend skeleton
 - issue #110: runnable `publish -> match -> commit -> reveal -> verify -> award` vertical slice
 - issue #111: executable smoke/E2E conversion using the command/evidence contract in `docs/RUNTIME_EXECUTION_HANDOFF.md`
+- `docs/VERIFY_AWARD_CONTRACT_ADOPTION_CHECKLIST.md`: exact verify/award vocabulary that #110 and #111 should consume first
 
 Reference contract threads:
 

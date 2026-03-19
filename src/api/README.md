@@ -8,4 +8,5 @@
 - Ranked candidates always carry `rank`; filtered-out candidates stay visible with `eligible=false` and no synthetic rank. `scoreBreakdown` remains optional behind `includeScoreBreakdown`.
 - Bid/proof status polling contracts now include typed read projections for async verification refresh.
 - `docs/BACKEND_API_EXAMPLE_PACKET.md`: canonical `publish -> match -> commit -> reveal -> verify -> award` request/response packet plus negative-path examples for issue #11 handoff.
+- `docs/VERIFY_AWARD_CONTRACT_ADOPTION_CHECKLIST.md`: shared verifier and award-adjacent vocabulary that runtime issue #110 and QA issue #111 should consume before depending on open read-model follow-ups.
 - `docs/ONBOARDING_PIPELINE.md`: deterministic onboarding pipeline, skill indexing contract, and retry guidance for bundle upload.
