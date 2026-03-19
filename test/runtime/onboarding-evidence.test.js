@@ -1,7 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 
-import { formatEpic2OnboardingEvidence } from "../../src/runtime/onboarding-evidence.js";
+import {
+  formatEpic2OnboardingEvidence,
+  parseEpic2OnboardingEvidenceArgs
+} from "../../src/runtime/onboarding-evidence.js";
 
 test("formatEpic2OnboardingEvidence includes the smoke summary, contract drift, and signature", () => {
   const markdown = formatEpic2OnboardingEvidence({
@@ -37,4 +41,28 @@ test("formatEpic2OnboardingEvidence includes the smoke summary, contract drift, 
   assert.match(markdown, /`\/v1\/agents\/bundles`/);
   assert.match(markdown, /`src\/api\/openapi\.yaml:68`/);
   assert.match(markdown, /--avery/);
+});
+
+test("parseEpic2OnboardingEvidenceArgs accepts --signature and rejects invalid flags", () => {
+  assert.deepEqual(parseEpic2OnboardingEvidenceArgs(["--signature", "avery"]), {
+    signature: "avery"
+  });
+  assert.throws(
+    () => parseEpic2OnboardingEvidenceArgs(["--signature"]),
+    /--signature requires a value/
+  );
+  assert.throws(
+    () => parseEpic2OnboardingEvidenceArgs(["--unknown"]),
+    /Unknown argument: --unknown/
+  );
+});
+
+test("onboarding-evidence CLI exits non-zero for invalid args", () => {
+  const result = spawnSync(process.execPath, ["src/runtime/onboarding-evidence.js", "--bad-flag"], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Unknown argument: --bad-flag/);
 });

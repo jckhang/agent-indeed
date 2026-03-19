@@ -119,21 +119,32 @@ export async function runEpic2OnboardingEvidence({ log = console.log, signature 
   };
 }
 
-function parseArgs(argv) {
+export function parseEpic2OnboardingEvidenceArgs(argv) {
   const options = {};
 
   for (let index = 0; index < argv.length; index += 1) {
-    if (argv[index] === "--signature") {
-      options.signature = argv[index + 1];
+    const arg = argv[index];
+
+    if (arg === "--signature") {
+      const value = argv[index + 1];
+
+      if (!value || value.startsWith("--")) {
+        throw new Error("--signature requires a value");
+      }
+
+      options.signature = value;
       index += 1;
+      continue;
     }
+
+    throw new Error(`Unknown argument: ${arg}`);
   }
 
   return options;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const options = parseArgs(process.argv.slice(2));
+  const options = parseEpic2OnboardingEvidenceArgs(process.argv.slice(2));
 
   runEpic2OnboardingEvidence(options).catch((error) => {
     console.error(error.message);

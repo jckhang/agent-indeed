@@ -47,7 +47,7 @@ into one ready-to-paste packet without manually rewriting the task/bid/proof ids
 codes, PASS-line transcript, or decision-trace fields.
 
 Once the onboarding upload smoke path lands on `main`, QA should pair that dispatch packet
-with `node src/runtime/onboarding-evidence.js --signature <agent-name>` so epic `#2` gets
+with `npm run --silent smoke:onboarding:evidence -- --signature <agent-name>` so epic `#2` gets
 the signed onboarding upload/replay/hash-mismatch transcript plus the matching
 `check:contract-drift` confirmation that `/v1/agents/bundles` is published.
 

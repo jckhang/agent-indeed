@@ -54,3 +54,4 @@
 - [x] 5.13 补充 issue #11 可直接复用的最小 SDK 片段与 smoke 标识符回写，确保 QA/beta consumer 不必从 PR 评论中手抄 `taskId` / `proofId` / `policyTraceId` / reason-code 证据。
 - [x] 5.14 为 issue #186 收敛 planning sweep 规则：同一 checkpoint 只保留一个 mergeable planning-sync PR，并把 superseded PR 的 merge/close rationale 回写到 GitHub 线程。
 - [x] 5.15 为 issue #206 增补 onboarding smoke evidence formatter 与 handoff 文档，确保 epic #2 回贴可直接复用 happy-path/replay/hash-mismatch 结果，并附带 `/v1/agents/bundles` contract-drift 确认。
+- [x] 5.15.a 为 onboarding evidence formatter 增补固定 `npm run --silent smoke:onboarding:evidence -- --signature <agent-name>` 入口和 CLI 参数校验，避免 QA 在 `main` 回归时继续依赖临时脚本路径或静默吞掉错误参数。

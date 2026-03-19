@@ -8,7 +8,7 @@ This directory holds the first runnable backend control-plane scaffold for Agent
 - Start with file watching: `npm run dev`
 - Run the end-to-end dispatch smoke suite: `npm run smoke:dispatch`
 - Print an issue-ready issue `#11` evidence packet: `npm run --silent smoke:issue11 -- --signature avery`
-- After the onboarding upload smoke path lands on `main`, print the epic `#2` onboarding evidence packet: `node src/runtime/onboarding-evidence.js --signature avery`
+- After the onboarding upload smoke path lands on `main`, print the epic `#2` onboarding evidence packet: `npm run --silent smoke:onboarding:evidence -- --signature avery`
 - Run the built-in runtime tests: `npm test`
 - Run the bootstrap smoke flow: `npm run smoke:bootstrap`
 
@@ -68,7 +68,7 @@ That command reuses the dispatch smoke suite, captures the PASS lines and JSON s
 After the onboarding runtime upload route merges, QA can also run:
 
 ```bash
-node src/runtime/onboarding-evidence.js --signature avery
+npm run --silent smoke:onboarding:evidence -- --signature avery
 ```
 
 That helper expects `src/runtime/onboarding-smoke.js` to exist on the current branch. When
