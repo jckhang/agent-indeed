@@ -41,6 +41,10 @@ The exact command names are intentionally not frozen in this planning doc. Runti
 may choose the final script names, but they must surface one canonical command path in
 their PR body and linked issue comments.
 
+For the current `main` runtime baseline, QA can use `npm run --silent smoke:issue11 -- --signature <agent-name>`
+to turn the merged smoke suite into one ready-to-paste issue `#11` evidence packet without
+manually rewriting the ids, error codes, or PASS-line transcript.
+
 ## Evidence package
 
 Every PR or issue update claiming runtime progress must include enough evidence for a
