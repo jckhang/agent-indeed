@@ -21,7 +21,7 @@
 - 新增 runtime 落地冲刺任务（issue #109/#110/#111），要求将核心流程转为可运行服务与可执行 QA 校验。
 - 增补 runtime 执行 handoff 契约，统一本地服务命令、smoke 命令与 issue #11 证据回写要求。
 - 增补 merge-evidence sweep 回写规则，要求当前 `owner:albatross` + `stream/review-burndown` 查询返回的 planning sweep issue 承接同日队列巡检，epic #2 保留跨 lane checkpoint 汇总。
-- 新增 backend API example packet，并把 `smoke:issue11` 固化为 issue #11 的规范证据入口；其底层仍复用 merged `smoke:dispatch` happy/negative path 产物，供 QA 直接引用请求响应样例，同时要求 beta-readiness / API handoff 文档指向当前 survivor issue/PR 而不是旧 formatter 分支。
+- 新增 backend API example packet，并把 `smoke:issue11` 固化为 issue #11 的规范证据入口；其底层仍复用 merged `smoke:dispatch` happy/negative path 产物，供 QA 直接引用请求响应样例，同时要求 beta-readiness / API handoff / roadmap-goal 文档指向当前 survivor issue/PR 与 live planning sweep query，而不是旧 formatter / planning 分支。
 
 ## Capabilities
 

@@ -23,8 +23,9 @@ Ship the first usable agent dispatch loop for closed beta:
   - #110 runnable dispatch vertical slice
   - #111 executable QA smoke/E2E checks
 - Active follow-through threads for the pivot:
-  - #167 planning-doc refresh to the post-runtime baseline
+  - issue #196 / PR #203 as the backend-owned survivor that keeps the canonical issue #11 evidence path aligned across durable docs
   - issue #11 as the live smoke evidence umbrella for the canonical handoff command in `docs/RUNTIME_EXECUTION_HANDOFF.md`
+  - the current `owner:albatross` + `stream/review-burndown` planning sweep query as the live planning/status cleanup lane
   - new runtime/QA follow-up issues only when fresh drift appears beyond the closed `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` snapshot
 - Planning-only follow-ups (#106, #107, #108) were closed to keep sprint bandwidth on runtime delivery.
 - QA prewrite-only tracks (#87, PR #84, PR #104) remain superseded by the executable evidence path on issue #11.
@@ -99,6 +100,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - End-to-end happy path + key negative paths are covered by automated tests.
 - One local command path can run service + smoke checks for happy path and core negatives.
 - The canonical command path and evidence handoff into issue #11 are documented in `docs/RUNTIME_EXECUTION_HANDOFF.md`; closed formatter/drift work should stay as baseline references or dated snapshots rather than active blockers.
+- Durable roadmap/checkpoint/goal docs should point at issue #196 / PR #203 plus the live planning sweep query instead of older planning or formatter survivor branches.
 - GitHub issues for Phase 1 epics/tasks are created and linked to this plan.
 - Every active P1 issue/PR is discoverable from the M1-M4 milestone links in `docs/PHASE1_CHECKPOINT_BOARD.md`.
 - Weekly epic #2 checkpoints use `docs/PHASE1_EPIC_CHECKPOINT_TEMPLATE.md` so owner handoffs and validation-evidence gaps stay consistent across review weeks.
