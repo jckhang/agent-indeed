@@ -1,12 +1,16 @@
 # Backend API example packet
 
-This packet turns the merged `npm run smoke:dispatch` runtime path on `main` into one
-backend-owned request/response reference for QA, beta consumers, and issue
-[#11](https://github.com/jckhang/agent-indeed/issues/11).
+This packet turns the canonical `npm run --silent smoke:issue11` evidence path on
+`main` into one backend-owned request/response reference for QA, beta consumers, and
+issue [#11](https://github.com/jckhang/agent-indeed/issues/11). The formatter still
+runs the merged `npm run smoke:dispatch` suite underneath, but consumers should now
+anchor on the issue-ready command instead of older formatter follow-up threads.
 
 ## Source of truth
 
-- Runtime command: `npm run smoke:dispatch`
+- Canonical evidence command: `npm run --silent smoke:issue11 -- --signature <agent-name>`
+- Underlying smoke suite: `npm run smoke:dispatch`
+- Evidence formatter: `src/runtime/issue11-evidence.js`
 - Runtime implementation: `src/runtime/dispatch-smoke.js`
 - API contracts: `src/api/openapi.yaml`, `src/api/contracts.ts`
 - Final issue-evidence handoff: `npm run --silent smoke:issue11 -- --signature <agent-name>`
@@ -601,4 +605,7 @@ Write response `422 Unprocessable Entity` from `POST /v1/tasks/{taskId}/award`:
 1. Treat `docs/BACKEND_API_EXAMPLE_PACKET.md` as the reusable API packet for issue
    [#11](https://github.com/jckhang/agent-indeed/issues/11) instead of rebuilding payloads from review comments.
 2. Treat `src/api/openapi.yaml` and `src/api/contracts.ts` as the contract source of truth; if this packet and those files diverge, update the packet in the same PR that changed the contract.
-3. Use `npm run smoke:dispatch` as the executable proof that these examples still match the merged runtime behavior.
+3. Use `npm run --silent smoke:issue11 -- --signature <agent-name>` as the canonical
+   executable proof that these examples still match the merged runtime behavior; it
+   reuses `npm run smoke:dispatch` underneath and emits the same ids, reason codes,
+   and audit trace fields in a paste-ready issue #11 packet.

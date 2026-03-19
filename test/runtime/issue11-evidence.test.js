@@ -10,6 +10,8 @@ test("formatIssue11Evidence includes the smoke summary, logs, and signature", ()
   const markdown = formatIssue11Evidence({
     summary: {
       command: "npm run smoke:dispatch",
+      evidenceCommand: "npm run --silent smoke:issue11 -- --signature avery",
+      underlyingCommand: "npm run smoke:dispatch",
       scenarios: [
         {
           name: "happy-path",
@@ -69,6 +71,11 @@ test("runIssue11Evidence returns the smoke markdown packet", async () => {
   });
 
   assert.equal(result.summary.status, "ok");
+  assert.equal(
+    result.summary.evidenceCommand,
+    "npm run --silent smoke:issue11 -- --signature avery"
+  );
+  assert.equal(result.summary.underlyingCommand, "npm run smoke:dispatch");
   assert.ok(result.logLines.some((line) => line.includes("PASS task-awarded")));
   assert.match(result.markdown, /## Issue #11 executable smoke evidence/);
   assert.match(result.markdown, /`npm run --silent smoke:issue11 -- --signature avery`/);
