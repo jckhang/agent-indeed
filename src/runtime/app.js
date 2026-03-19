@@ -17,6 +17,16 @@ const TASK_PROOF_VERIFY_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/pro
 const TASK_PROOF_STATUS_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/proofs\/(proof_[a-zA-Z0-9_-]{8,64})$/;
 const TASK_AWARD_PATTERN = /^\/v1\/tasks\/(task_[a-zA-Z0-9_-]{8,64})\/award$/;
 const BID_EVENTS_PATTERN = /^\/v1\/bids\/(bid_[a-zA-Z0-9_-]{8,64})\/events$/;
+const SUPPORTED_AGENT_BUNDLE_SCHEMA_VERSION = "1.0";
+const AGENT_BUNDLE_AUDIT_IDS = {
+  invalidJson: "audit_bundle_upload_invalid_json",
+  schemaInvalid: "audit_bundle_upload_schema_invalid",
+  unsupportedSchema: "audit_bundle_upload_unsupported_schema",
+  signerMismatch: "audit_bundle_upload_signer_mismatch",
+  payloadHashMismatch: "audit_bundle_upload_payload_hash_mismatch",
+  signatureInvalid: "audit_bundle_upload_signature_invalid",
+  versionConflict: "audit_bundle_upload_version_conflict"
+};
 
 function sha256(value) {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
@@ -24,6 +34,26 @@ function sha256(value) {
 
 function round(value) {
   return Number(value.toFixed(3));
+}
+
+function stableSerialize(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map((entry) => stableSerialize(entry)).join(",")}]`;
+  }
+
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${stableSerialize(value[key])}`)
+      .join(",")}}`;
+  }
+
+  return JSON.stringify(value);
+}
+
+function canonicalBundlePayloadHash(bundle) {
+  const { signature: _signature, ...unsignedBundle } = bundle;
+  return sha256(stableSerialize(unsignedBundle));
 }
 
 function buildError(code, category, message, { auditId, retryable = false, retryAfterSeconds, details } = {}) {
@@ -68,6 +98,304 @@ function buildTaskValidationError(message, details = {}) {
       details
     })
   };
+}
+
+function buildAgentBundleError(code, category, message, { auditId, details, conflict } = {}) {
+  return {
+    code,
+    category,
+    message,
+    auditId,
+    retryable: false,
+    ...(details ? { details } : {}),
+    ...(conflict ? { conflict } : {})
+  };
+}
+
+function validateAgentBundleSignature(payload) {
+  if (!payload || typeof payload !== "object") {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SCHEMA_INVALID",
+      "SCHEMA",
+      "request body is required",
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.schemaInvalid,
+        details: {
+          fieldPath: "body",
+          rule: "required",
+          expected: "object",
+          actual: "missing"
+        }
+      }
+    );
+  }
+
+  if (!payload.idempotencyKey) {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SCHEMA_INVALID",
+      "SCHEMA",
+      "idempotencyKey is required",
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.schemaInvalid,
+        details: {
+          fieldPath: "idempotencyKey",
+          rule: "required",
+          expected: "present",
+          actual: "missing"
+        }
+      }
+    );
+  }
+
+  const bundle = payload.bundle;
+  if (!bundle || typeof bundle !== "object") {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SCHEMA_INVALID",
+      "SCHEMA",
+      "bundle is required",
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.schemaInvalid,
+        details: {
+          fieldPath: "bundle",
+          rule: "required",
+          expected: "object",
+          actual: "missing"
+        }
+      }
+    );
+  }
+
+  if (!bundle.identity?.did) {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SCHEMA_INVALID",
+      "SCHEMA",
+      "bundle.identity.did is required",
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.schemaInvalid,
+        details: {
+          fieldPath: "bundle.identity.did",
+          rule: "required",
+          expected: "present",
+          actual: "missing"
+        }
+      }
+    );
+  }
+
+  if (!bundle.signature?.signerDid) {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SCHEMA_INVALID",
+      "SCHEMA",
+      "bundle.signature.signerDid is required",
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.schemaInvalid,
+        details: {
+          fieldPath: "bundle.signature.signerDid",
+          rule: "required",
+          expected: "present",
+          actual: "missing"
+        }
+      }
+    );
+  }
+
+  if (bundle.signature.signerDid !== bundle.identity.did) {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SIGNATURE_SIGNER_MISMATCH",
+      "SIGNATURE",
+      "signature.signerDid must match bundle.identity.did",
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.signerMismatch,
+        details: {
+          fieldPath: "bundle.signature.signerDid",
+          rule: "signer_matches_identity",
+          expected: bundle.identity.did,
+          actual: bundle.signature.signerDid
+        }
+      }
+    );
+  }
+
+  const canonicalPayloadHash = canonicalBundlePayloadHash(bundle);
+  if (!bundle.signature?.payloadHash || bundle.signature.payloadHash !== canonicalPayloadHash) {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SIGNATURE_PAYLOAD_MISMATCH",
+      "SIGNATURE",
+      "signature.payloadHash must match the canonical bundle payload hash",
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.payloadHashMismatch,
+        details: {
+          fieldPath: "bundle.signature.payloadHash",
+          rule: "payload_hash_matches_bundle",
+          expected: canonicalPayloadHash,
+          actual: bundle.signature?.payloadHash ?? "missing"
+        }
+      }
+    );
+  }
+
+  if (
+    typeof bundle.signature.signature !== "string" ||
+    !/^(base64:|sig-).+/.test(bundle.signature.signature)
+  ) {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SIGNATURE_INVALID",
+      "SIGNATURE",
+      "signature.signature must contain a verifiable signature payload",
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.signatureInvalid,
+        details: {
+          fieldPath: "bundle.signature.signature",
+          rule: "signature_format",
+          expected: "base64:<signature>",
+          actual: String(bundle.signature.signature ?? "missing")
+        }
+      }
+    );
+  }
+
+  return null;
+}
+
+function validateAgentBundleSchema(payload) {
+  const bundle = payload.bundle;
+
+  if (bundle.schemaVersion !== SUPPORTED_AGENT_BUNDLE_SCHEMA_VERSION) {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SCHEMA_UNSUPPORTED_VERSION",
+      "SCHEMA",
+      `bundle.schemaVersion ${bundle.schemaVersion ?? "missing"} is not supported`,
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.unsupportedSchema,
+        details: {
+          fieldPath: "bundle.schemaVersion",
+          rule: "supported_schema_version",
+          expected: SUPPORTED_AGENT_BUNDLE_SCHEMA_VERSION,
+          actual: String(bundle.schemaVersion ?? "missing")
+        }
+      }
+    );
+  }
+
+  const requiredStringFields = [
+    ["bundle.manifest.name", bundle.manifest?.name],
+    ["bundle.manifest.version", bundle.manifest?.version],
+    ["bundle.manifest.runtime", bundle.manifest?.runtime],
+    ["bundle.manifest.entrypoint", bundle.manifest?.entrypoint],
+    ["bundle.identity.publicKey", bundle.identity?.publicKey],
+    ["bundle.identity.credentialLevel", bundle.identity?.credentialLevel],
+    ["bundle.memoryRef.mode", bundle.memoryRef?.mode],
+    ["bundle.memoryRef.summaryHash", bundle.memoryRef?.summaryHash],
+    ["bundle.signature.algorithm", bundle.signature?.algorithm]
+  ];
+
+  for (const [fieldPath, value] of requiredStringFields) {
+    if (typeof value !== "string" || value.trim().length === 0) {
+      return buildAgentBundleError(
+        "AGENT_BUNDLE_SCHEMA_INVALID",
+        "SCHEMA",
+        `${fieldPath} is required`,
+        {
+          auditId: AGENT_BUNDLE_AUDIT_IDS.schemaInvalid,
+          details: {
+            fieldPath,
+            rule: "required",
+            expected: "present",
+            actual: "missing"
+          }
+        }
+      );
+    }
+  }
+
+  if (!Array.isArray(bundle.skills) || bundle.skills.length === 0) {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SCHEMA_INVALID",
+      "SCHEMA",
+      "bundle.skills must include at least one skill",
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.schemaInvalid,
+        details: {
+          fieldPath: "bundle.skills",
+          rule: "min_items",
+          expected: ">= 1",
+          actual: Array.isArray(bundle.skills) ? "0" : "missing"
+        }
+      }
+    );
+  }
+
+  for (let index = 0; index < bundle.skills.length; index += 1) {
+    const skill = bundle.skills[index];
+    const requiredSkillFields = [
+      ["skillId", skill?.skillId],
+      ["version", skill?.version],
+      ["inputSchema", skill?.inputSchema],
+      ["outputSchema", skill?.outputSchema]
+    ];
+
+    for (const [fieldName, value] of requiredSkillFields) {
+      if (
+        value === undefined ||
+        value === null ||
+        (typeof value === "string" && value.trim().length === 0)
+      ) {
+        return buildAgentBundleError(
+          "AGENT_BUNDLE_SCHEMA_INVALID",
+          "SCHEMA",
+          `bundle.skills[${index}].${fieldName} is required`,
+          {
+            auditId: AGENT_BUNDLE_AUDIT_IDS.schemaInvalid,
+            details: {
+              fieldPath: `bundle.skills[${index}].${fieldName}`,
+              rule: "required",
+              expected: "present",
+              actual: "missing"
+            }
+          }
+        );
+      }
+    }
+  }
+
+  if (bundle.memoryRef.mode === "INDEX_ONLY" && !bundle.memoryRef.vectorIndexUri) {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SCHEMA_INVALID",
+      "SCHEMA",
+      "bundle.memoryRef.vectorIndexUri is required for INDEX_ONLY mode",
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.schemaInvalid,
+        details: {
+          fieldPath: "bundle.memoryRef.vectorIndexUri",
+          rule: "required_for_mode",
+          expected: "present",
+          actual: "missing"
+        }
+      }
+    );
+  }
+
+  if (
+    (bundle.memoryRef.mode === "ENCRYPTED_REF" || bundle.memoryRef.mode === "FULL") &&
+    !bundle.memoryRef.encryptedBlobUri
+  ) {
+    return buildAgentBundleError(
+      "AGENT_BUNDLE_SCHEMA_INVALID",
+      "SCHEMA",
+      "bundle.memoryRef.encryptedBlobUri is required for encrypted memory modes",
+      {
+        auditId: AGENT_BUNDLE_AUDIT_IDS.schemaInvalid,
+        details: {
+          fieldPath: "bundle.memoryRef.encryptedBlobUri",
+          rule: "required_for_mode",
+          expected: "present",
+          actual: "missing"
+        }
+      }
+    );
+  }
+
+  return null;
 }
 
 function validateTaskSpec(task) {
@@ -931,6 +1259,96 @@ export function createApp({
         service: config.serviceName,
         generatedAt: nowValue,
         storage: store.summary()
+      });
+    }
+
+    if (req.method === "POST" && requestUrl.pathname === "/v1/agents/bundles") {
+      let payload;
+      try {
+        payload = await readJson(req);
+      } catch {
+        return reply(
+          400,
+          buildAgentBundleError(
+            "AGENT_BUNDLE_SCHEMA_INVALID",
+            "SCHEMA",
+            "Request body must be valid JSON",
+            {
+              auditId: AGENT_BUNDLE_AUDIT_IDS.invalidJson,
+              details: {
+                fieldPath: "body",
+                rule: "valid_json",
+                expected: "valid JSON object",
+                actual: "invalid"
+              }
+            }
+          )
+        );
+      }
+
+      const signatureError = validateAgentBundleSignature(payload);
+      if (signatureError) {
+        return reply(400, signatureError);
+      }
+
+      const schemaError = validateAgentBundleSchema(payload);
+      if (schemaError) {
+        return reply(400, schemaError);
+      }
+
+      const payloadHash = canonicalBundlePayloadHash(payload.bundle);
+      const outcome = store.saveAgentBundle({
+        idempotencyKey: payload.idempotencyKey,
+        bundle: payload.bundle,
+        payloadHash
+      });
+
+      if (outcome.conflict) {
+        return reply(
+          409,
+          buildAgentBundleError(
+            "AGENT_BUNDLE_VERSION_CONFLICT",
+            "VERSION",
+            `${outcome.record.agentId}@${outcome.record.version} already exists with a different payload hash`,
+            {
+              auditId: AGENT_BUNDLE_AUDIT_IDS.versionConflict,
+              conflict: {
+                strategy: "REJECT_ON_HASH_MISMATCH",
+                existingAgentId: outcome.record.agentId,
+                existingVersion: outcome.record.version,
+                existingPayloadHash: outcome.record.payloadHash,
+                incomingPayloadHash: payloadHash
+              }
+            }
+          )
+        );
+      }
+
+      if (outcome.replay) {
+        return reply(200, {
+          agentId: outcome.record.agentId,
+          version: outcome.record.version,
+          status: "EXISTING",
+          result: "RETURNED_EXISTING",
+          indexing: outcome.record.indexing,
+          replay: {
+            strategy: "RETURN_EXISTING_ON_HASH_MATCH",
+            existingAgentId: outcome.record.agentId,
+            existingVersion: outcome.record.version,
+            existingPayloadHash: outcome.record.payloadHash,
+            incomingPayloadHash: payloadHash
+          },
+          indexedAt: outcome.record.indexedAt
+        });
+      }
+
+      return reply(201, {
+        agentId: outcome.record.agentId,
+        version: outcome.record.version,
+        status: "ACCEPTED",
+        result: "CREATED",
+        indexing: outcome.record.indexing,
+        indexedAt: outcome.record.indexedAt
       });
     }
 

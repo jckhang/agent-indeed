@@ -15,6 +15,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 | Epic acceptance area | Current status | Source of truth | Next gate |
 | --- | --- | --- | --- |
 | OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts`, issue #167, PR #174, PR #176, PR #179, PR #133 | Merge the post-runtime planning/reference cleanup, then keep PR #133 aligned to the published contract vocabulary. |
+| Agent onboarding upload path is executable | In progress | `src/runtime/app.js`, `src/runtime/onboarding-smoke.js`, `docs/ONBOARDING_PIPELINE.md`, epic #2 follow-through PR for runtime onboarding upload | Extend the same runtime baseline with agent-bundle read/query surfaces and keep the upload smoke command wired into local review. |
 | End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, `docs/RUNTIME_EXECUTION_HANDOFF.md`, issues #177, #178, and #11 | Publish one canonical smoke evidence format, run the formatter-backed smoke pass, and paste the final evidence back onto issue #11. |
 | Core negative scenarios are covered | Blocked | issue #11, PR #172, `docs/CLOSED_BETA_SECURITY_READINESS.md`, `docs/ERROR_CODE_RETRY_POLICY.md` | Turn the documented failure cases into reproducible smoke evidence tied to the merged runtime baseline. |
 | Audit events cover key state transitions | In progress | merged runtime baseline from issues #109/#110, `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, issue #11 | Keep the verify/award/audit follow-through aligned while the final smoke evidence proves the emitted trail. |
@@ -33,6 +34,7 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 - QA contract-drift guard baseline is merged in PR #159 and retained in `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md`.
 - Frontend runtime consumer baseline is merged in PR #152.
 - Backend API example packet is merged in PR #164.
+- Agent onboarding runtime upload path is now executable locally via `npm run smoke:onboarding`.
 
 ### Active follow-through slices
 

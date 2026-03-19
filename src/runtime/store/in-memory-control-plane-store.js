@@ -16,6 +16,9 @@ function roundScore(value) {
 export class InMemoryControlPlaneStore {
   constructor({ now = () => new Date().toISOString() } = {}) {
     this.now = now;
+    this.agentBundles = new Map();
+    this.agentBundleVersions = new Map();
+    this.agentBundleIdempotency = new Map();
     this.tasks = new Map();
     this.bids = new Map();
     this.proofs = new Map();
@@ -30,6 +33,76 @@ export class InMemoryControlPlaneStore {
     this.eventIds = new IdSequence("aev");
     this.matchingTraceIds = new IdSequence("matchtrace");
     this.policyTraceIds = new IdSequence("policytrace");
+  }
+
+  saveAgentBundle({ idempotencyKey, bundle, payloadHash }) {
+    const versionKey = `${bundle.identity.did}::${bundle.manifest.version}`;
+    const indexedAt = this.now();
+    const existingVersion = this.agentBundleVersions.get(versionKey);
+
+    if (existingVersion) {
+      const samePayload = existingVersion.payloadHash === payloadHash;
+      const existingRecord = this.agentBundles.get(existingVersion.agentBundleId);
+      if (!existingRecord) {
+        return null;
+      }
+
+      if (samePayload) {
+        this.agentBundleIdempotency.set(idempotencyKey, existingRecord.agentBundleId);
+        return {
+          record: clone(existingRecord),
+          created: false,
+          replay: true,
+          conflict: false
+        };
+      }
+
+      return {
+        record: clone(existingRecord),
+        created: false,
+        replay: false,
+        conflict: true
+      };
+    }
+
+    const replayAgentBundleId = this.agentBundleIdempotency.get(idempotencyKey);
+    if (replayAgentBundleId) {
+      const replayRecord = this.agentBundles.get(replayAgentBundleId);
+      if (replayRecord) {
+        return {
+          record: clone(replayRecord),
+          created: false,
+          replay: true,
+          conflict: false
+        };
+      }
+    }
+
+    const agentId = buildAgentId(bundle);
+    const record = {
+      agentBundleId: `${agentId}@${bundle.manifest.version}`,
+      agentId,
+      version: bundle.manifest.version,
+      payloadHash,
+      idempotencyKey,
+      indexedAt,
+      bundle: clone(bundle),
+      indexing: buildIndexingSummary({ agentId, bundle })
+    };
+
+    this.agentBundles.set(record.agentBundleId, record);
+    this.agentBundleVersions.set(versionKey, {
+      agentBundleId: record.agentBundleId,
+      payloadHash
+    });
+    this.agentBundleIdempotency.set(idempotencyKey, record.agentBundleId);
+
+    return {
+      record: clone(record),
+      created: true,
+      replay: false,
+      conflict: false
+    };
   }
 
   createTask({ workspaceId, task }) {
@@ -511,6 +584,30 @@ export class InMemoryControlPlaneStore {
       latestAuditId: this.auditEvents.at(-1)?.auditId ?? null
     };
   }
+}
+
+function buildAgentId(bundle) {
+  const normalized = bundle.manifest.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  return `agent_${normalized || "bundle"}`;
+}
+
+function buildIndexingSummary({ agentId, bundle }) {
+  return {
+    status: "INDEXED",
+    indexedSkillCount: bundle.skills.length,
+    memoryMode: bundle.memoryRef.mode,
+    skills: bundle.skills.map((skill) => ({
+      skillId: skill.skillId,
+      version: skill.version,
+      sourceAgentId: agentId,
+      sourceVersion: bundle.manifest.version,
+      ...(skill.tags ? { tags: clone(skill.tags) } : {})
+    }))
+  };
 }
 
 export function buildCandidateSnapshot({ taskId, task, includeScoreBreakdown = true, limit = 10 }) {

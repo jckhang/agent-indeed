@@ -24,5 +24,6 @@ Agent dispatch platform prototype.
 - Frontend/backend delivery tracks: `docs/ENGINEERING_TRACKS_FE_BE.md`
 - HR hiring plan: `docs/HR_HIRING_PLAN.md`
 - Runtime control-plane scaffold: `src/runtime/README.md`
+- Onboarding smoke command: `npm run smoke:onboarding`
 - Runtime bootstrap smoke command: `npm run smoke:bootstrap`
 - Runnable dispatch smoke suite: `npm run smoke:dispatch`

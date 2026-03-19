@@ -5,6 +5,21 @@ import { createServer } from "node:http";
 import { once } from "node:events";
 import { createApp } from "../../src/runtime/app.js";
 
+function stableSerialize(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map((entry) => stableSerialize(entry)).join(",")}]`;
+  }
+
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${stableSerialize(value[key])}`)
+      .join(",")}}`;
+  }
+
+  return JSON.stringify(value);
+}
+
 function buildTask(overrides = {}) {
   return {
     title: "Run dispatch loop baseline",
@@ -86,6 +101,71 @@ function buildRevealHash(reveal) {
     executionPlan: reveal.executionPlan,
     proof: reveal.proof
   })).digest("hex")}`;
+}
+
+function buildBundlePayloadHash(bundle) {
+  const { signature: _signature, ...unsignedBundle } = bundle;
+  return `sha256:${createHash("sha256").update(stableSerialize(unsignedBundle)).digest("hex")}`;
+}
+
+function buildAgentBundle(overrides = {}) {
+  const bundle = {
+    schemaVersion: "1.0",
+    manifest: {
+      name: "support_triage_agent",
+      version: "1.2.0",
+      runtime: "OPENCLAW",
+      entrypoint: "./bin/triage"
+    },
+    identity: {
+      did: "did:key:z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8Kestrel",
+      publicKey: "z6MkhaXgBZDvotDkL9Q1Y1w2X5h2k2u6Y8VnSx4Q8KestrelPubKey",
+      credentialLevel: "T1"
+    },
+    skills: [
+      {
+        skillId: "skill_support.triage",
+        version: "1.4.0",
+        tags: ["support", "routing"],
+        inputSchema: { type: "object" },
+        outputSchema: { type: "object" }
+      }
+    ],
+    memoryRef: {
+      mode: "INDEX_ONLY",
+      summaryHash: "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      vectorIndexUri: "s3://agent-memory/support-triage/index.bin"
+    }
+  };
+
+  const signature = {
+    algorithm: "ED25519",
+    payloadHash: buildBundlePayloadHash(bundle),
+    signature: "base64:MEUCIQDdExampleSignatureForBundleUploadFlow1234567890==",
+    signerDid: bundle.identity.did
+  };
+
+  return {
+    ...bundle,
+    signature,
+    ...overrides,
+    manifest: {
+      ...bundle.manifest,
+      ...overrides.manifest
+    },
+    identity: {
+      ...bundle.identity,
+      ...overrides.identity
+    },
+    memoryRef: {
+      ...bundle.memoryRef,
+      ...overrides.memoryRef
+    },
+    signature: {
+      ...signature,
+      ...overrides.signature
+    }
+  };
 }
 
 async function startTestServer({ now } = {}) {
@@ -178,6 +258,139 @@ test("POST /v1/tasks persists a task and updates runtime summary", async () => {
     assert.equal(summaryBody.storage.latestTaskId, "task_00000001");
     assert.equal(logEntries[0].workspaceId, "workspace-kestrel");
     assert.equal(logEntries[0].statusCode, 201);
+  } finally {
+    server.close();
+    await once(server, "close");
+  }
+});
+
+test("POST /v1/agents/bundles accepts a valid bundle and returns indexed skill records", async () => {
+  const { server, baseUrl, logEntries } = await startTestServer();
+
+  try {
+    const bundle = buildAgentBundle();
+    const response = await fetch(`${baseUrl}/v1/agents/bundles`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        idempotencyKey: "idem_agentbundle_001",
+        bundle
+      })
+    });
+
+    assert.equal(response.status, 201);
+    const body = await response.json();
+    assert.equal(body.agentId, "agent_support_triage_agent");
+    assert.equal(body.result, "CREATED");
+    assert.equal(body.indexing.indexedSkillCount, 1);
+    assert.equal(body.indexing.skills[0].sourceVersion, "1.2.0");
+    assert.equal(logEntries.at(-1)?.path, "/v1/agents/bundles");
+    assert.equal(logEntries.at(-1)?.statusCode, 201);
+  } finally {
+    server.close();
+    await once(server, "close");
+  }
+});
+
+test("POST /v1/agents/bundles replays the same accepted version and rejects payload hash drift", async () => {
+  const { server, baseUrl } = await startTestServer();
+
+  try {
+    const bundle = buildAgentBundle();
+    const created = await fetch(`${baseUrl}/v1/agents/bundles`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        idempotencyKey: "idem_agentbundle_001",
+        bundle
+      })
+    });
+    assert.equal(created.status, 201);
+
+    const replay = await fetch(`${baseUrl}/v1/agents/bundles`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        idempotencyKey: "idem_agentbundle_001",
+        bundle
+      })
+    });
+    assert.equal(replay.status, 200);
+    const replayBody = await replay.json();
+    assert.equal(replayBody.result, "RETURNED_EXISTING");
+
+    const drift = await fetch(`${baseUrl}/v1/agents/bundles`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        idempotencyKey: "idem_agentbundle_002",
+        bundle: buildAgentBundle({
+          signature: {
+            payloadHash: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        })
+      })
+    });
+    assert.equal(drift.status, 400);
+    const driftBody = await drift.json();
+    assert.equal(driftBody.code, "AGENT_BUNDLE_SIGNATURE_PAYLOAD_MISMATCH");
+  } finally {
+    server.close();
+    await once(server, "close");
+  }
+});
+
+test("POST /v1/agents/bundles rejects same version with a different bundle payload", async () => {
+  const { server, baseUrl } = await startTestServer();
+
+  try {
+    const created = await fetch(`${baseUrl}/v1/agents/bundles`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        idempotencyKey: "idem_agentbundle_001",
+        bundle: buildAgentBundle()
+      })
+    });
+    assert.equal(created.status, 201);
+
+    const changedBundle = buildAgentBundle({
+      skills: [
+        {
+          skillId: "skill_support.priority_score",
+          version: "1.5.0",
+          inputSchema: { type: "object" },
+          outputSchema: { type: "object" }
+        }
+      ]
+    });
+    changedBundle.signature.payloadHash = buildBundlePayloadHash(changedBundle);
+
+    const conflict = await fetch(`${baseUrl}/v1/agents/bundles`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        idempotencyKey: "idem_agentbundle_003",
+        bundle: changedBundle
+      })
+    });
+
+    assert.equal(conflict.status, 409);
+    const body = await conflict.json();
+    assert.equal(body.code, "AGENT_BUNDLE_VERSION_CONFLICT");
+    assert.equal(body.conflict.strategy, "REJECT_ON_HASH_MISMATCH");
   } finally {
     server.close();
     await once(server, "close");
