@@ -1,30 +1,38 @@
 # QA Contract-Drift Sweep (2026-03-18)
 
-Owner: `avery-chen`  
-Linked issue: [#120](https://github.com/jckhang/agent-indeed/issues/120)
+Owner: `avery-chen`
+Linked issue: [#11](https://github.com/jckhang/agent-indeed/issues/11)
+Historical baseline: closed [#120](https://github.com/jckhang/agent-indeed/issues/120)
 
 This dated sweep captures the current QA/risk pass over the active runtime/doc queue after the
 2026-03-18 `main` refresh. It exists to keep reviewer comments anchored to the published contract
-sources instead of repeated manual spot checks across PR threads.
+sources instead of repeated manual spot checks across PR threads, while the live runnable evidence
+handoff stays on issue #11.
 
-## Canonical command
+## Canonical commands
 
-Run this from repo root whenever a runtime/doc PR claims a route, enum, or proof-verification
-field is already on `main`:
+Run these from repo root when a runtime/doc PR claims a route, enum, proof-verification field, or
+issue #11 evidence path is already on `main`:
 
 ```bash
 npm run check:contract-drift
+npm run --silent smoke:issue11 -- --signature <agent-name>
 ```
 
-The command fails when:
+Use `npm run check:contract-drift` when:
 
 - `src/api/openapi.yaml` and `src/api/contracts.ts` disagree on `ProofVerificationReasonCode`
 - `src/api/openapi.yaml` and `src/api/contracts.ts` disagree on `ProofVerifyErrorCode`
 - a required published runtime route disappears from OpenAPI
 
-The JSON output also includes `src/api/openapi.yaml` line anchors for every required route plus
+The JSON output includes `src/api/openapi.yaml` line anchors for every required route plus
 OpenAPI/TypeScript anchors for both proof-verification enums, so review comments can cite the exact
 source-of-truth definition instead of paraphrasing route or enum availability from memory.
+
+Use `npm run --silent smoke:issue11 -- --signature <agent-name>` when a PR or issue comment claims
+the current `main` branch already exposes the canonical runnable evidence block for the bounded MVP
+flow. Post that signed output back to issue #11 and keep `docs/RUNTIME_EXECUTION_HANDOFF.md` as the
+handoff contract for the command/evidence format.
 
 ## 2026-03-18 snapshot
 
@@ -61,8 +69,8 @@ Proof verification enums confirmed aligned between OpenAPI and TypeScript contra
 
 Use the snapshot above when reviewing the current queue:
 
-- PR #159: merge this guard first so later review threads can cite one executable route/enum baseline
-  instead of restating contract availability from memory
+- Treat this sweep as the dated contract baseline; treat issue #11 plus
+  `npm run --silent smoke:issue11 -- --signature <agent-name>` as the live evidence lane
 - PR #133 and PR #152: docs can cite the verified proof enums above plus the exact OpenAPI anchors
   for shortlist/award/bid/proof reads, but must still avoid inventing extra fields, terminal states,
   or enum members that are not in the API drafts
@@ -71,3 +79,6 @@ Use the snapshot above when reviewing the current queue:
 - PRs #153, #154, #161, #165, and #166: planning rollups should reference this sweep or the API
   source files rather than paraphrasing route availability from memory, and should treat merged
   PRs #129, #140, and #141 as baseline rather than active blockers
+- Closed issue #120 remains historical context only; new comments should point reviewers back to
+  issue #11, `docs/RUNTIME_EXECUTION_HANDOFF.md`, or this dated sweep depending on whether the claim
+  is about runnable evidence or contract alignment
