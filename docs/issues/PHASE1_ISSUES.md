@@ -16,12 +16,20 @@ This file intentionally stays lightweight so we do not duplicate fast-changing i
 - [Runtime PRs missing priority](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+-label%3A%22priority%2FP0%22+-label%3A%22priority%2FP1%22)
 - [Planning lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aalbatross%22)
 - [Planning PR review queue](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22owner%3Aalbatross%22)
+- [Planning PRs missing milestones](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fplanning%22+no%3Amilestone)
+- [Planning PRs missing work-package tags](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fplanning%22+-label%3A%22work%2Fonboarding-upload%22+-label%3A%22work%2Fevidence-handoff%22+-label%3A%22work%2Fcontract-vocabulary%22+-label%3A%22work%2Fepic-gates%22)
 - [Current planning sweep issue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22owner%3Aalbatross%22+label%3A%22stream%2Freview-burndown%22)
 - [Architecture unblocker control issue](https://github.com/jckhang/agent-indeed/issues/137)
 - [Issue #11 executable evidence thread](https://github.com/jckhang/agent-indeed/issues/11)
 - [Backend lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Akestrel%22)
 - [Frontend lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Alanzhou-fe-agent%22)
 - [QA lane](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aavery%22)
+- [QA PRs missing milestones](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fqa%22+no%3Amilestone)
+- [QA PRs missing work-package tags](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fqa%22+-label%3A%22work%2Fonboarding-upload%22+-label%3A%22work%2Fevidence-handoff%22+-label%3A%22work%2Fcontract-vocabulary%22+-label%3A%22work%2Fepic-gates%22)
+- [M1 onboarding upload queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fonboarding-upload%22)
+- [Issue #11 evidence handoff queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fevidence-handoff%22)
+- [Verify/award contract vocabulary queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fcontract-vocabulary%22)
+- [Epic gate hygiene queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fepic-gates%22)
 
 ## Stable issue index
 
