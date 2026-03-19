@@ -587,6 +587,51 @@ test("dispatch vertical slice publishes, matches, bids, verifies, awards, and ex
   }
 });
 
+test("candidate shortlist query flags project a canonical snapshot without mutating it", async () => {
+  const { server, baseUrl } = await startTestServer();
+
+  try {
+    const created = await createTaskRecord(baseUrl, buildTask({
+      constraints: {
+        identityTierMin: "T1",
+        requiredSkills: ["backend", "api"],
+        complianceTags: []
+      }
+    }));
+    const taskId = created.taskId;
+
+    const seededResponse = await fetch(
+      `${baseUrl}/v1/tasks/${taskId}/candidates?limit=1&includeScoreBreakdown=false`
+    );
+    assert.equal(seededResponse.status, 409);
+
+    const limitedResponse = await fetch(
+      `${baseUrl}/v1/tasks/${taskId}/candidates?limit=1&includeScoreBreakdown=false`
+    );
+    assert.equal(limitedResponse.status, 200);
+    const limitedBody = await limitedResponse.json();
+    assert.equal(limitedBody.candidates.length, 2);
+    assert.equal(limitedBody.candidates[0].agentId, "agent_kestrel_alpha");
+    assert.equal(limitedBody.candidates[0].eligible, true);
+    assert.equal("scoreBreakdown" in limitedBody.candidates[0], false);
+    assert.equal(limitedBody.candidates[1].eligible, false);
+
+    const expandedResponse = await fetch(`${baseUrl}/v1/tasks/${taskId}/candidates?limit=2`);
+    assert.equal(expandedResponse.status, 200);
+    const expandedBody = await expandedResponse.json();
+    assert.equal(expandedBody.candidates.length, 3);
+    assert.equal(expandedBody.candidates[0].agentId, "agent_kestrel_alpha");
+    assert.equal(expandedBody.candidates[1].agentId, "agent_kestrel_beta");
+    assert.equal(expandedBody.candidates[1].eligible, true);
+    assert.ok(expandedBody.candidates[0].scoreBreakdown);
+    assert.ok(expandedBody.candidates[1].scoreBreakdown);
+    assert.equal(expandedBody.candidates[2].eligible, false);
+  } finally {
+    server.close();
+    await once(server, "close");
+  }
+});
+
 test("invalid signature, reveal without a commit, and failed verification return stable errors", async () => {
   let currentTime = "2026-03-16T00:00:00.000Z";
   const { server, baseUrl, setNow } = await startTestServer({

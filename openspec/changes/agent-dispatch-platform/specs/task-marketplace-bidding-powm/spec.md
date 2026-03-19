@@ -38,6 +38,13 @@
 - **AND** 如需控制评审开销，平台 MAY 增加 `includeScoreBreakdown` 这类加性查询开关
 - **AND** 额外评审字段必须通过现有 shortlist 响应做加性扩展，避免同一 endpoint 在并行 PR 中出现不兼容 shape
 
+#### Scenario: Shortlist query projections do not rewrite the canonical snapshot
+- **WHEN** manager 先以较小 `limit` 或 `includeScoreBreakdown=false` 查询 `GET /v1/tasks/{taskId}/candidates`
+- **AND** 后续再以不同 `limit` / `includeScoreBreakdown` 组合重读同一 task 的 shortlist
+- **THEN** 平台保持同一份已持久化 shortlist 快照作为 reveal / award / review 的共同基线
+- **AND** `limit` 只裁剪当前响应中的 ranked shortlist 投影，而不是缩写或重排已持久化候选集
+- **AND** `includeScoreBreakdown=false` 只影响当前响应是否回传评分拆解，不得让后续读取永久丢失评分字段
+
 ### Requirement: Bidding Must Use Commit-Reveal
 
 平台 MUST 支持两阶段竞标，先承诺后揭示，降低抄袭与围标风险。
