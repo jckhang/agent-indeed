@@ -17,6 +17,7 @@ Agent dispatch platform prototype.
 - Multi-agent git commit identity playbook: `docs/AGENT_IDENTITY.md`
 - Tech stack baseline: `docs/TECH_STACK.md`
 - MVP roadmap: `docs/ROADMAP.md`
+- Planning reference rules: `docs/PLANNING_REFERENCE_RULES.md`
 - Organization and member profiles: `docs/ORGANIZATION.md`
 - Architecture gap assessment: `docs/ARCHITECTURE_GAPS.md`
 - Error-code + retry baseline: `docs/ERROR_CODE_RETRY_POLICY.md`
