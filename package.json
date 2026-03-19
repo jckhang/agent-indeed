@@ -8,6 +8,7 @@
     "smoke:dispatch": "node src/runtime/dispatch-smoke.js",
     "smoke:issue11": "node src/runtime/issue11-evidence.js",
     "smoke:bootstrap": "node src/runtime/bootstrap-smoke.js",
+    "check:work-item-metadata": "node scripts/check-work-item-metadata.js --assert",
     "check:contract-drift": "node scripts/check-runtime-contract-drift.js --assert",
     "test": "node --test"
   },

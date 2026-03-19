@@ -42,5 +42,6 @@
 - 新增 `docs/RUNTIME_EXECUTION_HANDOFF.md`，作为 runtime sprint 中 backend/QA/planning 的统一命令与证据交接基线。
 - 明确当前 planning sweep issue 与 epic #2 的 GitHub 评论分工，并要求每次 checkpoint sweep 只保留一个 mergeable planning-sync PR，减少 review-burndown 期间重复回贴和状态漂移。
 - 将开放的 M1 / issue #11 follow-through 线程收敛到 `work/onboarding-upload`、`work/evidence-handoff`、`work/contract-vocabulary`、`work/epic-gates` 四个稳定 work package，方便 checkpoint review 直接过滤。
+- 补一个 repo-local metadata audit 命令，直接枚举开放 planning / QA PR 是否缺少 owner、priority、status、stream、work-package label 或 milestone，减少只靠 GitHub 搜索链接逐个点开的成本。
 - 将影响后续模块：Registry、Matching、Bidding、PoMW Verifier、Audit/Reputation、Settlement。
 - 该变更现阶段除了规格定义，也显式承接运行时落地任务，并要求以可执行实现和测试证据作为关闭实现 issue 的依据。

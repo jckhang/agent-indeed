@@ -91,6 +91,7 @@ Use the smallest stable `work/*` label set that still explains why a thread surv
 
 - Use the milestone that matches the gate the thread is actively unblocking, not the original umbrella epic.
 - Current examples: onboarding upload work belongs on `M1 Contract Freeze + Upload`; issue #11 evidence publication belongs on `M4 Audit + Beta Readiness`; verify/award vocabulary cleanup belongs on `M3 Verify + Agent Flow`.
+- Validate open planning/QA PR hygiene with `PATH="/opt/homebrew/opt/node/bin:$PATH" npm run check:work-item-metadata`; the command fails under `-- --assert` if any tracked PR still misses owner/priority/status/stream/work labels or a milestone.
 
 ## Recommended mapping examples
 

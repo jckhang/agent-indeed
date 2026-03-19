@@ -34,6 +34,13 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
 - Work package queue - epic gates: [open epic gate threads](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fepic-gates%22)
 - Dated runtime blocker ledger: `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`
 
+## Local audit command
+
+Use the repo-local audit before or after the GitHub searches when you need one text report of every open planning/QA PR that is still missing queue metadata:
+
+- `PATH="/opt/homebrew/opt/node/bin:$PATH" npm run check:work-item-metadata`
+- add `-- --assert` when you want the command to fail if any open planning/QA PR is still missing an owner, priority, status, stream, work-package label, or milestone.
+
 ## Merge-train routine
 
 1. Refresh `main` locally before touching any queue branch:
