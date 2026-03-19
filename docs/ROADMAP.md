@@ -106,7 +106,7 @@ Scope:
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
 - M1 (2026-03-20): close post-runtime planning/reference drift (#167, PR #174, PR #176) and keep verify/award follow-through on PR #133 tied to the merged contract baseline.
-- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA keep one canonical smoke evidence path on `main` (`npm run --silent smoke:issue11 -- --signature <agent-name>`) and post the final run to issue #11.
+- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA keep one canonical smoke evidence path on `main` (`npm run --silent smoke:issue11 -- --signature <agent-name>`) and refresh issue #11 whenever the runtime evidence changes.
 - M3 (2026-04-03): stabilize verify/award/audit evidence and run executable smoke checks against the merged runtime baseline.
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
 - M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, and `docs/CLOSED_BETA_SECURITY_READINESS.md` so telemetry owners plus auth, secret-handling, and redaction follow-ons stay reviewable.
