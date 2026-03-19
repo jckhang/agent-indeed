@@ -44,7 +44,7 @@
 - [x] 5.4 输出前端 runtime 集成 tranche 与本地 runbook（issue #136），串联 manager publish / shortlist / award-readiness 与 agent commit / reveal / status-refresh 路径。
 - [x] 5.5 收敛前端 runtime 文档队列（issue #145），把 wiring target、fixture pack 与 demo payload pack 合并进单一 mainline handoff。
 - [x] 5.6 输出 `docs/RUNTIME_EXECUTION_HANDOFF.md`，统一 runtime sprint 的本地命令契约、证据包与 issue #11 回写规则。
-- [x] 5.7 明确 issue #146 merge-evidence sweep 与 epic #2 checkpoint 的双轨回写规则，统一 clean tranche、dirty follow-on 与 validation evidence gap 的 GitHub 记录方式。
+- [x] 5.7 明确 planning sweep issue 与 epic #2 checkpoint 的双轨回写规则，统一 clean tranche、dirty follow-on 与 validation evidence gap 的 GitHub 记录方式。
 - [x] 5.8 完成前端 runtime consumer verification pass（issue #150），校准 task composer、shortlist/award、bid workspace、verification timeline 对当前 `main` runtime 字段与 fallback 语义的引用。
 - [x] 5.9 跟进前端 consumer contract claim trim（issue #157），把 shortlist/award/bid/proof 读路径的 `main` 基线解释收敛到 OpenAPI/TS draft anchors，避免把 runtime 数据缺口误写成 contract 缺口。
 - [x] 5.10 补充前端 consumer contract reviewer quick-check 锚点，给出 `origin/main` 的行号与 grep 校验命令，减少对已发布读路径的重复误判。
@@ -52,3 +52,4 @@
 - [x] 5.12 刷新 checkpoint / merge-train 模板，移除对已关闭 issue #146 的活跃 blocker 依赖，改用 live planning sweep 查询与 issue #11 证据线程。
 - [x] 5.13 补充 issue #11 可直接复用的最小 SDK 片段与 smoke 标识符回写，确保 QA/beta consumer 不必从 PR 评论中手抄 `taskId` / `proofId` / `policyTraceId` / reason-code 证据。
 - [x] 5.14 为 issue #186 收敛 planning sweep 规则：同一 checkpoint 只保留一个 mergeable planning-sync PR，并把 superseded PR 的 merge/close rationale 回写到 GitHub 线程。
+- [x] 5.15 刷新 epic #2 的稳定执行快照（`docs/PHASE1_EPIC_STATUS.md` 与 `docs/ROADMAP.md`），把 M1 规划收敛、issue #11 证据路径与当前 follow-through PR 队列对齐到 2026-03-19 基线。
