@@ -1,6 +1,6 @@
 # Frontend Runtime Integration Tranche (P1-40)
 
-Last updated: 2026-03-18
+Last updated: 2026-03-19
 
 Related issue: [#136](https://github.com/jckhang/agent-indeed/issues/136)
 Mainline sync issue: [#145](https://github.com/jckhang/agent-indeed/issues/145)
@@ -43,6 +43,16 @@ Result:
 - remaining risk stays in runtime execution readiness from issues [#110](https://github.com/jckhang/agent-indeed/issues/110), [#115](https://github.com/jckhang/agent-indeed/issues/115), and QA evidence from [#111](https://github.com/jckhang/agent-indeed/issues/111), not in the published field names or fallback rules
 
 Issue [#157](https://github.com/jckhang/agent-indeed/issues/157) narrows the review rule for this pass: if the docs say a read is on `main`, reviewers should be able to find the exact path plus response type in both `src/api/openapi.yaml` and `src/api/contracts.ts`. A local stack still returning empty or lagging projection data is a runtime readiness gap, not proof that the contract path is unpublished.
+
+## Executable follow-up slice for issue #188
+
+Selected runtime-consumer entrypoint:
+- `GET /v1/tasks/{taskId}/candidates`
+
+Acceptance notes for this cut:
+- `limit` stays a response-projection control for the ranked shortlist and does not rewrite the persisted shortlist snapshot that reveal, award-readiness, and later manager reads depend on.
+- `includeScoreBreakdown=false` hides ranking detail only for that response; a later read with `includeScoreBreakdown=true` must still surface the same canonical shortlist members with score data intact.
+- The runtime keeps ineligible candidates visible as review context, so the manager shell can preserve blocker and missing-data fallbacks without inventing a parallel shortlist contract.
 
 ## Canonical handoff status
 

@@ -38,6 +38,28 @@ function buildError(code, category, message, { auditId, retryable = false, retry
   };
 }
 
+function projectCandidateSnapshot(snapshot, { limit, includeScoreBreakdown }) {
+  const projectCandidate = (candidate) => ({
+    ...candidate,
+    ...(includeScoreBreakdown ? {} : { scoreBreakdown: undefined })
+  });
+
+  const eligibleCandidates = snapshot.candidates
+    .filter((candidate) => candidate.eligible)
+    .slice(0, limit)
+    .map(projectCandidate);
+  const ineligibleCandidates = snapshot.candidates
+    .filter((candidate) => !candidate.eligible)
+    .map(projectCandidate);
+
+  return {
+    taskId: snapshot.taskId,
+    status: snapshot.status,
+    generatedAt: snapshot.generatedAt,
+    candidates: [...eligibleCandidates, ...ineligibleCandidates]
+  };
+}
+
 function buildTaskValidationError(message, details = {}) {
   return {
     statusCode: 400,
@@ -996,9 +1018,7 @@ export function createApp({
       if (store.isMatchingPending(taskId)) {
         const seededSnapshot = buildCandidateSnapshot({
           taskId,
-          task: task.task,
-          includeScoreBreakdown,
-          limit
+          task: task.task
         });
         store.createMatchingSnapshot(taskId, seededSnapshot.candidates);
         return reply(
@@ -1017,15 +1037,7 @@ export function createApp({
       }
 
       const snapshot = store.getMatchingSnapshot(taskId);
-      return reply(200, {
-        taskId,
-        status: snapshot.status,
-        generatedAt: snapshot.generatedAt,
-        candidates: snapshot.candidates.map((candidate) => ({
-          ...candidate,
-          ...(includeScoreBreakdown ? {} : { scoreBreakdown: undefined })
-        }))
-      });
+      return reply(200, projectCandidateSnapshot(snapshot, { limit, includeScoreBreakdown }));
     }
 
     const commitMatch = requestUrl.pathname.match(TASK_BID_COMMIT_PATTERN);

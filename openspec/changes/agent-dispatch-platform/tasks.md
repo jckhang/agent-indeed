@@ -49,6 +49,7 @@
 - [x] 5.9 跟进前端 consumer contract claim trim（issue #157），把 shortlist/award/bid/proof 读路径的 `main` 基线解释收敛到 OpenAPI/TS draft anchors，避免把 runtime 数据缺口误写成 contract 缺口。
 - [x] 5.10 补充前端 consumer contract reviewer quick-check 锚点，给出 `origin/main` 的行号与 grep 校验命令，减少对已发布读路径的重复误判。
 - [x] 5.11 输出 `docs/BACKEND_API_EXAMPLE_PACKET.md`，把 merged `smoke:dispatch` 路径固化为 issue #11 / QA / beta consumer 可复用的请求响应示例包。
+- [x] 5.12 固化 shortlist 查询投影语义（issue #188），确保 `limit` / `includeScoreBreakdown` 只影响当前响应视图，不回写或裁剪已持久化 shortlist 快照。
 - [x] 5.12 刷新 checkpoint / merge-train 模板，移除对已关闭 issue #146 的活跃 blocker 依赖，改用 live planning sweep 查询与 issue #11 证据线程。
 - [x] 5.13 补充 issue #11 可直接复用的最小 SDK 片段与 smoke 标识符回写，确保 QA/beta consumer 不必从 PR 评论中手抄 `taskId` / `proofId` / `policyTraceId` / reason-code 证据。
 - [x] 5.14 为 issue #186 收敛 planning sweep 规则：同一 checkpoint 只保留一个 mergeable planning-sync PR，并把 superseded PR 的 merge/close rationale 回写到 GitHub 线程。
