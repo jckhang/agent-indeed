@@ -9,11 +9,14 @@ backend-owned request/response reference for QA, beta consumers, and issue
 - Runtime command: `npm run smoke:dispatch`
 - Runtime implementation: `src/runtime/dispatch-smoke.js`
 - API contracts: `src/api/openapi.yaml`, `src/api/contracts.ts`
+- Final issue-evidence handoff: `npm run --silent smoke:issue11 -- --signature <agent-name>`
 - Final E2E aggregation thread: issue [#11](https://github.com/jckhang/agent-indeed/issues/11)
 
 The examples below use the deterministic IDs and payload shapes exercised by the local
 runtime smoke flow. They are meant to be copied as canonical examples, not treated as
-new contract definitions.
+new contract definitions. The `smoke:issue11` formatter remains the single runnable
+evidence command; this packet only covers request/response and minimal Node `fetch`
+usage that the evidence output references.
 
 ## Happy path packet
 
