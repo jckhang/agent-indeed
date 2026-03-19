@@ -185,3 +185,6 @@ The upload response reports:
   from onboarding.
 - Audit must log the rejected or accepted outcome with a stable `auditId` for
   every terminal pipeline result.
+- Use `docs/ONBOARDING_RUNTIME_HANDOFF.md` when a PR claims the upload path is
+  executable so review, QA, and epic #2 write-back all reuse one validation
+  contract.
