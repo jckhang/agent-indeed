@@ -5,21 +5,26 @@ function findScenario(summary, name) {
   return summary.scenarios.find((scenario) => scenario.name === name);
 }
 
+function buildEvidenceCommand(signature) {
+  return signature
+    ? `npm run --silent smoke:issue11 -- --signature ${signature}`
+    : "npm run --silent smoke:issue11";
+}
+
 export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
   const happyPath = findScenario(summary, "happy-path");
   const invalidSignature = findScenario(summary, "invalid-signature");
   const negativePaths = findScenario(summary, "negative-paths");
   const evidenceLog = logLines.join("\n");
   const signedNote = signature ? `\n--${signature}` : "";
-  const evidenceCommand = signature
-    ? `npm run --silent smoke:issue11 -- --signature ${signature}`
-    : "npm run --silent smoke:issue11";
+  const evidenceCommand = summary.evidenceCommand ?? buildEvidenceCommand(signature);
+  const underlyingCommand = summary.underlyingCommand ?? summary.command;
 
   return [
     "## Issue #11 executable smoke evidence",
     "",
     `- Evidence command: \`${evidenceCommand}\``,
-    `- Underlying smoke suite: \`${summary.command}\``,
+    `- Underlying smoke suite: \`${underlyingCommand}\``,
     "- API examples: `docs/BACKEND_API_EXAMPLE_PACKET.md`",
     "- Handoff contract: `docs/RUNTIME_EXECUTION_HANDOFF.md`",
     "",
@@ -58,12 +63,17 @@ export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
 
 export async function runIssue11Evidence({ log = console.log, signature } = {}) {
   const logLines = [];
-  const summary = await runDispatchSmokeSuite({
+  const dispatchSummary = await runDispatchSmokeSuite({
     command: "npm run smoke:dispatch",
     log: (line) => {
       logLines.push(line);
     }
   });
+  const summary = {
+    ...dispatchSummary,
+    evidenceCommand: buildEvidenceCommand(signature),
+    underlyingCommand: dispatchSummary.command
+  };
   const markdown = formatIssue11Evidence({
     summary,
     logLines,
