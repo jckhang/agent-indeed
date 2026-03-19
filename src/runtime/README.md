@@ -69,8 +69,9 @@ To keep the pasted stdout packet and save the same run into a local archive dire
 npm run --silent smoke:issue11 -- --signature avery --output-dir ./artifacts/issue11
 ```
 
-That variant still prints the markdown packet to stdout and also writes `issue11-evidence.md`
-plus `issue11-summary.json` into the requested directory for PR attachments or local reruns.
+That variant still prints the markdown packet to stdout and also writes `issue11-evidence.md`,
+`issue11-summary.json`, and `issue11-artifacts-manifest.json` into the requested directory
+for PR attachments, automation handoff, or local reruns.
 
 `npm test` also shells this command end-to-end and asserts the PASS-line plus JSON-summary contract, so CI covers the exact smoke output shape that QA copies into issue evidence.
 

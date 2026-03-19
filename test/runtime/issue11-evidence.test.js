@@ -9,7 +9,8 @@ import { fileURLToPath } from "node:url";
 import {
   formatIssue11Evidence,
   parseIssue11EvidenceArgs,
-  runIssue11Evidence
+  runIssue11Evidence,
+  writeIssue11Artifacts
 } from "../../src/runtime/issue11-evidence.js";
 
 test("formatIssue11Evidence includes the smoke summary, logs, and signature", () => {
@@ -94,14 +95,48 @@ test("runIssue11Evidence writes markdown and summary artifacts when requested", 
 
   assert.equal(result.artifactPaths.markdownPath, path.join(outputDir, "issue11-evidence.md"));
   assert.equal(result.artifactPaths.summaryPath, path.join(outputDir, "issue11-summary.json"));
+  assert.equal(
+    result.artifactPaths.manifestPath,
+    path.join(outputDir, "issue11-artifacts-manifest.json")
+  );
 
   const markdown = await readFile(result.artifactPaths.markdownPath, "utf8");
   const summary = JSON.parse(await readFile(result.artifactPaths.summaryPath, "utf8"));
+  const manifest = JSON.parse(await readFile(result.artifactPaths.manifestPath, "utf8"));
 
   assert.match(markdown, /## Issue #11 executable smoke evidence/);
   assert.match(markdown, /--avery/);
   assert.equal(summary.status, "ok");
   assert.equal(summary.scenarios[0].name, "happy-path");
+  assert.equal(manifest.evidenceIssue, 11);
+  assert.equal(
+    manifest.evidenceCommand,
+    `npm run --silent smoke:issue11 -- --signature avery --output-dir ${outputDir}`
+  );
+  assert.equal(manifest.generatedArtifacts.markdownPath, result.artifactPaths.markdownPath);
+  assert.equal(manifest.generatedArtifacts.summaryPath, result.artifactPaths.summaryPath);
+});
+
+test("writeIssue11Artifacts persists a self-describing manifest alongside exported files", async () => {
+  const outputDir = await mkdtemp(path.join(os.tmpdir(), "issue11-manifest-"));
+  const artifactPaths = await writeIssue11Artifacts({
+    markdown: "## Issue #11 executable smoke evidence\n--avery",
+    outputDir,
+    signature: "avery",
+    summary: {
+      command: "npm run smoke:dispatch",
+      status: "ok",
+      scenarios: []
+    }
+  });
+
+  const manifest = JSON.parse(await readFile(artifactPaths.manifestPath, "utf8"));
+
+  assert.equal(manifest.artifactVersion, 1);
+  assert.equal(manifest.signature, "avery");
+  assert.equal(manifest.smokeCommand, "npm run smoke:dispatch");
+  assert.equal(manifest.generatedArtifacts.markdownPath, artifactPaths.markdownPath);
+  assert.equal(manifest.generatedArtifacts.summaryPath, artifactPaths.summaryPath);
 });
 
 test("parseIssue11EvidenceArgs accepts signature and output directory flags", () => {

@@ -18,8 +18,9 @@ runtime smoke flow. They are meant to be copied as canonical examples, not treat
 new contract definitions. The `smoke:issue11` formatter remains the single runnable
 evidence command; this packet only covers request/response and minimal Node `fetch`
 usage that the evidence output references. When a PR or local archive also needs files,
-the same command can emit `issue11-evidence.md` and `issue11-summary.json` via
-`--output-dir <dir>` without changing the stdout packet that gets pasted into issue
+the same command can emit `issue11-evidence.md`, `issue11-summary.json`, and a
+self-describing `issue11-artifacts-manifest.json` via `--output-dir <dir>` without
+changing the stdout packet that gets pasted into issue
 [#11](https://github.com/jckhang/agent-indeed/issues/11).
 
 ## Happy path packet

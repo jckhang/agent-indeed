@@ -78,6 +78,7 @@ export async function runIssue11Evidence({
   const artifactPaths = await writeIssue11Artifacts({
     markdown,
     outputDir,
+    signature,
     summary
   });
 
@@ -91,7 +92,12 @@ export async function runIssue11Evidence({
   };
 }
 
-async function writeIssue11Artifacts({ markdown, outputDir, summary }) {
+export async function writeIssue11Artifacts({
+  markdown,
+  outputDir,
+  signature,
+  summary
+}) {
   if (!outputDir) {
     return null;
   }
@@ -99,14 +105,31 @@ async function writeIssue11Artifacts({ markdown, outputDir, summary }) {
   const resolvedOutputDir = path.resolve(outputDir);
   const markdownPath = path.join(resolvedOutputDir, "issue11-evidence.md");
   const summaryPath = path.join(resolvedOutputDir, "issue11-summary.json");
+  const manifestPath = path.join(resolvedOutputDir, "issue11-artifacts-manifest.json");
+  const evidenceCommand = signature
+    ? `npm run --silent smoke:issue11 -- --signature ${signature} --output-dir ${outputDir}`
+    : `npm run --silent smoke:issue11 -- --output-dir ${outputDir}`;
+  const manifest = {
+    artifactVersion: 1,
+    evidenceIssue: 11,
+    evidenceCommand,
+    smokeCommand: summary.command,
+    signature: signature ?? null,
+    generatedArtifacts: {
+      markdownPath,
+      summaryPath
+    }
+  };
 
   await mkdir(resolvedOutputDir, { recursive: true });
   await Promise.all([
     writeFile(markdownPath, `${markdown}\n`, "utf8"),
-    writeFile(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8")
+    writeFile(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8"),
+    writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8")
   ]);
 
   return {
+    manifestPath,
     markdownPath,
     summaryPath
   };

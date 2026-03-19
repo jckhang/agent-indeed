@@ -45,8 +45,9 @@ For the current `main` runtime baseline, QA can use `npm run --silent smoke:issu
 as the canonical backend-owned issue `#11` evidence command. It turns the merged smoke suite
 into one ready-to-paste packet without manually rewriting the task/bid/proof ids, error
 codes, PASS-line transcript, or decision-trace fields. When a PR or local rerun also needs
-artifact files, add `--output-dir <dir>` to emit `issue11-evidence.md` plus
-`issue11-summary.json` without changing the pasted stdout packet.
+artifact files, add `--output-dir <dir>` to emit `issue11-evidence.md`,
+`issue11-summary.json`, and `issue11-artifacts-manifest.json` without changing the pasted
+stdout packet.
 
 ## Evidence package
 
