@@ -1,6 +1,6 @@
 # Agent Indeed Roadmap
 
-Last updated: 2026-03-18
+Last updated: 2026-03-19
 
 ## Product North Star
 
@@ -39,27 +39,19 @@ Exit criteria:
 Goal: deliver a runnable MVP control-plane and event trail to run closed-beta tasks end-to-end.
 
 Scope:
-- Runtime sprint pivot (2026-03-16) is execution-first:
+- Runtime sprint pivot (2026-03-16) has already landed its baseline implementation threads:
   - #109 bootstrap runnable backend skeleton
   - #110 implement runnable dispatch vertical slice (`publish -> match -> commit -> reveal -> verify -> award`)
   - #111 convert QA smoke/E2E matrices into executable checks
-- Treat the proof-status and award-read contracts from PRs #66 and #68 as merged baseline work; the remaining frontend follow-through is to keep the runtime handoff docs aligned to `main` and collapse stale queue branches through issue #145.
+- Post-runtime planning work now focuses on keeping roadmap/checkpoint references aligned to the merged baseline, not reopening the bootstrap queue.
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
 - Manager shortlist and award review contracts with audit-linked status context.
-- Manager console baseline (`docs/MANAGER_CONSOLE_BASELINE.md`, issue #43 / PR #53) keeps the publish form, shortlist evidence, and award-summary dependency notes visible while interactive award APIs are still pending.
-- Manager task-composer frontend slice (`docs/MANAGER_TASK_COMPOSER_UI_SLICE.md`, issue #61 / PR #70) documents the current task-create contract and calls out idempotency follow-up explicitly.
-- Manager shortlist review slice (`docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md`, issue #62) keeps shortlist fallback states and award blockers reviewable while shortlist/award contracts remain in flight.
 - Commit-reveal bidding workflow.
-- Agent bidding console baseline (`docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, issue #44 / PR #56) keeps the broader commit/reveal + verification journey visible.
-- Dedicated bid workspace slice (`docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, issue #63 / PR #76) narrows the frontend delivery item to one commit/reveal workflow while handing runtime status refresh to the merged bid/proof read routes.
-- Frontend runtime integration tranche (`docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md`, issues #136 and #145) defines the first manager + agent runtime-backed smoke path, absorbs the old runtime wiring/fixture/demo doc queue, and keeps one local evidence runbook tied to #110 and #115.
-- Audit visibility console baseline (`docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md`, issue #47) keeps task/bid timeline review, failure translation, and missing-field alert requirements visible while audit query completeness and local runtime materialization are still pending.
 - PoMW verification baseline with identity-tier policy.
-- Agent verification timeline/read-refresh baseline tied to the merged bid/proof status reads and the runtime persistence work behind issue #136.
 - Auditable award events and minimal reputation writeback hook.
 - Lifecycle observability baseline for `upload -> match -> bid -> verify -> award`.
-- Operator audit timeline baseline (`docs/OPERATOR_AUDIT_TIMELINE_BASELINE.md`, issue #65 / PR #67) defines the first focused operator read surface and keeps audit-event completeness gaps visible before backend event reads are finalized.
+- Closed-beta evidence handoff stays concentrated on issue #11 plus its immediate formatter/smoke follow-through issues (#177 and #178).
 
 Exit criteria:
 - Core APIs available and documented in `src/api/openapi.yaml`.
@@ -70,16 +62,24 @@ Exit criteria:
 ## Current Sprint Pivot (2026-03-16 to 2026-03-27)
 
 Focus:
-- Deliver executable backend runtime slices first (#109, #110).
-- Convert QA readiness docs into runnable checks tied to runtime behavior (#111, issue #11).
-- Keep OpenSpec/OpenAPI/contracts synchronized while implementation PRs land.
-- Use `docs/RUNTIME_CUTLINE_2026-03-16.md` as the sprint-level rule for which open contract PRs are true runtime blockers versus additive-safe follow-ups.
-- Use `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` plus issue #137 as the daily owner/blocker ledger for the 2026-03-20 runtime push.
+- Treat issues #109, #110, and #111 as merged runtime baseline work.
+- Clear the planning/reference review blockers on PR #174 and PR #176 so post-runtime docs stop pointing at closed issues.
+- Land one surviving planning rollup for issue #167; use PR #179 as the preferred branch to absorb the refresh and close or supersede overlapping older planning PRs (#171, #154, #165, #166, #161, #153).
+- Keep PR #133 aligned to the published verify/award contract vocabulary after the planning refresh settles.
+- Move QA evidence forward through issue #177, issue #178, and issue #11 instead of reopening closed issue #120.
 
 De-scoped from current sprint:
 - Planning-only follow-ups #106, #107, #108 were closed to avoid additional doc-layer churn.
-- Planning-sync PRs #82, #95, #96, #102, #103, and #105 were closed for the same reason.
-- QA prewrite-only threads (#87, PR #84, PR #104) are treated as superseded by runtime execution issue #111.
+- QA prewrite-only threads (#87, PR #84, PR #104) remain superseded by the executable QA path that now runs through issue #11.
+- Closed issue #120 remains a dated baseline reference only; it is not an active evidence lane.
+
+## Next 24h Merge Sequence
+
+1. Merge PR #174 (`docs: refresh runtime handoff baseline`) after removing the last stale references to closed issue #120.
+2. Merge PR #176 (`docs: codify planning reference rules`) so contributor guidance matches the post-runtime review workflow.
+3. Refresh and merge PR #179 (`[P1-167] Refresh planning docs to post-runtime baseline`) as the single surviving planning rollup for issue #167.
+4. Close, restack, or fold overlapping planning refresh PRs (#171, #154, #165, #166, #161, #153) behind the merged #167 rollup instead of keeping multiple conflicting status snapshots open.
+5. Revisit PR #133 once the planning baseline is stable, then hand the canonical smoke evidence path to issue #177, issue #178, and issue #11.
 
 ### Phase 2: Execution & Trust Loop (Target: 2026-05 to 2026-06)
 
@@ -105,10 +105,9 @@ Scope:
 
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
-- M1 (2026-03-20): absorb the merged runtime read-model baseline into one frontend handoff doc, then land runnable backend skeleton (#109).
-- Runtime work may proceed ahead of full contract convergence when the cutline marks a delta additive-safe; verifier payload/result vocabulary is now merged, so the remaining near-term review risk is contract drift on the additive read surfaces and frontend wiring handoff.
-- M2 (2026-03-27): land runnable publish/match/commit/reveal/verify/award vertical slice (#110).
-- M3 (2026-04-03): stabilize verify/award/audit runtime behavior and run executable smoke checks (#111).
+- M1 (2026-03-20): close post-runtime planning/reference drift (#167, PR #174, PR #176) and keep verify/award follow-through on PR #133 tied to the merged contract baseline.
+- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA publish one canonical smoke evidence path (#177, #178, issue #11).
+- M3 (2026-04-03): stabilize verify/award/audit evidence and run executable smoke checks against the merged runtime baseline.
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
 - M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, and `docs/CLOSED_BETA_SECURITY_READINESS.md` so telemetry owners plus auth, secret-handling, and redaction follow-ons stay reviewable.
 - Review `docs/PHASE1_BETA_READINESS_GATES.md` as the compact release-gate checklist for the remaining Phase 1 contract, QA, audit, and planning blockers.
