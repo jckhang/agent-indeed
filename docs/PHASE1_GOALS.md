@@ -17,18 +17,21 @@ Ship the first usable agent dispatch loop for closed beta:
 
 - The runtime pivot delivered its baseline implementation threads and now moves into evidence and planning cleanup.
 - Runtime cutline decisions for open contract PRs live in `docs/RUNTIME_CUTLINE_2026-03-16.md`; use that table to decide which deltas block follow-through versus which are additive-safe.
-- Runtime command/evidence expectations live in `docs/RUNTIME_EXECUTION_HANDOFF.md`; use that handoff contract when issue #177, issue #178, or issue #11 claims executable progress.
+- Runtime command/evidence expectations live in `docs/RUNTIME_EXECUTION_HANDOFF.md`; use that handoff contract when PR #191, PR #182, PR #172, or issue #11 claims executable progress, with merged PR #175 as the backend evidence baseline.
+- Architecture coordination for the 2026-03-17 to 2026-03-20 unblocker window lives in `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` and issue #137.
 - Closed baseline issues from the pivot:
   - #109 backend runtime skeleton
   - #110 runnable dispatch vertical slice
   - #111 executable QA smoke/E2E checks
 - Active follow-through threads for the pivot:
-  - #167 planning-doc refresh to the post-runtime baseline
-  - #177 canonical backend smoke formatter and evidence block
-  - #178 formatter-backed smoke pass that feeds issue #11
+  - `owner:albatross` + `stream/review-burndown` query for the planning/doc cleanup sweep
+  - merged PR #175 as the canonical backend evidence baseline
+  - PR #191 canonical backend evidence path for issue #11
+  - PR #182 smoke CLI coverage for the replayable command contract
+  - PR #172 plus issue #11 for the live smoke-command follow-through and signed evidence handoff
 - Planning-only follow-ups (#106, #107, #108) were closed to keep sprint bandwidth on runtime delivery.
 - QA prewrite-only tracks (#87, PR #84, PR #104) remain superseded by the executable evidence path on issue #11.
-- Closed issue #120 is a dated QA sweep baseline, not an active blocker.
+- Closed issue #120 remains a dated QA sweep baseline documented in `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md`, not an active blocker.
 
 ## In Scope
 
@@ -82,7 +85,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Audit visibility console baseline is captured in `docs/AUDIT_VISIBILITY_CONSOLE_BASELINE.md` so timeline, failure-translation, and missing-field acceptance criteria stay reviewable while audit query and award-read contracts are still backend follow-ups.
 - Operator audit timeline baseline is captured in `docs/OPERATOR_AUDIT_TIMELINE_BASELINE.md` so chronological event rendering, failure translation, and missing-field alerts are reviewed as explicit Phase 1 audit acceptance criteria.
 - Downstream implementation handoff for telemetry owners, contract gaps, and M4 checks is tracked in `docs/MVP_TELEMETRY_HANDOFF.md`.
-- Audit/verification outputs must be exercised by executable smoke assertions that ultimately feed issue #11.
+- Audit/verification outputs must be exercised by executable smoke assertions that ultimately feed issue #11, with `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` serving only as the dated QA baseline.
 
 ## Out of Scope (Phase 1)
 
@@ -98,7 +101,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Implementation-scoped issues are closed only when runtime code or executable test coverage is merged.
 - End-to-end happy path + key negative paths are covered by automated tests.
 - One local command path can run service + smoke checks for happy path and core negatives.
-- The canonical command path and evidence handoff into issue #11 are documented in `docs/RUNTIME_EXECUTION_HANDOFF.md` and the active formatter/smoke follow-through threads.
+- The canonical command path and evidence handoff into issue #11 are documented in `docs/RUNTIME_EXECUTION_HANDOFF.md`, with merged PR #175 as the baseline evidence format and PR #172 as the live QA handoff.
 - GitHub issues for Phase 1 epics/tasks are created and linked to this plan.
 - Every active P1 issue/PR is discoverable from the M1-M4 milestone links in `docs/PHASE1_CHECKPOINT_BOARD.md`.
 - Weekly epic #2 checkpoints use `docs/PHASE1_EPIC_CHECKPOINT_TEMPLATE.md` so owner handoffs and validation-evidence gaps stay consistent across review weeks.

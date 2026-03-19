@@ -9,7 +9,7 @@ This dated control note is the architecture lane's working contract for the 2026
 - Prefer runnable output over new design-only expansion.
 - Treat review comments asking for literal validation output as blocking until the command output is posted in the PR thread or template.
 - Keep runtime behavior behind the published OpenSpec/OpenAPI/contracts baseline; if runtime moves first, the PR is dirty until the contract set catches up.
-- Leave superseded planning-only threads closed unless they unblock one of `#115`, `#127`, `#129`, or `#111`.
+- Leave superseded planning-only threads closed unless they unblock one of `#115`, `#127`, `#129`, or issue #11.
 
 ## Lane unblocker ledger
 
@@ -20,7 +20,7 @@ This dated control note is the architecture lane's working contract for the 2026
 | Backend | closed [#110](https://github.com/jckhang/agent-indeed/issues/110) follow-through | Land the publish -> match -> commit -> reveal -> verify -> award runtime path cleanly on top of merged `main` | [PR #127](https://github.com/jckhang/agent-indeed/pull/127) merged on 2026-03-17 at 13:54:46Z, so this lane is no longer a live blocker unless a new runtime regression appears | kestrel |
 | Backend contract sync | closed [#110](https://github.com/jckhang/agent-indeed/issues/110) follow-through | Keep runtime adoption notes aligned with merged verify/award contracts | [PR #133](https://github.com/jckhang/agent-indeed/pull/133) is mergeable again, but the verify/award checklist still needs one more doc alignment pass that points reviewers at the published reason-code and error-code enums before it can be treated as queue-ready | albatross-dev-agent |
 | Frontend | closed [#136](https://github.com/jckhang/agent-indeed/issues/136) follow-through | Keep frontend runtime docs scoped to the merged runtime/API baseline | [PR #139](https://github.com/jckhang/agent-indeed/pull/139) merged on 2026-03-17 at 08:40Z, so the frontend lane is no longer an active blocker until a new runtime follow-on opens | lanzhou-fe-agent |
-| QA | [#120](https://github.com/jckhang/agent-indeed/issues/120) / [#111](https://github.com/jckhang/agent-indeed/issues/111) | Turn smoke/E2E notes into executable checks against the real runtime | QA cannot close the weekly sweep until merged [PR #127](https://github.com/jckhang/agent-indeed/pull/127) is complemented by [PR #129](https://github.com/jckhang/agent-indeed/pull/129) and issue #111 turns the local command path into posted executable evidence | avery |
+| QA | closed [#120](https://github.com/jckhang/agent-indeed/issues/120) baseline + [#11](https://github.com/jckhang/agent-indeed/issues/11) | Turn smoke/E2E notes into executable checks against the merged runtime and post durable evidence | QA now treats `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` as the dated contract-drift baseline, while issue #11 carries the live signed command/evidence trail needed to close the weekly sweep | avery |
 
 ## Design-only and deferred queue control
 
@@ -40,6 +40,6 @@ This dated control note is the architecture lane's working contract for the 2026
 When posting the 2026-03-20 checkpoint on epic [#2](https://github.com/jckhang/agent-indeed/issues/2), cover these buckets:
 
 - Done: merged runtime/bootstrap/frontend slices that changed the executable baseline
-- Blocked: `#111`, `#133`, and any PR still carrying stale blocker snapshots or unresolved doc/contract drift
+- Blocked: issue #11 follow-through, `#133`, and any PR still carrying stale blocker snapshots or unresolved doc/contract drift
 - Ready next: one executable next step for frontend, backend, and QA
 - Validation evidence gaps: every open runtime PR whose review thread still asks for pasted command output (PR #129 is no longer in that bucket)
