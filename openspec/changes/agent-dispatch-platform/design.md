@@ -90,6 +90,7 @@
    - `Implement` 类 issue 的关闭标准必须包含运行时代码或可执行测试证据，spec/docs-only PR 不再作为单独关闭依据。
    - runtime 线程共享同一份 `docs/RUNTIME_EXECUTION_HANDOFF.md` 命令/证据契约：至少发布 service、reset/seed、smoke 三类命令，并将最终 happy/negative 证据回写到 issue #11。
    - backend 侧补充 `docs/BACKEND_API_EXAMPLE_PACKET.md`，把 merged smoke flow 的 publish/match/commit/reveal/verify/award 请求响应和核心负面场景固定成一个 QA / beta consumer 可复用的数据包。
+   - onboarding upload smoke 合入后，QA 需要同时向 epic #2 发布 companion evidence，确认上传 happy path、幂等 replay、payload-hash mismatch 以及 `/v1/agents/bundles` 已进入 published route 集；该回贴应复用统一 formatter，避免评论里手抄 agent/version/error code。
 12. Bid / proof 异步状态读取在 MVP 阶段统一采用轮询
    - 写接口（commit、reveal、verify）只保证接收或返回当前决策快照，不承诺前端可以仅靠写响应完成后续时间线渲染。
    - 读接口补充 `GET /v1/tasks/{taskId}/bids/{bidId}` 与 `GET /v1/tasks/{taskId}/proofs/{proofId}`，提供 commit/reveal/proof/award 的当前状态投影。
