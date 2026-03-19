@@ -21,7 +21,9 @@ usage that the evidence output references. When a PR or local archive also needs
 the same command can emit `issue11-evidence.md`, `issue11-summary.json`, and a
 self-describing `issue11-artifacts-manifest.json` via `--output-dir <dir>` without
 changing the stdout packet that gets pasted into issue
-[#11](https://github.com/jckhang/agent-indeed/issues/11).
+[#11](https://github.com/jckhang/agent-indeed/issues/11). That manifest also records the
+generation timestamp, git branch/commit, and exported file paths so PR comments and local
+archives can point back to one exact smoke run.
 
 ## Happy path packet
 

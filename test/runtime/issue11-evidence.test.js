@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import {
   formatIssue11Evidence,
   parseIssue11EvidenceArgs,
+  readGitMetadata,
   runIssue11Evidence,
   writeIssue11Artifacts
 } from "../../src/runtime/issue11-evidence.js";
@@ -108,6 +109,9 @@ test("runIssue11Evidence writes markdown and summary artifacts when requested", 
   assert.match(markdown, /--avery/);
   assert.equal(summary.status, "ok");
   assert.equal(summary.scenarios[0].name, "happy-path");
+  assert.match(manifest.generatedAt, /^\d{4}-\d{2}-\d{2}T/);
+  assert.equal(manifest.generatedArtifacts.manifestPath, result.artifactPaths.manifestPath);
+  assert.equal(manifest.repo.cwd, process.cwd());
   assert.equal(manifest.evidenceIssue, 11);
   assert.equal(
     manifest.evidenceCommand,
@@ -132,11 +136,20 @@ test("writeIssue11Artifacts persists a self-describing manifest alongside export
 
   const manifest = JSON.parse(await readFile(artifactPaths.manifestPath, "utf8"));
 
-  assert.equal(manifest.artifactVersion, 1);
+  assert.equal(manifest.artifactVersion, 2);
   assert.equal(manifest.signature, "avery");
   assert.equal(manifest.smokeCommand, "npm run smoke:dispatch");
+  assert.equal(manifest.repo.cwd, process.cwd());
   assert.equal(manifest.generatedArtifacts.markdownPath, artifactPaths.markdownPath);
+  assert.equal(manifest.generatedArtifacts.manifestPath, artifactPaths.manifestPath);
   assert.equal(manifest.generatedArtifacts.summaryPath, artifactPaths.summaryPath);
+});
+
+test("readGitMetadata returns the current branch and commit when available", () => {
+  const metadata = readGitMetadata();
+
+  assert.match(metadata.commit, /^[0-9a-f]{40}$/);
+  assert.ok(metadata.branch);
 });
 
 test("parseIssue11EvidenceArgs accepts signature and output directory flags", () => {

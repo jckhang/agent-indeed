@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { runDispatchSmokeSuite } from "./dispatch-smoke.js";
@@ -109,13 +110,22 @@ export async function writeIssue11Artifacts({
   const evidenceCommand = signature
     ? `npm run --silent smoke:issue11 -- --signature ${signature} --output-dir ${outputDir}`
     : `npm run --silent smoke:issue11 -- --output-dir ${outputDir}`;
+  const generatedAt = new Date().toISOString();
+  const gitMetadata = readGitMetadata();
   const manifest = {
-    artifactVersion: 1,
+    artifactVersion: 2,
     evidenceIssue: 11,
+    generatedAt,
+    repo: {
+      branch: gitMetadata.branch,
+      commit: gitMetadata.commit,
+      cwd: process.cwd()
+    },
     evidenceCommand,
     smokeCommand: summary.command,
     signature: signature ?? null,
     generatedArtifacts: {
+      manifestPath,
       markdownPath,
       summaryPath
     }
@@ -133,6 +143,28 @@ export async function writeIssue11Artifacts({
     markdownPath,
     summaryPath
   };
+}
+
+export function readGitMetadata() {
+  const fallback = {
+    branch: null,
+    commit: null
+  };
+
+  try {
+    return {
+      branch: execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
+        cwd: process.cwd(),
+        encoding: "utf8"
+      }).trim(),
+      commit: execFileSync("git", ["rev-parse", "HEAD"], {
+        cwd: process.cwd(),
+        encoding: "utf8"
+      }).trim()
+    };
+  } catch {
+    return fallback;
+  }
 }
 
 export function parseIssue11EvidenceArgs(argv) {

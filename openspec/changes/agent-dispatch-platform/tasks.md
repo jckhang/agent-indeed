@@ -55,3 +55,4 @@
 - [x] 5.14 为 issue #186 收敛 planning sweep 规则：同一 checkpoint 只保留一个 mergeable planning-sync PR，并把 superseded PR 的 merge/close rationale 回写到 GitHub 线程。
 - [x] 5.15 为 issue #11 证据命令增加可选工件导出（Markdown + JSON），让 QA/automation 可复用同一份 smoke 结果回贴 issue、附到 PR、并保留本地归档。
 - [x] 5.15.a 为 issue #11 导出工件增加自描述 manifest，固定证据命令与产物路径，避免 PR/自动化侧重复猜测文件名。
+- [x] 5.15.b 为 issue #11 导出 manifest 增加生成时间、git branch/commit 与全量工件路径，确保跨 PR/本地归档的证据可以追溯到同一 smoke run。

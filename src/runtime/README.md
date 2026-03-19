@@ -71,7 +71,9 @@ npm run --silent smoke:issue11 -- --signature avery --output-dir ./artifacts/iss
 
 That variant still prints the markdown packet to stdout and also writes `issue11-evidence.md`,
 `issue11-summary.json`, and `issue11-artifacts-manifest.json` into the requested directory
-for PR attachments, automation handoff, or local reruns.
+for PR attachments, automation handoff, or local reruns. The manifest records the generated
+timestamp, current git branch/commit, and all exported artifact paths so downstream lanes can
+trace a copied artifact set back to the exact smoke run that produced it.
 
 `npm test` also shells this command end-to-end and asserts the PASS-line plus JSON-summary contract, so CI covers the exact smoke output shape that QA copies into issue evidence.
 

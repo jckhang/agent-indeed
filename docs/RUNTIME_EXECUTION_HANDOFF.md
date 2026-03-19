@@ -47,7 +47,8 @@ into one ready-to-paste packet without manually rewriting the task/bid/proof ids
 codes, PASS-line transcript, or decision-trace fields. When a PR or local rerun also needs
 artifact files, add `--output-dir <dir>` to emit `issue11-evidence.md`,
 `issue11-summary.json`, and `issue11-artifacts-manifest.json` without changing the pasted
-stdout packet.
+stdout packet. The manifest must carry enough provenance to map exported files back to the
+exact smoke run, including generated time, git branch/commit, and the resolved artifact paths.
 
 ## Evidence package
 
