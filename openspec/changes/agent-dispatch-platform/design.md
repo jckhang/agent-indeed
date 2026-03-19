@@ -80,7 +80,7 @@
    - merge-train blocker note 必须同时说明：main 上发生了什么变化、当前 owner label、下一步命令/评审动作，以及是否需要新开 follow-up issue 保持 PR 聚焦。
    - 任何请求 re-review 的 PR 都必须附带 literal validation output；未贴出输出时，规划侧将其视为阻塞项而不是“默认已跑”。
    - 当新 blocker 会跨越多个 rebase 周期、需要跨 lane 接力，或会让现有 PR 超出原始验收范围时，必须升级为 follow-up issue，而不是只留在 PR 评论里。
-   - 同日 merge-evidence sweep 的短记录放在 issue #146，至少覆盖 clean tranche、dirty follow-ons 与 validation evidence gaps；跨 lane 的 checkpoint 总结再同步到 epic #2。
+   - 同日 merge-evidence sweep 的短记录放在当前开放的 planning sweep issue，至少覆盖 clean tranche、dirty follow-ons 与 validation evidence gaps；跨 lane 的 checkpoint 总结再同步到 epic #2。
    - 例行流程写入 `docs/MERGE_TRAIN_PLAYBOOK.md` 并在 `CONTRIBUTING.md` 链接，减少多 agent 并行时的重复沟通和冲突。
 
 11. Phase 1 当前冲刺采用 runtime-first 交付
