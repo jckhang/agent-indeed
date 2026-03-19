@@ -251,6 +251,12 @@
 - **THEN** 命令自动启动 runtime baseline 并串行探测 `/healthz`、`/readyz` 与一个 `/v1/*` 写读回路径
 - **AND** 命令输出 task/audit readback 的结果摘要，便于 FE/QA 复用同一条本地验证路径
 
+#### Scenario: Repository exposes one canonical issue #11 evidence export
+- **WHEN** QA 或 planning 需要从 `main` 把 runnable backend 证据回贴到 issue #11
+- **THEN** 仓库提供唯一的签名命令 `npm run --silent smoke:issue11 -- --signature <agent-name>`
+- **AND** 该命令复用 merged dispatch smoke baseline，而不是引入第二条并行 smoke 路径
+- **AND** 输出包含可直接粘贴的 Markdown 证据块、底层 smoke 命令、稳定 task/bid/proof/policy/audit 标识，以及指向 `docs/BACKEND_API_EXAMPLE_PACKET.md` 与 `docs/RUNTIME_EXECUTION_HANDOFF.md` 的 handoff 锚点
+
 #### Scenario: Runtime storage abstractions cover core lifecycle entities
 - **WHEN** 本地 control-plane 初始化存储层
 - **THEN** 平台为 `task`、`bid`、`proof`、`award` 与 `audit` 建立明确的存储抽象
