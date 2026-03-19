@@ -63,8 +63,8 @@ Exit criteria:
 
 Focus:
 - Treat issues #109, #110, and #111 as merged runtime baseline work.
-- Clear the planning/reference review blockers on PR #174 and PR #176 so post-runtime docs stop pointing at closed issues.
-- Land one surviving planning rollup for issue #167; use PR #179 as the preferred branch to absorb the refresh and close or supersede overlapping older planning PRs (#171, #154, #165, #166, #161, #153).
+- Clear the planning/reference review blockers on PR #174 and PR #190 so post-runtime docs stop pointing at closed issues.
+- Land one surviving planning cleanup path from the review-burndown queue; keep PR #190 as the checkpoint-sync baseline and close or supersede overlapping older planning PRs (#171, #154, #165, #166, #161, #153).
 - Keep PR #133 aligned to the published verify/award contract vocabulary after the planning refresh settles.
 - Move QA evidence forward through issue #196 and issue #11 instead of reopening closed issue #120 or restacking formatter-only PRs.
 
@@ -105,7 +105,7 @@ Scope:
 
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
-- M1 (2026-03-20): close post-runtime planning/reference drift (#167, PR #174, PR #176) and keep verify/award follow-through on PR #133 tied to the merged contract baseline.
+- M1 (2026-03-20): close post-runtime planning/reference drift through the review-burndown queue plus PR #174 / PR #190 and keep verify/award follow-through on PR #133 tied to the merged contract baseline.
 - M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA keep one canonical smoke evidence path on `main` (`npm run --silent smoke:issue11 -- --signature <agent-name>`) and refresh issue #11 whenever the runtime evidence changes.
 - M3 (2026-04-03): stabilize verify/award/audit evidence and run executable smoke checks against the merged runtime baseline.
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
