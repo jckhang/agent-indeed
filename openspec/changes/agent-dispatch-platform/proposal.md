@@ -22,6 +22,7 @@
 - 增补 runtime 执行 handoff 契约，统一本地服务命令、smoke 命令与 issue #11 证据回写要求。
 - 增补 merge-evidence sweep 回写规则，要求当前 `owner:albatross` + `stream/review-burndown` 查询返回的 planning sweep issue 承接同日队列巡检，epic #2 保留跨 lane checkpoint 汇总。
 - 新增 backend API example packet，把 merged `smoke:dispatch` happy/negative path 产物整理成 issue #11 可直接引用的请求响应样例。
+- 让 issue #11 证据命令支持额外导出 Markdown/JSON 工件，便于 QA 在 PR、本地归档与 issue 回贴之间复用同一份 smoke 结果。
 
 ## Capabilities
 

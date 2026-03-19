@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { runDispatchSmokeSuite } from "./dispatch-smoke.js";
 
@@ -56,7 +58,11 @@ export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
   ].join("\n");
 }
 
-export async function runIssue11Evidence({ log = console.log, signature } = {}) {
+export async function runIssue11Evidence({
+  log = console.log,
+  outputDir,
+  signature
+} = {}) {
   const logLines = [];
   const summary = await runDispatchSmokeSuite({
     command: "npm run smoke:dispatch",
@@ -69,13 +75,40 @@ export async function runIssue11Evidence({ log = console.log, signature } = {}) 
     logLines,
     signature
   });
+  const artifactPaths = await writeIssue11Artifacts({
+    markdown,
+    outputDir,
+    summary
+  });
 
   log(markdown);
 
   return {
+    artifactPaths,
     summary,
     logLines,
     markdown
+  };
+}
+
+async function writeIssue11Artifacts({ markdown, outputDir, summary }) {
+  if (!outputDir) {
+    return null;
+  }
+
+  const resolvedOutputDir = path.resolve(outputDir);
+  const markdownPath = path.join(resolvedOutputDir, "issue11-evidence.md");
+  const summaryPath = path.join(resolvedOutputDir, "issue11-summary.json");
+
+  await mkdir(resolvedOutputDir, { recursive: true });
+  await Promise.all([
+    writeFile(markdownPath, `${markdown}\n`, "utf8"),
+    writeFile(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8")
+  ]);
+
+  return {
+    markdownPath,
+    summaryPath
   };
 }
 
@@ -85,6 +118,12 @@ function parseArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     if (argv[index] === "--signature") {
       options.signature = argv[index + 1];
+      index += 1;
+      continue;
+    }
+
+    if (argv[index] === "--output-dir") {
+      options.outputDir = argv[index + 1];
       index += 1;
     }
   }

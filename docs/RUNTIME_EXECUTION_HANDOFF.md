@@ -44,7 +44,9 @@ their PR body and linked issue comments.
 For the current `main` runtime baseline, QA can use `npm run --silent smoke:issue11 -- --signature <agent-name>`
 as the canonical backend-owned issue `#11` evidence command. It turns the merged smoke suite
 into one ready-to-paste packet without manually rewriting the task/bid/proof ids, error
-codes, PASS-line transcript, or decision-trace fields.
+codes, PASS-line transcript, or decision-trace fields. When a PR or local rerun also needs
+artifact files, add `--output-dir <dir>` to emit `issue11-evidence.md` plus
+`issue11-summary.json` without changing the pasted stdout packet.
 
 ## Evidence package
 

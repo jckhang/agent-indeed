@@ -1,5 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import os from "node:os";
+import path from "node:path";
+import { mkdtemp, readFile } from "node:fs/promises";
 
 import {
   formatIssue11Evidence,
@@ -76,4 +79,24 @@ test("runIssue11Evidence returns the smoke markdown packet", async () => {
   assert.match(result.markdown, /`policytrace_00000001`/);
   assert.match(result.markdown, /```json/);
   assert.match(outputs[0], /## Issue #11 executable smoke evidence/);
+});
+
+test("runIssue11Evidence writes markdown and summary artifacts when requested", async () => {
+  const outputDir = await mkdtemp(path.join(os.tmpdir(), "issue11-evidence-"));
+  const result = await runIssue11Evidence({
+    signature: "avery",
+    outputDir,
+    log: () => {}
+  });
+
+  assert.equal(result.artifactPaths.markdownPath, path.join(outputDir, "issue11-evidence.md"));
+  assert.equal(result.artifactPaths.summaryPath, path.join(outputDir, "issue11-summary.json"));
+
+  const markdown = await readFile(result.artifactPaths.markdownPath, "utf8");
+  const summary = JSON.parse(await readFile(result.artifactPaths.summaryPath, "utf8"));
+
+  assert.match(markdown, /## Issue #11 executable smoke evidence/);
+  assert.match(markdown, /--avery/);
+  assert.equal(summary.status, "ok");
+  assert.equal(summary.scenarios[0].name, "happy-path");
 });
