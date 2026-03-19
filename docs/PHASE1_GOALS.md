@@ -101,11 +101,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Implementation-scoped issues are closed only when runtime code or executable test coverage is merged.
 - End-to-end happy path + key negative paths are covered by automated tests.
 - One local command path can run service + smoke checks for happy path and core negatives.
-<<<<<<< HEAD
-- The canonical command path and evidence handoff into issue #11 are documented in `docs/RUNTIME_EXECUTION_HANDOFF.md`; closed formatter/drift work should stay as baseline references or dated snapshots rather than active blockers.
-=======
-- The canonical command path and evidence handoff into issue #11 are documented in `docs/RUNTIME_EXECUTION_HANDOFF.md`, `docs/BACKEND_API_EXAMPLE_PACKET.md`, and the live issue #11 follow-through PRs.
->>>>>>> 79c6d54 (docs: refresh issue 11 planning evidence anchors)
+- The canonical command path and evidence handoff into issue #11 are documented in `docs/RUNTIME_EXECUTION_HANDOFF.md`, `docs/BACKEND_API_EXAMPLE_PACKET.md`, and the live issue #11 follow-through PRs; closed formatter/drift work should stay as baseline references or dated snapshots rather than active blockers.
 - GitHub issues for Phase 1 epics/tasks are created and linked to this plan.
 - Every active P1 issue/PR is discoverable from the M1-M4 milestone links in `docs/PHASE1_CHECKPOINT_BOARD.md`.
 - Weekly epic #2 checkpoints use `docs/PHASE1_EPIC_CHECKPOINT_TEMPLATE.md` so owner handoffs and validation-evidence gaps stay consistent across review weeks.

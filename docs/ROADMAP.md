@@ -80,11 +80,7 @@ De-scoped from current sprint:
 2. Merge PR #176 (`docs: codify planning reference rules`) so contributor guidance matches the post-runtime review workflow.
 3. Refresh and merge PR #179 (`[P1-167] Refresh planning docs to post-runtime baseline`) as the single surviving planning rollup for issue #167.
 4. Close, restack, or fold overlapping planning refresh PRs (#171, #154, #165, #166, #161, #153) behind the merged #167 rollup instead of keeping multiple conflicting status snapshots open.
-<<<<<<< HEAD
-5. Revisit PR #133 once the planning baseline is stable, then keep the canonical smoke evidence path anchored to issue #11 plus `docs/RUNTIME_EXECUTION_HANDOFF.md`.
-=======
-5. Revisit PR #133 once the planning baseline is stable, then keep the canonical smoke evidence path anchored on issue #11 plus the surviving QA handoff PRs.
->>>>>>> 79c6d54 (docs: refresh issue 11 planning evidence anchors)
+5. Revisit PR #133 once the planning baseline is stable, then keep the canonical smoke evidence path anchored to issue #11, the surviving QA handoff PRs, and `docs/RUNTIME_EXECUTION_HANDOFF.md`.
 
 ### Phase 2: Execution & Trust Loop (Target: 2026-05 to 2026-06)
 
@@ -111,11 +107,7 @@ Scope:
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
 - M1 (2026-03-20): close post-runtime planning/reference drift (#167, PR #174, PR #176) and keep verify/award follow-through on PR #133 tied to the merged contract baseline.
-<<<<<<< HEAD
-- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA publish one canonical smoke evidence path through issue #11 and `docs/RUNTIME_EXECUTION_HANDOFF.md`.
-=======
-- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA keep one canonical smoke evidence path on issue #11 and `smoke:issue11`.
->>>>>>> 79c6d54 (docs: refresh issue 11 planning evidence anchors)
+- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA keep one canonical smoke evidence path through issue #11, `docs/RUNTIME_EXECUTION_HANDOFF.md`, and `smoke:issue11`.
 - M3 (2026-04-03): stabilize verify/award/audit evidence and run executable smoke checks against the merged runtime baseline.
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
 - M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, and `docs/CLOSED_BETA_SECURITY_READINESS.md` so telemetry owners plus auth, secret-handling, and redaction follow-ons stay reviewable.
