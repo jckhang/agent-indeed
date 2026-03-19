@@ -1,9 +1,10 @@
 # Frontend Runtime Integration Tranche (P1-40)
 
-Last updated: 2026-03-19
+Last updated: 2026-03-20
 
 Related issue: closed baseline [#136](https://github.com/jckhang/agent-indeed/issues/136)
 Mainline sync issue: [#145](https://github.com/jckhang/agent-indeed/issues/145)
+Onboarding follow-through: [#205](https://github.com/jckhang/agent-indeed/issues/205)
 
 ## Objective
 
@@ -12,6 +13,7 @@ Capture the first runtime-backed frontend handoff slice for this week's executio
 This document is now the single surviving frontend runtime handoff against the current checked-in backend API baseline. It absorbs the still-open frontend runtime doc queue from PRs [#122](https://github.com/jckhang/agent-indeed/pull/122), [#125](https://github.com/jckhang/agent-indeed/pull/125), and [#132](https://github.com/jckhang/agent-indeed/pull/132) so wiring guidance, fixture vocabulary, and QA replay payloads stop drifting independently.
 
 This tranche is intentionally grounded in the current checked-in API baseline:
+- agent onboarding uses `POST /v1/agents/bundles`
 - manager publish uses `POST /v1/tasks`
 - manager shortlist and award-readiness use `GET /v1/tasks/{taskId}/candidates` and `GET /v1/tasks/{taskId}/award`
 - agent commit/reveal uses `POST /v1/tasks/{taskId}/bids/commit` and `POST /v1/tasks/{taskId}/bids/reveal`
@@ -33,6 +35,7 @@ Closed issue [#150](https://github.com/jckhang/agent-indeed/issues/150) captured
 
 | Surface | Canonical doc | Runtime-backed contract truth | Consumer note |
 | --- | --- | --- | --- |
+| Agent onboarding | `docs/FRONTEND_MVP_SURFACE.md` | `POST /v1/agents/bundles` returns either `UploadAgentBundleCreatedResponse` or `UploadAgentBundleReplayResponse` in the checked-in API drafts (`src/api/openapi.yaml` and `src/api/contracts.ts`). | Treat `result=CREATED` and `result=RETURNED_EXISTING` as success states; success UI should show `indexing.status/indexedSkillCount/memoryMode/skills[]` and must not require optional `indexedAt` before confirming acceptance. |
 | Manager task composer | `docs/MANAGER_TASK_COMPOSER_UI_SLICE.md` | `POST /v1/tasks` with `CreateTaskRequest.task` and `CreateTaskResponse.taskId/status/commitDeadline/revealDeadline` | Publish stays aligned to `TaskSpec`; task-create idempotency is still a follow-up, not baseline reality. |
 | Manager shortlist + award-readiness | `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` | `GET /v1/tasks/{taskId}/candidates` -> `CandidateMatchListResponse` and `GET /v1/tasks/{taskId}/award` -> `AwardDecisionDetail` are both defined in the checked-in API drafts (`src/api/openapi.yaml` and `src/api/contracts.ts`). | Treat `TASK_MATCH_NOT_READY` as retryable loading and use award `status/statusMessage/proofSummary/handoff` directly from the checked-in read model. |
 | Agent bid workspace | `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md` | `POST /v1/tasks/{taskId}/bids/commit` and `POST /v1/tasks/{taskId}/bids/reveal` | Commit/reveal shell stays server-authored via `window.*`; reveal success hands off `proofSubmission.proofId` into the status reads. |
@@ -49,9 +52,28 @@ Issue [#157](https://github.com/jckhang/agent-indeed/issues/157) narrows the rev
 
 Keep the post-merge follow-up list short and tied to currently published contracts:
 
-1. Runtime parity for award and verification refresh still depends on keeping the running service aligned with the closed implementation baselines from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) and [#115](https://github.com/jckhang/agent-indeed/issues/115), even though the read contracts are already present in the checked-in API drafts.
-2. QA still needs executable evidence that the publish -> shortlist -> commit -> reveal -> verification -> award path behaves the same under runtime conditions; `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` is the last closed drift-sweep snapshot, while issue [#11](https://github.com/jckhang/agent-indeed/issues/11) is the live smoke-evidence thread.
-3. Frontend docs should only describe a surface as part of the checked-in API baseline when reviewers can find both the exact path and the response type in `src/api/openapi.yaml` and `src/api/contracts.ts`; otherwise, record the gap as a follow-up instead of broadening runtime scope.
+1. Runtime parity for onboarding, award, and verification refresh still depends on keeping the running service aligned with the closed implementation baselines from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) and [#115](https://github.com/jckhang/agent-indeed/issues/115), even though the upload/read contracts are already present in the checked-in API drafts.
+2. Issue [#205](https://github.com/jckhang/agent-indeed/issues/205) adds one explicit onboarding rule for frontend docs: treat upload replay as success, surface indexing details as the matching-visible receipt, and call any still-open runtime smoke command dependency a follow-up instead of implying it already landed on `main`.
+3. QA still needs executable evidence that the onboarding upload and publish -> shortlist -> commit -> reveal -> verification -> award paths behave the same under runtime conditions; `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` is the last closed drift-sweep snapshot, while issue [#11](https://github.com/jckhang/agent-indeed/issues/11) plus PR [#204](https://github.com/jckhang/agent-indeed/pull/204) carry the live smoke/runtime follow-through (`npm run smoke:onboarding` becomes the canonical onboarding evidence command once PR #204 merges).
+4. Frontend docs should only describe a surface as part of the checked-in API baseline when reviewers can find both the exact path and the response type in `src/api/openapi.yaml` and `src/api/contracts.ts`; otherwise, record the gap as a follow-up instead of broadening runtime scope.
+
+## Agent onboarding follow-through (issue #205)
+
+The onboarding surface is now part of the durable frontend handoff for one narrow reason: the checked-in API drafts already define the exact success, replay, and failure shapes that agent-facing UI needs to preserve while the runtime upload slice continues through PR [#204](https://github.com/jckhang/agent-indeed/pull/204).
+
+Frontend-visible assumptions to keep explicit:
+
+1. Success is not limited to a new create.
+   - `result=CREATED` means a new bundle version was accepted.
+   - `result=RETURNED_EXISTING` means the same bundle was safely replayed with the same `idempotencyKey`.
+   - UI should confirm both outcomes instead of turning replay into a duplicate-error screen.
+2. Indexing is the primary success receipt.
+   - Show `indexing.status`, `indexing.indexedSkillCount`, `indexing.memoryMode`, and `indexing.skills[]` directly in the success state so the agent sees what matching can consume immediately.
+3. `indexedAt` is additive metadata.
+   - The current contract makes `indexedAt` optional, so the UI should not block a successful acceptance/replay state when the timestamp is absent.
+4. Runtime evidence should stay honestly scoped.
+   - The checked-in API baseline already supports doc-level wiring for onboarding.
+   - The executable upload/smoke command remains a runtime follow-through item until PR [#204](https://github.com/jckhang/agent-indeed/pull/204) merges; once it does, point reviewers at `npm run smoke:onboarding` and the linked issue [#11](https://github.com/jckhang/agent-indeed/issues/11) evidence thread instead of presenting any other branch as active baseline.
 
 ## Executable follow-up slice for issue #188
 
@@ -77,12 +99,15 @@ These frontend handoff claims are backed by the current API sources of truth in 
 
 | Runtime surface | OpenAPI anchor | TypeScript contract anchor |
 | --- | --- | --- |
+| Agent onboarding upload | `src/api/openapi.yaml:59` -> `/v1/agents/bundles` + `UploadAgentBundleCreatedResponse` / `UploadAgentBundleReplayResponse` | `src/api/contracts.ts:187` -> `UploadAgentBundleCreatedResponse`, `src/api/contracts.ts:254` -> `UploadAgentBundleReplayResponse` |
 | Shortlist read | `src/api/openapi.yaml:355` -> `/v1/tasks/{taskId}/candidates` + `CandidateMatchListResponse` | `src/api/contracts.ts:539` -> `CandidateMatchListResponse` |
 | Award-readiness read | `src/api/openapi.yaml:522` -> `/v1/tasks/{taskId}/award` + `AwardDecisionDetail` | `src/api/contracts.ts:759` -> `AwardDecisionDetail` |
 | Bid status read | `src/api/openapi.yaml:763` -> `/v1/tasks/{taskId}/bids/{bidId}` + `BidStatusResponse` | `src/api/contracts.ts:1002` -> `BidStatusResponse` |
 | Proof status read | `src/api/openapi.yaml:1207` -> `/v1/tasks/{taskId}/proofs/{proofId}` + `ProofStatusResponse` | `src/api/contracts.ts:1024` -> `ProofStatusResponse` |
 
 Reviewer quick-check on a fresh `origin/main` sync:
+- `git show origin/main:src/api/openapi.yaml | rg -n "/v1/agents/bundles|UploadAgentBundle(Created|Replay)Response"`
+- `git show origin/main:src/api/contracts.ts | rg -n "interface (UploadAgentBundleCreatedResponse|UploadAgentBundleReplayResponse|UploadAgentBundleIndexingSummary)"`
 - `git show origin/main:src/api/openapi.yaml | rg -n "/v1/tasks/\\{taskId\\}/(candidates|award|bids/\\{bidId\\}|proofs/\\{proofId\\})"`
 - `git show origin/main:src/api/contracts.ts | rg -n "interface (CandidateMatchListResponse|AwardDecisionDetail|BidStatusResponse|ProofStatusResponse)"`
 
@@ -108,6 +133,7 @@ Out of scope:
 
 | Route | Persona | Primary API dependency | Runtime expectation |
 | --- | --- | --- | --- |
+| `/agent/onboarding` | Agent | `POST /v1/agents/bundles` | Accept or replay a signed bundle, surface indexing receipt details, and tie runtime-smoke wording to the merged `npm run smoke:onboarding` + issue `#11` evidence path only when PR `#204` lands |
 | `/manager/tasks/new` | Manager | `POST /v1/tasks` | Publish a task and transition into a created task summary with real deadlines/status |
 | `/manager/tasks/{taskId}/review` | Manager | `GET /v1/tasks/{taskId}/candidates`, `GET /v1/tasks/{taskId}/award` | Render shortlist freshness, candidate ranking, blockers, and award-readiness from runtime reads |
 | `/agent/tasks/{taskId}/bid-workspace` | Agent | `POST /v1/tasks/{taskId}/bids/commit`, `POST /v1/tasks/{taskId}/bids/reveal` | Preserve server-authored window state and hand off to verification without inventing hidden state |
