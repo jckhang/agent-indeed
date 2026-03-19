@@ -103,7 +103,7 @@ Render for the selected row:
 
 Fallback behavior:
 - Missing proof summary: render `Verification detail pending`.
-- Missing shortlist audit id: render `Audit reference pending runtime materialization`.
+- Missing shortlist audit id: render `Audit reference pending runtime evidence`.
 - Missing decision trace: keep the candidate visible and note that trace linkage is not yet returned.
 
 ## Loading, empty, and error states
