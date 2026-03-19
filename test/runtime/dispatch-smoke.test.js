@@ -12,7 +12,10 @@ test("runDispatchSmoke executes the publish to award flow", async () => {
 
   assert.equal(result.taskId, "task_00000001");
   assert.equal(result.bidId, "bid_00000001");
+  assert.equal(result.proofId, "proof_00000001");
+  assert.equal(result.policyTraceId, "policytrace_00000001");
   assert.equal(result.verificationResult, "PASS");
+  assert.match(result.decisionTraceHash, /^sha256:/);
   assert.deepEqual(result.eventTypes, [
     "TASK_CREATED",
     "BID_COMMITTED",
@@ -53,10 +56,27 @@ test("runDispatchSmokeSuite executes happy-path and negative smoke scenarios", a
     result.scenarios.map((scenario) => scenario.status),
     ["PASS", "PASS", "PASS"]
   );
+  assert.deepEqual(result.scenarios[0].eventTypes, [
+    "TASK_CREATED",
+    "BID_COMMITTED",
+    "BID_REVEALED",
+    "POMW_VERIFIED",
+    "TASK_AWARDED"
+  ]);
+  assert.equal(result.scenarios[0].proofId, "proof_00000001");
+  assert.equal(result.scenarios[0].policyTraceId, "policytrace_00000001");
+  assert.match(result.scenarios[0].decisionTraceHash, /^sha256:/);
   assert.deepEqual(result.scenarios[1].reasonCodes, ["TRACE_SIGNATURE_INVALID"]);
   assert.equal(result.scenarios[2].revealWithoutCommit, "BID_REVEAL_COMMIT_NOT_FOUND");
   assert.equal(result.scenarios[2].proofFail, "PROOF_VERIFY_FAILED");
   assert.equal(result.scenarios[2].awardBlocked, "TASK_AWARD_PRECONDITION_FAILED");
+  assert.equal(result.scenarios[2].proofId, "proof_00000002");
+  assert.equal(result.scenarios[2].policyTraceId, "policytrace_00000001");
+  assert.deepEqual(result.scenarios[2].proofFailReasonCodes, [
+    "QUALITY_SCORE_BELOW_MINIMUM",
+    "HASHCASH_BITS_BELOW_MINIMUM"
+  ]);
+  assert.match(result.scenarios[2].decisionTraceHash, /^sha256:/);
   assert.ok(logLines.some((line) => line.includes("[happy-path] PASS task-awarded")));
   assert.ok(
     logLines.some((line) => line.includes("[invalid-signature] PASS invalid-signature-rejected"))

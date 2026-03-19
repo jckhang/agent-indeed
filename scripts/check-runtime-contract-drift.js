@@ -40,7 +40,7 @@ function extractTsStringUnion(source, typeName) {
 
 function extractOpenApiEnum(source, schemaName) {
   const block = source.match(
-    new RegExp(`^\\s{4}${schemaName}:\\n([\\s\\S]*?)(?=^\\s{4}[A-Za-z0-9_]+:|\\Z)`, "m")
+    new RegExp(`^ {4}${schemaName}:\\n([\\s\\S]*?)(?=^ {4}[A-Za-z0-9_]+:|\\Z)`, "m")
   );
 
   if (!block) {
@@ -61,13 +61,43 @@ function extractTsTypeAnchor(source, typeName) {
 }
 
 function extractOpenApiSchemaAnchor(source, schemaName) {
-  const match = source.match(new RegExp(`^\\s{4}${schemaName}:$`, "m"));
+  const match = source.match(new RegExp(`^ {4}${schemaName}:$`, "m"));
   if (!match || match.index === undefined) {
     throw new Error(`Unable to find OpenAPI schema anchor for ${schemaName}`);
   }
 
   const lineNumber = source.slice(0, match.index).split("\n").length;
   return `src/api/openapi.yaml:${lineNumber}`;
+}
+
+function extractOpenApiSchemaBlock(source, schemaName) {
+  const block = source.match(
+    new RegExp(`^ {4}${schemaName}:\\n([\\s\\S]*?)(?=^ {4}[A-Za-z0-9_]+:|\\Z)`, "m")
+  );
+
+  if (!block) {
+    throw new Error(`Unable to find OpenAPI schema block for ${schemaName}`);
+  }
+
+  return block[1];
+}
+
+function extractTsInterfaceAnchor(source, interfaceName) {
+  const match = source.match(new RegExp(`^export interface ${interfaceName}\\b`, "m"));
+  if (!match || match.index === undefined) {
+    throw new Error(`Unable to find TypeScript interface anchor for ${interfaceName}`);
+  }
+
+  const lineNumber = source.slice(0, match.index).split("\n").length;
+  return `src/api/contracts.ts:${lineNumber}`;
+}
+
+function hasMatch(source, pattern, description) {
+  if (!pattern.test(source)) {
+    throw new Error(`Unable to find ${description}`);
+  }
+
+  return true;
 }
 
 function extractOpenApiPaths(source) {
@@ -89,7 +119,6 @@ function buildSnapshot() {
   const openapiPaths = extractOpenApiPaths(openapiSource);
   const openapiPathAnchors = extractOpenApiPathAnchors(openapiSource);
   const publishedRoutes = REQUIRED_RUNTIME_ROUTES.filter((route) => openapiPaths.includes(route));
-
   return {
     generatedFrom: {
       openapiPath: "src/api/openapi.yaml",
@@ -115,6 +144,60 @@ function buildSnapshot() {
         openapi: extractOpenApiEnum(openapiSource, "ProofVerifyErrorCode"),
         contracts: extractTsStringUnion(contractsSource, "ProofVerifyErrorCode")
       }
+    },
+    shapes: {
+      proofPack: {
+        openapiAnchor: extractOpenApiSchemaAnchor(openapiSource, "ProofPack"),
+        contractsAnchor: extractTsInterfaceAnchor(contractsSource, "ProofPack"),
+        openapiHasProofSchemaVersion: hasMatch(
+          openapiSource,
+          /ProofPack:[\s\S]*?proofSchemaVersion:/,
+          "ProofPack.proofSchemaVersion in OpenAPI"
+        ),
+        openapiHasCapturedAt: hasMatch(
+          openapiSource,
+          /ProofPack:[\s\S]*?capturedAt:/,
+          "ProofPack.capturedAt in OpenAPI"
+        ),
+        contractsHasProofSchemaVersion: hasMatch(
+          contractsSource,
+          /export interface ProofPack[\s\S]*?proofSchemaVersion: ProofSchemaVersion;/,
+          "ProofPack.proofSchemaVersion in TypeScript contracts"
+        ),
+        contractsHasCapturedAt: hasMatch(
+          contractsSource,
+          /export interface ProofPack[\s\S]*?capturedAt: string;/,
+          "ProofPack.capturedAt in TypeScript contracts"
+        )
+      },
+      proofVerificationResponse: {
+        openapiAnchor: extractOpenApiSchemaAnchor(openapiSource, "ProofVerificationResponse"),
+        contractsAnchor: extractTsInterfaceAnchor(contractsSource, "ProofVerificationResponse"),
+        openapiHasDecisionTraceHash: hasMatch(
+          openapiSource,
+          /ProofVerificationResponse:[\s\S]*?decisionTraceHash:/,
+          "ProofVerificationResponse.decisionTraceHash in OpenAPI"
+        ),
+        contractsHasDecisionTraceHash: hasMatch(
+          contractsSource,
+          /export interface ProofVerificationResponse[\s\S]*?decisionTraceHash\?: string;/,
+          "ProofVerificationResponse.decisionTraceHash in TypeScript contracts"
+        )
+      },
+      proofVerifyErrorResponse: {
+        openapiAnchor: extractOpenApiSchemaAnchor(openapiSource, "ProofVerifyErrorResponse"),
+        contractsAnchor: extractTsInterfaceAnchor(contractsSource, "ProofVerifyErrorResponse"),
+        openapiHasDecisionTraceHash: hasMatch(
+          openapiSource,
+          /ProofVerifyErrorResponse:[\s\S]*?decisionTraceHash:/,
+          "ProofVerifyErrorResponse.details.decisionTraceHash in OpenAPI"
+        ),
+        contractsHasDecisionTraceHash: hasMatch(
+          contractsSource,
+          /export interface ProofVerifyErrorResponse[\s\S]*?details\?: \{[\s\S]*?decisionTraceHash\?: string;/,
+          "ProofVerifyErrorResponse.details.decisionTraceHash in TypeScript contracts"
+        )
+      }
     }
   };
 }
@@ -139,6 +222,18 @@ function assertNoDrift(snapshot) {
           `OpenAPI: ${enumSnapshot.openapi.join(", ")}\n` +
           `Contracts: ${enumSnapshot.contracts.join(", ")}`
       );
+    }
+  }
+
+  for (const [shapeName, shapeSnapshot] of Object.entries(snapshot.shapes)) {
+    for (const [fieldName, present] of Object.entries(shapeSnapshot)) {
+      if (fieldName.endsWith("Anchor")) {
+        continue;
+      }
+
+      if (!present) {
+        failures.push(`${shapeName}.${fieldName} is missing from the published contract snapshot.`);
+      }
     }
   }
 

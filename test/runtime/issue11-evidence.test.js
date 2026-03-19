@@ -16,6 +16,10 @@ test("formatIssue11Evidence includes the smoke summary, logs, and signature", ()
           status: "PASS",
           taskId: "task_00000001",
           bidId: "bid_00000001",
+          proofId: "proof_00000001",
+          policyTraceId: "policytrace_00000001",
+          decisionTraceHash: "sha256:happy-path-trace",
+          awardAuditId: "audit_00000005",
           verificationResult: "PASS"
         },
         {
@@ -29,6 +33,10 @@ test("formatIssue11Evidence includes the smoke summary, logs, and signature", ()
           status: "PASS",
           revealWithoutCommit: "BID_REVEAL_COMMIT_NOT_FOUND",
           proofFail: "PROOF_VERIFY_FAILED",
+          proofFailReasonCodes: [
+            "QUALITY_SCORE_BELOW_MINIMUM",
+            "HASHCASH_BITS_BELOW_MINIMUM"
+          ],
           awardBlocked: "TASK_AWARD_PRECONDITION_FAILED"
         }
       ]
@@ -38,8 +46,15 @@ test("formatIssue11Evidence includes the smoke summary, logs, and signature", ()
   });
 
   assert.match(markdown, /## Issue #11 executable smoke evidence/);
+  assert.match(markdown, /`npm run --silent smoke:issue11 -- --signature avery`/);
+  assert.match(markdown, /`npm run smoke:dispatch`/);
   assert.match(markdown, /`task_00000001`/);
+  assert.match(markdown, /`proof_00000001`/);
+  assert.match(markdown, /`policytrace_00000001`/);
+  assert.match(markdown, /`sha256:happy-path-trace`/);
+  assert.match(markdown, /`audit_00000005`/);
   assert.match(markdown, /TRACE_SIGNATURE_INVALID/);
+  assert.match(markdown, /QUALITY_SCORE_BELOW_MINIMUM, HASHCASH_BITS_BELOW_MINIMUM/);
   assert.match(markdown, /TASK_AWARD_PRECONDITION_FAILED/);
   assert.match(markdown, /--avery/);
 });
@@ -56,6 +71,9 @@ test("runIssue11Evidence returns the smoke markdown packet", async () => {
   assert.equal(result.summary.status, "ok");
   assert.ok(result.logLines.some((line) => line.includes("PASS task-awarded")));
   assert.match(result.markdown, /## Issue #11 executable smoke evidence/);
+  assert.match(result.markdown, /`npm run --silent smoke:issue11 -- --signature avery`/);
+  assert.match(result.markdown, /`proof_00000001`/);
+  assert.match(result.markdown, /`policytrace_00000001`/);
   assert.match(result.markdown, /```json/);
   assert.match(outputs[0], /## Issue #11 executable smoke evidence/);
 });

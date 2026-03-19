@@ -50,3 +50,4 @@
 - [x] 5.10 补充前端 consumer contract reviewer quick-check 锚点，给出 `origin/main` 的行号与 grep 校验命令，减少对已发布读路径的重复误判。
 - [x] 5.11 输出 `docs/BACKEND_API_EXAMPLE_PACKET.md`，把 merged `smoke:dispatch` 路径固化为 issue #11 / QA / beta consumer 可复用的请求响应示例包。
 - [x] 5.12 刷新 checkpoint / merge-train 模板，移除对已关闭 issue #146 的活跃 blocker 依赖，改用 live planning sweep 查询与 issue #11 证据线程。
+- [x] 5.13 补充 issue #11 可直接复用的最小 SDK 片段与 smoke 标识符回写，确保 QA/beta consumer 不必从 PR 评论中手抄 `taskId` / `proofId` / `policyTraceId` / reason-code 证据。
