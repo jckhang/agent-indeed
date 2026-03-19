@@ -112,27 +112,36 @@ async function writeIssue11Artifacts({ markdown, outputDir, summary }) {
   };
 }
 
-function parseArgs(argv) {
+export function parseIssue11EvidenceArgs(argv) {
   const options = {};
 
   for (let index = 0; index < argv.length; index += 1) {
-    if (argv[index] === "--signature") {
-      options.signature = argv[index + 1];
+    const arg = argv[index];
+
+    if (arg === "--signature" || arg === "--output-dir") {
+      const value = argv[index + 1];
+      if (!value || value.startsWith("--")) {
+        throw new Error(`missing value for ${arg}`);
+      }
+
+      if (arg === "--signature") {
+        options.signature = value;
+      } else {
+        options.outputDir = value;
+      }
+
       index += 1;
       continue;
     }
 
-    if (argv[index] === "--output-dir") {
-      options.outputDir = argv[index + 1];
-      index += 1;
-    }
+    throw new Error(`unknown argument: ${arg}`);
   }
 
   return options;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const options = parseArgs(process.argv.slice(2));
+  const options = parseIssue11EvidenceArgs(process.argv.slice(2));
 
   runIssue11Evidence(options).catch((error) => {
     console.error(error);

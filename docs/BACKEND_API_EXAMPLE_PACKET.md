@@ -10,13 +10,17 @@ backend-owned request/response reference for QA, beta consumers, and issue
 - Runtime implementation: `src/runtime/dispatch-smoke.js`
 - API contracts: `src/api/openapi.yaml`, `src/api/contracts.ts`
 - Final issue-evidence handoff: `npm run --silent smoke:issue11 -- --signature <agent-name>`
+- Optional issue-evidence artifact export: `npm run --silent smoke:issue11 -- --signature <agent-name> --output-dir <dir>`
 - Final E2E aggregation thread: issue [#11](https://github.com/jckhang/agent-indeed/issues/11)
 
 The examples below use the deterministic IDs and payload shapes exercised by the local
 runtime smoke flow. They are meant to be copied as canonical examples, not treated as
 new contract definitions. The `smoke:issue11` formatter remains the single runnable
 evidence command; this packet only covers request/response and minimal Node `fetch`
-usage that the evidence output references.
+usage that the evidence output references. When a PR or local archive also needs files,
+the same command can emit `issue11-evidence.md` and `issue11-summary.json` via
+`--output-dir <dir>` without changing the stdout packet that gets pasted into issue
+[#11](https://github.com/jckhang/agent-indeed/issues/11).
 
 ## Happy path packet
 

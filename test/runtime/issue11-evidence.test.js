@@ -6,6 +6,7 @@ import { mkdtemp, readFile } from "node:fs/promises";
 
 import {
   formatIssue11Evidence,
+  parseIssue11EvidenceArgs,
   runIssue11Evidence
 } from "../../src/runtime/issue11-evidence.js";
 
@@ -99,4 +100,31 @@ test("runIssue11Evidence writes markdown and summary artifacts when requested", 
   assert.match(markdown, /--avery/);
   assert.equal(summary.status, "ok");
   assert.equal(summary.scenarios[0].name, "happy-path");
+});
+
+test("parseIssue11EvidenceArgs accepts signature and output directory flags", () => {
+  assert.deepEqual(parseIssue11EvidenceArgs([
+    "--signature",
+    "avery",
+    "--output-dir",
+    "./artifacts/issue11"
+  ]), {
+    signature: "avery",
+    outputDir: "./artifacts/issue11"
+  });
+});
+
+test("parseIssue11EvidenceArgs rejects missing flag values and unknown arguments", () => {
+  assert.throws(
+    () => parseIssue11EvidenceArgs(["--signature"]),
+    /missing value for --signature/
+  );
+  assert.throws(
+    () => parseIssue11EvidenceArgs(["--output-dir", "--signature"]),
+    /missing value for --output-dir/
+  );
+  assert.throws(
+    () => parseIssue11EvidenceArgs(["--bogus"]),
+    /unknown argument: --bogus/
+  );
 });
