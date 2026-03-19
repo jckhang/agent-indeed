@@ -52,3 +52,4 @@
 - [x] 5.12 刷新 checkpoint / merge-train 模板，移除对已关闭 issue #146 的活跃 blocker 依赖，改用 live planning sweep 查询与 issue #11 证据线程。
 - [x] 5.13 补充 issue #11 可直接复用的最小 SDK 片段与 smoke 标识符回写，确保 QA/beta consumer 不必从 PR 评论中手抄 `taskId` / `proofId` / `policyTraceId` / reason-code 证据。
 - [x] 5.14 为 issue #186 收敛 planning sweep 规则：同一 checkpoint 只保留一个 mergeable planning-sync PR，并把 superseded PR 的 merge/close rationale 回写到 GitHub 线程。
+- [x] 5.15 收敛 issue #11 backend evidence 路径（issue #196），把规划/状态文档统一到 `main` 上的 `smoke:issue11` 命令、`docs/RUNTIME_EXECUTION_HANDOFF.md` 与最终 issue #11 证据线程，移除对临时 formatter PR 栈的稳定锚点依赖。

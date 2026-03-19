@@ -17,15 +17,14 @@ Ship the first usable agent dispatch loop for closed beta:
 
 - The runtime pivot delivered its baseline implementation threads and now moves into evidence and planning cleanup.
 - Runtime cutline decisions for open contract PRs live in `docs/RUNTIME_CUTLINE_2026-03-16.md`; use that table to decide which deltas block follow-through versus which are additive-safe.
-- Runtime command/evidence expectations live in `docs/RUNTIME_EXECUTION_HANDOFF.md`; use that handoff contract when issue #177, issue #178, or issue #11 claims executable progress.
+- Runtime command/evidence expectations live in `docs/RUNTIME_EXECUTION_HANDOFF.md`; use that handoff contract when issue #196 or issue #11 claims executable progress.
 - Closed baseline issues from the pivot:
   - #109 backend runtime skeleton
   - #110 runnable dispatch vertical slice
   - #111 executable QA smoke/E2E checks
 - Active follow-through threads for the pivot:
   - #167 planning-doc refresh to the post-runtime baseline
-  - #177 canonical backend smoke formatter and evidence block
-  - #178 formatter-backed smoke pass that feeds issue #11
+  - #196 converge the issue #11 backend handoff onto the canonical `main` command and final handoff thread
 - Planning-only follow-ups (#106, #107, #108) were closed to keep sprint bandwidth on runtime delivery.
 - QA prewrite-only tracks (#87, PR #84, PR #104) remain superseded by the executable evidence path on issue #11.
 - Closed issue #120 is a dated QA sweep baseline, not an active blocker.
@@ -98,7 +97,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Implementation-scoped issues are closed only when runtime code or executable test coverage is merged.
 - End-to-end happy path + key negative paths are covered by automated tests.
 - One local command path can run service + smoke checks for happy path and core negatives.
-- The canonical command path and evidence handoff into issue #11 are documented in `docs/RUNTIME_EXECUTION_HANDOFF.md` and the active formatter/smoke follow-through threads.
+- The canonical command path and evidence handoff into issue #11 are documented in `docs/RUNTIME_EXECUTION_HANDOFF.md`; planning docs should point at that `main` command plus issue #196 / issue #11 instead of transient formatter PR stacks.
 - GitHub issues for Phase 1 epics/tasks are created and linked to this plan.
 - Every active P1 issue/PR is discoverable from the M1-M4 milestone links in `docs/PHASE1_CHECKPOINT_BOARD.md`.
 - Weekly epic #2 checkpoints use `docs/PHASE1_EPIC_CHECKPOINT_TEMPLATE.md` so owner handoffs and validation-evidence gaps stay consistent across review weeks.

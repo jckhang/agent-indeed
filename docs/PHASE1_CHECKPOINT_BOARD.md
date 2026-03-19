@@ -8,8 +8,8 @@ This document keeps only the stable checkpoint structure and links to the live m
 | Checkpoint | Target date | Owners | Live issues | Live PRs | Review focus |
 | --- | --- | --- | --- | --- | --- |
 | M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | Post-runtime planning/reference cleanup plus verify/award contract adoption (planning review-burndown queue, PR #174, PR #133). |
-| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | Hold the merged runtime slice steady while backend publishes canonical smoke formatting and evidence (#177, PR #175). |
-| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | Formatter-backed smoke pass, QA packet updates, and final issue #11 evidence handoff (#178, PR #172, issue #11). |
+| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | Hold the merged runtime slice steady while backend keeps the canonical `main` smoke evidence path and packet aligned for issue #11 handoff. |
+| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | Reuse the canonical `main` smoke evidence command and API packet, then keep the final issue #11 evidence handoff current. |
 | M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | Final E2E evidence, audit trail sign-off, and security readiness closure (issue #11). |
 
 ## Metadata hygiene queries
@@ -27,8 +27,7 @@ Sprint pivot dated 2026-03-16 now uses these anchors by default:
 
 - Closed runtime baseline: `#109`, `#110`, `#111`
 - Live planning refresh: `owner:albatross` + `stream/review-burndown` query
-- Live backend formatter handoff: `#177`
-- Live QA smoke handoff: `#178`
+- Live backend evidence path: `docs/RUNTIME_EXECUTION_HANDOFF.md` + `npm run --silent smoke:issue11 -- --signature <agent-name>`
 - Final evidence gate: `#11`
 
 ## Review routine
