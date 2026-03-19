@@ -54,7 +54,7 @@ Keep the post-merge follow-up list short and tied to currently published contrac
 
 1. Runtime parity for onboarding, award, and verification refresh still depends on keeping the running service aligned with the closed implementation baselines from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) and [#115](https://github.com/jckhang/agent-indeed/issues/115), even though the upload/read contracts are already present in the checked-in API drafts.
 2. Issue [#205](https://github.com/jckhang/agent-indeed/issues/205) adds one explicit onboarding rule for frontend docs: treat upload replay as success, surface indexing details as the matching-visible receipt, and call any still-open runtime smoke command dependency a follow-up instead of implying it already landed on `main`.
-3. QA still needs executable evidence that the onboarding upload and publish -> shortlist -> commit -> reveal -> verification -> award paths behave the same under runtime conditions; `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` is the last closed drift-sweep snapshot, while issue [#11](https://github.com/jckhang/agent-indeed/issues/11) plus PR [#204](https://github.com/jckhang/agent-indeed/pull/204) carry the live smoke/runtime follow-through.
+3. QA still needs executable evidence that the onboarding upload and publish -> shortlist -> commit -> reveal -> verification -> award paths behave the same under runtime conditions; `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` is the last closed drift-sweep snapshot, while issue [#11](https://github.com/jckhang/agent-indeed/issues/11) plus PR [#204](https://github.com/jckhang/agent-indeed/pull/204) carry the live smoke/runtime follow-through (`npm run smoke:onboarding` becomes the canonical onboarding evidence command once PR #204 merges).
 4. Frontend docs should only describe a surface as part of the checked-in API baseline when reviewers can find both the exact path and the response type in `src/api/openapi.yaml` and `src/api/contracts.ts`; otherwise, record the gap as a follow-up instead of broadening runtime scope.
 
 ## Agent onboarding follow-through (issue #205)
@@ -73,7 +73,7 @@ Frontend-visible assumptions to keep explicit:
    - The current contract makes `indexedAt` optional, so the UI should not block a successful acceptance/replay state when the timestamp is absent.
 4. Runtime evidence should stay honestly scoped.
    - The checked-in API baseline already supports doc-level wiring for onboarding.
-   - The executable upload/smoke command remains a runtime follow-through item until PR [#204](https://github.com/jckhang/agent-indeed/pull/204) merges; mention that dependency directly instead of presenting the command as already available on `main`.
+   - The executable upload/smoke command remains a runtime follow-through item until PR [#204](https://github.com/jckhang/agent-indeed/pull/204) merges; once it does, point reviewers at `npm run smoke:onboarding` and the linked issue [#11](https://github.com/jckhang/agent-indeed/issues/11) evidence thread instead of presenting any other branch as active baseline.
 
 ## Executable follow-up slice for issue #188
 
@@ -133,7 +133,7 @@ Out of scope:
 
 | Route | Persona | Primary API dependency | Runtime expectation |
 | --- | --- | --- | --- |
-| `/agent/onboarding` | Agent | `POST /v1/agents/bundles` | Accept or replay a signed bundle, surface indexing receipt details, and keep runtime-smoke wording tied to the merged upload path only when PR `#204` lands |
+| `/agent/onboarding` | Agent | `POST /v1/agents/bundles` | Accept or replay a signed bundle, surface indexing receipt details, and tie runtime-smoke wording to the merged `npm run smoke:onboarding` + issue `#11` evidence path only when PR `#204` lands |
 | `/manager/tasks/new` | Manager | `POST /v1/tasks` | Publish a task and transition into a created task summary with real deadlines/status |
 | `/manager/tasks/{taskId}/review` | Manager | `GET /v1/tasks/{taskId}/candidates`, `GET /v1/tasks/{taskId}/award` | Render shortlist freshness, candidate ranking, blockers, and award-readiness from runtime reads |
 | `/agent/tasks/{taskId}/bid-workspace` | Agent | `POST /v1/tasks/{taskId}/bids/commit`, `POST /v1/tasks/{taskId}/bids/reveal` | Preserve server-authored window state and hand off to verification without inventing hidden state |
