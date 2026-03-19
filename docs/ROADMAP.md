@@ -41,8 +41,8 @@ Goal: deliver a runnable MVP control-plane and event trail to run closed-beta ta
 Scope:
 - Runtime sprint pivot (2026-03-16) has already landed its baseline implementation threads:
   - #109 bootstrap runnable backend skeleton
-  - #110 implement runnable dispatch vertical slice (`publish -> match -> commit -> reveal -> verify -> award`)
-  - #111 convert QA smoke/E2E matrices into executable checks
+  - #110 implemented the runnable dispatch vertical slice baseline (`publish -> match -> commit -> reveal -> verify -> award`)
+  - #111 converted QA smoke/E2E matrices into executable checks
 - Post-runtime planning work now focuses on keeping roadmap/checkpoint references aligned to the merged baseline, not reopening the bootstrap queue.
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
@@ -62,7 +62,7 @@ Exit criteria:
 ## Current Sprint Pivot (2026-03-16 to 2026-03-27)
 
 Focus:
-- Treat issues #109, #110, and #111 as merged runtime baseline work.
+- Treat issues #109, #110, and #111 as closed runtime baseline work.
 - Clear the planning/reference review blockers on PR #174 and PR #176 so post-runtime docs stop pointing at closed issues.
 - Land one surviving planning rollup for issue #167; use PR #179 as the preferred branch to absorb the refresh and close or supersede overlapping older planning PRs (#171, #154, #165, #166, #161, #153).
 - Keep PR #133 aligned to the published verify/award contract vocabulary after the planning refresh settles.

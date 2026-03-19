@@ -17,7 +17,7 @@ Ship the first usable agent dispatch loop for closed beta:
 
 - The runtime pivot delivered its baseline implementation threads and now moves into evidence and planning cleanup.
 - Runtime cutline decisions for open contract PRs live in `docs/RUNTIME_CUTLINE_2026-03-16.md`; use that table to decide which deltas block follow-through versus which are additive-safe.
-- Runtime command/evidence expectations live in `docs/RUNTIME_EXECUTION_HANDOFF.md`; use that handoff contract when issue #177, issue #178, or issue #11 claims executable progress.
+- Runtime command/evidence expectations live in `docs/RUNTIME_EXECUTION_HANDOFF.md`; use that handoff contract when checking progress against the closed implementation baselines from issues #109 and #110, the active formatter follow-through in issues #177 and #178, or the still-open smoke thread in issue #11.
 - Closed baseline issues from the pivot:
   - #109 backend runtime skeleton
   - #110 runnable dispatch vertical slice
@@ -37,7 +37,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - `AgentBundle` schema finalized (`manifest`, `identity`, `skills`, `memoryRef`).
 - Upload validation pipeline implemented (signature, schema, indexing, version conflict).
 - Memory supports index/encrypted reference mode (no raw memory required).
-- Onboarding write/read behavior is backed by the merged runtime baseline from issues #109 and #110.
+- Onboarding write/read behavior must stay executable from a local running service, using closed issues #109 and #110 as the baseline reference.
 
 ### G2. Task publication and matching baseline
 
@@ -49,7 +49,7 @@ Ship the first usable agent dispatch loop for closed beta:
   - compliance flags
 - Candidate shortlist read model also exposes additive review context (`missingDataStates`, `proofReadiness`, `shortlistAuditId`) so manager review does not hide partial evidence.
 - Candidate retrieval exposes a retryable "snapshot pending" state instead of returning an ambiguous empty shortlist during matching materialization.
-- Candidate shortlist behavior is expected to reflect the merged runtime baseline, not docs-only assumptions.
+- Candidate shortlist behavior must be backed by runtime state, not docs-only assumptions, with closed issue #110 treated as the baseline reference.
 - Soft ranking baseline:
   - success rate
   - latency
@@ -63,7 +63,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Commit-reveal bidding APIs available.
 - Reveal rejected when no valid commit exists.
 - `ProofPack` accepted and verified with T0/T1/T2 policy mapping.
-- Commit/reveal/verify/award transitions persist through the merged runtime path and still need canonical smoke evidence for issue #11.
+- Commit/reveal/verify/award transitions must persist through the merged runtime path and still need canonical smoke evidence for issue #11, using closed issue #110 as the implementation baseline reference.
 - Runtime implementers should treat `docs/RUNTIME_CUTLINE_2026-03-16.md` as the current go/no-go rule for open contract PR dependencies while the follow-through stack finishes converging.
 - Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, with focused follow-through in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`, and `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md`, so commit/reveal and verification acceptance criteria stay tied to the merged bid/proof read contracts.
 - Agent-facing verification status uses explicit queued/verifying/terminal terminology and does not invent backend fields that are not yet contractually available.
