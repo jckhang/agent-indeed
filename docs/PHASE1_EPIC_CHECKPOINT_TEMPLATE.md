@@ -9,7 +9,7 @@ consistent, owner-specific, and reviewable.
 
 - Open the milestone links in `docs/PHASE1_CHECKPOINT_BOARD.md`.
 - Run the metadata hygiene queries from `docs/PHASE1_CHECKPOINT_BOARD.md`.
-- Check the live planning sweep query and issue #11 before copying any blocker or evidence note into the checkpoint comment.
+- Open the current planning sweep issue from the `owner:albatross` + `stream/review-burndown` query before copying any blocker or evidence note into the checkpoint comment.
 - Pull the current runtime blocker snapshot from the dated control doc when one
   exists.
 - Verify every blocker references a live issue or PR and the owner label already
@@ -54,7 +54,7 @@ consistent, owner-specific, and reviewable.
 - `Ready next` should describe executable slices only; defer design-only follow-ups unless they unblock the runtime path this week.
 - `Validation evidence gaps` should call out the exact missing command output so reviewers know what to ask for next.
 - The owner handoff table should stay short enough to scan in GitHub without expanding code blocks.
-- Prefer live queries or issue #11 for same-day evidence threads; do not cite closed umbrella issues as active blocker owners.
+- Prefer the current planning sweep issue plus issue #11 for same-day evidence threads; do not cite closed historical sweep issues as active blocker owners.
 
 ## Minimum evidence checklist
 
