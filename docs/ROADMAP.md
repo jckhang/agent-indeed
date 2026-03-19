@@ -43,7 +43,7 @@ Scope:
   - #109 bootstrap runnable backend skeleton
   - #110 implement runnable dispatch vertical slice (`publish -> match -> commit -> reveal -> verify -> award`)
   - #111 convert QA smoke/E2E matrices into executable checks
-- Post-runtime planning work now focuses on keeping roadmap/checkpoint references aligned to the merged baseline, not reopening the bootstrap queue.
+- Post-runtime planning work now focuses on one surviving planning-sync thread per checkpoint sweep instead of parallel roadmap/checkpoint rewrites.
 - Agent onboarding and metadata sync (`AgentBundle` with identity/memory/skills).
 - Task publication and candidate matching (hard filter + soft ranking baseline).
 - Manager shortlist and award review contracts with audit-linked status context.
@@ -51,7 +51,7 @@ Scope:
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.
 - Lifecycle observability baseline for `upload -> match -> bid -> verify -> award`.
-- Closed-beta evidence handoff stays concentrated on issue #11 plus its immediate formatter/smoke follow-through issues (#177 and #178).
+- Closed-beta evidence handoff stays concentrated on issue #11 plus its immediate backend, CI, and QA follow-through PRs (#191, #182, #172).
 
 Exit criteria:
 - Core APIs available and documented in `src/api/openapi.yaml`.
@@ -63,23 +63,26 @@ Exit criteria:
 
 Focus:
 - Treat issues #109, #110, and #111 as merged runtime baseline work.
-- Clear the planning/reference review blockers on PR #174 and PR #176 so post-runtime docs stop pointing at closed issues.
-- Land one surviving planning rollup for issue #167; use PR #179 as the preferred branch to absorb the refresh and close or supersede overlapping older planning PRs (#171, #154, #165, #166, #161, #153).
-- Keep PR #133 aligned to the published verify/award contract vocabulary after the planning refresh settles.
-- Move QA evidence forward through issue #177, issue #178, and issue #11 instead of reopening closed issue #120.
+- Merge PR #190 as the single surviving planning-sync thread for the M1 checkpoint sweep.
+- Keep PR #166 and PR #174 aligned to that same post-runtime planning baseline while they finish review.
+- Keep PR #133 aligned to the published verify/award contract vocabulary.
+- Move issue #11 evidence forward through PR #191, PR #182, and PR #172.
+- Keep frontend runtime-consumer follow-ons (PR #170 and PR #189) tied to the merged read and refresh surfaces.
 
 De-scoped from current sprint:
 - Planning-only follow-ups #106, #107, #108 were closed to avoid additional doc-layer churn.
+- Older planning-stack rewrites should be closed, superseded, or restacked behind PR #190 instead of reopened as fresh snapshots.
 - QA prewrite-only threads (#87, PR #84, PR #104) remain superseded by the executable QA path that now runs through issue #11.
-- Closed issue #120 remains a dated baseline reference only; it is not an active evidence lane.
+- Closed issue #120 remains a dated contract baseline reference only; it is not an active evidence lane.
 
 ## Next 24h Merge Sequence
 
-1. Merge PR #174 (`docs: refresh runtime handoff baseline`) after removing the last stale references to closed issue #120.
-2. Merge PR #176 (`docs: codify planning reference rules`) so contributor guidance matches the post-runtime review workflow.
-3. Refresh and merge PR #179 (`[P1-167] Refresh planning docs to post-runtime baseline`) as the single surviving planning rollup for issue #167.
-4. Close, restack, or fold overlapping planning refresh PRs (#171, #154, #165, #166, #161, #153) behind the merged #167 rollup instead of keeping multiple conflicting status snapshots open.
-5. Revisit PR #133 once the planning baseline is stable, then hand the canonical smoke evidence path to issue #177, issue #178, and issue #11.
+1. Merge PR #190 (`docs: collapse planning sweep stack before M1`) so the planning lane stops carrying parallel checkpoint-rollup rewrites.
+2. Merge PR #191 (`[P1-187] Flatten issue #11 backend evidence path`) to give issue #11 one canonical backend-owned evidence format.
+3. Merge PR #182 (`[P1-09] Cover dispatch smoke CLI contract in CI`) so the smoke handoff contract is continuously checked.
+4. Merge PR #172 (`[P1-11] Add QA packet snippets for issue #11`) once the backend evidence block is stable.
+5. Revisit PR #133 and the final issue #11 rerun after the planning and evidence-path updates are settled.
+6. Keep PR #170 and PR #189 constrained to merged runtime behavior while the issue #11 evidence chain closes.
 
 ### Phase 2: Execution & Trust Loop (Target: 2026-05 to 2026-06)
 
@@ -105,9 +108,9 @@ Scope:
 
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
-- M1 (2026-03-20): close post-runtime planning/reference drift (#167, PR #174, PR #176) and keep verify/award follow-through on PR #133 tied to the merged contract baseline.
-- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA publish one canonical smoke evidence path (#177, #178, issue #11).
-- M3 (2026-04-03): stabilize verify/award/audit evidence and run executable smoke checks against the merged runtime baseline.
+- M1 (2026-03-20): collapse the planning-stack duplicates behind PR #190 and keep the surviving evidence-path PRs reviewable on current `main`.
+- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while frontend runtime consumers and verify/award wording converge on the same published contracts.
+- M3 (2026-04-03): stabilize verify/award/audit evidence and complete the remaining executable smoke handoff on issue #11.
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
 - M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, and `docs/CLOSED_BETA_SECURITY_READINESS.md` so telemetry owners plus auth, secret-handling, and redaction follow-ons stay reviewable.
 - Review `docs/PHASE1_BETA_READINESS_GATES.md` as the compact release-gate checklist for the remaining Phase 1 contract, QA, audit, and planning blockers.
