@@ -1,6 +1,6 @@
 # Phase 1 Epic Status
 
-Last updated: 2026-03-19
+Last updated: 2026-03-20
 
 This document is the execution snapshot for epic #2 (`[Phase 1 Epic] Agent Dispatch Foundation MVP`).
 It complements `docs/PHASE1_GOALS.md` by mapping epic acceptance criteria to the current post-runtime issues and PR gates.
@@ -14,9 +14,9 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 
 | Epic acceptance area | Current status | Source of truth | Next gate |
 | --- | --- | --- | --- |
-| OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts`, issue #167, PR #174, PR #176, PR #179, PR #133 | Merge the post-runtime planning/reference cleanup, then keep PR #133 aligned to the published contract vocabulary. |
-| End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, `docs/RUNTIME_EXECUTION_HANDOFF.md`, issues #177, #178, and #11 | Publish one canonical smoke evidence format, run the formatter-backed smoke pass, and paste the final evidence back onto issue #11. |
-| Core negative scenarios are covered | Blocked | issue #11, PR #172, `docs/CLOSED_BETA_SECURITY_READINESS.md`, `docs/ERROR_CODE_RETRY_POLICY.md` | Turn the documented failure cases into reproducible smoke evidence tied to the merged runtime baseline. |
+| OpenSpec/API/contracts stay synchronized | In progress | `openspec/changes/agent-dispatch-platform/`, `src/api/openapi.yaml`, `src/api/contracts.ts`, PR #174, PR #199, PR #133, merged PR #176, merged PR #179, merged PR #194 | Keep the surviving planning docs aligned with the published contract vocabulary and the current issue #11 evidence lane. |
+| End-to-end happy path can be demonstrated | Blocked | `docs/PHASE1_GOALS.md`, `docs/RUNTIME_EXECUTION_HANDOFF.md`, issue #11, PR #191, PR #209, merged PR #172 | Land the remaining backend/evidence follow-through PRs, then paste one signed `smoke:issue11` run from `main` onto issue #11. |
+| Core negative scenarios are covered | Blocked | issue #11, PR #209, merged PR #172, `docs/CLOSED_BETA_SECURITY_READINESS.md`, `docs/ERROR_CODE_RETRY_POLICY.md` | Re-run the canonical issue #11 smoke path from `main` so the documented failure cases are attached to the live runtime baseline instead of scattered PR comments. |
 | Audit events cover key state transitions | In progress | merged runtime baseline from issues #109/#110, `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, issue #11 | Keep the verify/award/audit follow-through aligned while the final smoke evidence proves the emitted trail. |
 
 ## Delivery Slice Status
@@ -38,11 +38,11 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 
 | Epic step | Active issue / PR | Why it still matters to epic #2 |
 | --- | --- | --- |
-| Post-runtime planning refresh | issue #167, PR #174, PR #176, PR #179 | These threads remove stale references to closed runtime/QA issues and establish one consistent planning baseline for the remaining Phase 1 queue. |
-| Overlapping planning rollups | PR #171, PR #154, PR #165, PR #166, PR #161, PR #153 | These older planning refresh branches should either be folded into PR #179 or closed as superseded so the repo stops carrying conflicting queue snapshots. |
+| Post-runtime planning refresh | PR #174, PR #199, merged PR #176, merged PR #179, merged PR #194 | These threads remove stale references to closed runtime/QA issues and establish one consistent planning baseline for the remaining Phase 1 queue. |
+| Overlapping planning rollups | PR #174, PR #199 | These are the remaining open planning snapshots that still need to converge on the same live issue #11 evidence lane and blocker list. |
 | Verify/award contract adoption | PR #133 | The checklist still needs to describe only the proof fields, error codes, and reason-code vocabulary that are actually published on `main`. |
-| Backend smoke formatter | issue #177 / PR #175 | QA needs one canonical backend-owned evidence block before the final smoke pass can be repeated consistently. |
-| QA packet and smoke evidence | PR #172, issue #178, issue #11 | The remaining QA work is to reuse the canonical formatter output, run the bounded smoke pass, and post the exact result on issue #11. |
+| Backend handoff convergence | PR #191 | Backend still needs one surviving mainline handoff path so the runnable smoke evidence stays anchored to the current runtime contract. |
+| QA packet and smoke evidence | PR #209, merged PR #172, issue #11 | The remaining QA work is to reuse the merged packet baseline, land reusable artifact exports, and post the exact signed result on issue #11. |
 
 ### Remaining blocked slices
 
@@ -54,19 +54,19 @@ Deliver a closed-beta MVP for the agent dispatch loop:
 
 | Order | Thread | Why now | Expected result |
 | --- | --- | --- | --- |
-| 1 | PR #174 `docs: refresh runtime handoff baseline` | Smallest live planning fix with direct stale-reference feedback. | Runtime handoff docs stop treating closed issue #120 as active. |
-| 2 | PR #176 `docs: codify planning reference rules` | Makes the contributor/reference rules match the post-runtime review workflow. | Future planning PRs point at live queries and same-day sweep threads instead of closed issues. |
-| 3 | PR #179 `[P1-167] Refresh planning docs to post-runtime baseline` | Preferred surviving rollup for issue #167 after the two smaller doc fixes land. | `docs/ROADMAP.md`, `docs/PHASE1_GOALS.md`, `docs/PHASE1_CHECKPOINT_BOARD.md`, and this file all describe the same post-runtime queue. |
-| 4 | PRs #171, #154, #165, #166, #161, #153 | Overlapping planning branches should no longer stay open as competing snapshots. | Close, fold, or restack them behind the merged #167 rollup. |
-| 5 | PR #133, issue #177, issue #178, issue #11 | Contract wording and final smoke evidence remain after planning drift is removed. | One canonical smoke evidence path feeds the final QA sign-off thread. |
+| 1 | PR #174 `docs: refresh runtime handoff baseline` | Smallest remaining planning fix touching the canonical runtime evidence contract. | Runtime handoff docs stay aligned with the live issue #11 lane. |
+| 2 | PR #199 `[P1-09] Refresh planning anchors to issue #11 evidence lane` | Keeps the Phase 1 planning snapshots consistent with merged PR #194 and the live QA queue. | `docs/ROADMAP.md`, `docs/PHASE1_GOALS.md`, `docs/PHASE1_EPIC_STATUS.md`, and checkpoint guidance stop pointing at closed formatter issues. |
+| 3 | PR #133 `[P1-131] Add verify-award adoption checklist` | Remaining contract checklist still needs to match the published OpenAPI/TypeScript vocabulary. | Contract wording risk shrinks before final beta gating. |
+| 4 | PR #191 `[P1-43] Converge issue #11 backend handoff on one mainline path` | Backend handoff still has to settle on one surviving evidence path on `main`. | Runtime happy-path proof is easier to rerun and cite. |
+| 5 | PR #209 `[P1-09] Export issue #11 evidence artifacts`, issue #11 | QA still needs reusable exported artifacts plus one signed rerun from `main`. | One canonical smoke evidence path feeds the final QA sign-off thread. |
 
 ## Checkpoint Rollup
 
 | Checkpoint | Epic relevance | Current note |
 | --- | --- | --- |
-| M1 | Post-runtime planning/reference cleanup | The immediate M1 gate is landing the #167 planning refresh plus PR #174 and PR #176 without leaving older duplicate status threads behind. |
-| M2 | Runtime evidence formatting and reuse | Backend still needs the canonical smoke formatter path from issue #177 / PR #175 before QA can reuse it cleanly. |
-| M3 | Verify, audit, and executable QA | PR #172, issue #178, and issue #11 are the remaining proof points for runnable smoke evidence on top of the merged runtime baseline. |
+| M1 | Post-runtime planning/reference cleanup | The immediate M1 gate is landing PR #174 and PR #199 so the surviving planning docs all point at the same live issue #11 evidence lane. |
+| M2 | Runtime evidence formatting and reuse | Merged PR #172 gives QA one reusable packet baseline; PR #191 and PR #209 still need to finish the surviving handoff/export path on top of `main`. |
+| M3 | Verify, audit, and executable QA | Issue #11 remains the live proof point once the open backend/evidence follow-through PRs land and QA can paste a signed rerun from `main`. |
 | M4 | Beta readiness sign-off | Issue #11 final E2E evidence and audit/security verification remain required. |
 
 ## Epic Exit Checklist
