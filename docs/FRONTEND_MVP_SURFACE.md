@@ -1,9 +1,10 @@
 # Frontend MVP Surface and API Wiring Matrix
 
-Last updated: 2026-03-18
+Last updated: 2026-03-20
 
 Related issue: [#33](https://github.com/jckhang/agent-indeed/issues/33)
 Runtime mainline handoff: `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md` (issues [#136](https://github.com/jckhang/agent-indeed/issues/136) and [#145](https://github.com/jckhang/agent-indeed/issues/145))
+Onboarding follow-through: [#205](https://github.com/jckhang/agent-indeed/issues/205)
 
 ## Goal
 
@@ -38,7 +39,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 ### Agent Console
 
 1. `/agent/onboarding`
-   - Upload signed `AgentBundle` and handle schema/signature failures.
+   - Upload signed `AgentBundle`, distinguish created vs replayed submissions, and show whether skill indexing finished.
 2. `/agent/tasks/{taskId}/commit`
    - Submit commit hash before commit deadline.
 3. `/agent/tasks/{taskId}/reveal`
@@ -71,7 +72,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 
 | Page | API endpoint | Required request fields from UI | Response fields required by UI | Contract status |
 | --- | --- | --- | --- | --- |
-| `/agent/onboarding` | `POST /v1/agents/bundles` | `idempotencyKey`, `bundle.schemaVersion`, `bundle.manifest.*`, `bundle.identity.*`, `bundle.skills[]`, `bundle.memoryRef.*`, `bundle.signature.*` | `agentId`, `version`, `status`, `result`, `indexedAt`; error `code`, `category`, `auditId`, `retryable`, `details`, `conflict` | Ready for create/replay/conflict/error paths in the current draft API, including explicit schema-version and signature payload-hash failures |
+| `/agent/onboarding` | `POST /v1/agents/bundles` | `idempotencyKey`, `bundle.schemaVersion`, `bundle.manifest.*`, `bundle.identity.*`, `bundle.skills[]`, `bundle.memoryRef.*`, `bundle.signature.*` | `agentId`, `version`, `status`, `result`, `indexing.status`, `indexing.indexedSkillCount`, `indexing.memoryMode`, `indexing.skills[]`, optional `indexedAt`, optional `replay.strategy`; error `code`, `category`, `auditId`, `retryable`, `details`, `conflict` | Ready in the checked-in API draft for create/replay/conflict/error paths, including explicit schema-version and signature payload-hash failures; frontend should treat `RETURNED_EXISTING` as a first-class success state and keep runtime smoke copy gated on the still-open onboarding runtime follow-through from PR `#204` |
 | `/agent/tasks/{taskId}/bid-workspace` (commit stage) | `POST /v1/tasks/{taskId}/bids/commit` | `idempotencyKey`, `commit.bidId`, `commit.taskId`, `commit.agentId`, `commit.bidHash`, `commit.committedAt` | `bidId`, `taskId`, `agentId`, `phase`, `status`, `result`, `window.*` | Ready for the commit stage of the unified workspace; stable reason codes and server-authored window snapshot already exist |
 | `/agent/tasks/{taskId}/bid-workspace` (reveal stage) | `POST /v1/tasks/{taskId}/bids/reveal` | `idempotencyKey`, `reveal.bidId`, `reveal.taskId`, `reveal.agentId`, `reveal.nonce`, `reveal.price.*`, `reveal.executionPlan.*`, `reveal.proof.*` | `bidId`, `phase`, `status`, `result`, `rankingScore`, `decisionTraceHash`, `proofSubmission.*`, `window.*` | Ready for the reveal stage with typed failure paths; the returned `proofSubmission` should hand off directly into the merged status reads |
 | `/agent/tasks/{taskId}/verification` | `GET /v1/tasks/{taskId}/proofs/{proofId}` | `taskId`, `proofId` | `verificationState`, `requiredDifficulty`, `achievedDifficulty`, `reasonCodes`, `verifiedAt`, `decisionTraceHash`, `refresh.*` | Ready on `main`; runtime persistence from issue `#110` determines whether queued/verifying snapshots are populated for local runs |
@@ -98,6 +99,10 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 
 | Risk | Impact on frontend delivery | Minimal backend addition to unblock |
 | --- | --- | --- |
+| Onboarding runtime smoke evidence is still landing outside the checked-in docs baseline | Frontend can design against the published upload contract today, but should not promise a merged executable smoke command until PR `#204` lands on `main` | Merge the onboarding runtime/upload evidence slice from PR `#204`, then keep the frontend handoff wording pinned to that merged command path |
+| Onboarding success can be a replay, not a fresh create | Treating `RETURNED_EXISTING` like a generic duplicate error would make a safe retry look broken | Preserve the existing API shape and render replay metadata (`status=EXISTING`, `result=RETURNED_EXISTING`, `replay.strategy`) as a success confirmation |
+| Onboarding indexing details are richer than a simple accepted status | If UI drops `indexing.skills[]` or `memoryMode`, agents lose the only immediate confirmation of what matching can consume | Keep the current indexing summary in the response and surface it directly in onboarding success/replay states |
+| `indexedAt` is optional in the upload response | Requiring the timestamp in the UI would turn a valid synchronous acceptance into a false error state | Treat `indexedAt` as best-effort metadata and gate the primary success state on `status`, `result`, and `indexing.*` instead |
 | Candidate snapshot may still be pending when task first opens | Manager can land on an empty or confusing shortlist state | Surface `TASK_MATCH_NOT_READY` as a retryable loading state and poll using the API delay hint |
 | Award APIs depend on runtime implementation | UI contract exists, but live manager actions still need backend handlers | Land issue `#110` on top of the merged award read/write contract without changing the API shape again |
 | Runtime status projections may still be absent in a local environment even though the contracts are merged | UI can recover only when the running stack behind issue `#110` persists and serves bid/proof status snapshots | Keep runtime handlers and persistence aligned with the merged `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` contracts |
