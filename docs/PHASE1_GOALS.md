@@ -25,6 +25,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Active follow-through threads for the pivot:
   - #167 planning-doc refresh to the post-runtime baseline
   - issue #11 as the live smoke evidence umbrella for the canonical handoff command in `docs/RUNTIME_EXECUTION_HANDOFF.md`
+  - PR #204 plus follow-up issues #205 and #206 as the active onboarding upload queue for the M1 "Contract Freeze + Upload" checkpoint
   - new runtime/QA follow-up issues only when fresh drift appears beyond the closed `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` snapshot
 - Planning-only follow-ups (#106, #107, #108) were closed to keep sprint bandwidth on runtime delivery.
 - QA prewrite-only tracks (#87, PR #84, PR #104) remain superseded by the executable evidence path on issue #11.

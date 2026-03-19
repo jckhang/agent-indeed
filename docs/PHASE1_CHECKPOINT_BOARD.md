@@ -7,8 +7,8 @@ This document keeps only the stable checkpoint structure and links to the live m
 
 | Checkpoint | Target date | Owners | Live issues | Live PRs | Review focus |
 | --- | --- | --- | --- | --- | --- |
-| M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | Post-runtime planning/reference cleanup plus verify/award contract adoption (planning review-burndown queue, PR #174, PR #133). |
-| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | Hold the merged runtime slice steady while backend publishes canonical smoke formatting and evidence (#177, PR #175). |
+| M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | Post-runtime planning/reference cleanup plus onboarding upload review/evidence and verify/award contract adoption (planning review-burndown queue, PR #204, issues #205/#206, PR #174, PR #133). |
+| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | Hold the merged runtime slice steady while backend publishes canonical smoke formatting/evidence and frontend absorbs the onboarding upload baseline after PR #204 merges (#177, PR #175, issue #205). |
 | M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | Formatter-backed smoke pass, QA packet updates, and final issue #11 evidence handoff (#178, PR #172, issue #11). |
 | M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | Final E2E evidence, audit trail sign-off, and security readiness closure (issue #11). |
 
@@ -26,6 +26,7 @@ Use these GitHub queries before a checkpoint comment so milestone views and runt
 Sprint pivot dated 2026-03-16 now uses these anchors by default:
 
 - Closed runtime baseline: `#109`, `#110`, `#111`
+- Live onboarding upload queue: PR `#204`, issue `#205`, issue `#206`
 - Live planning refresh: `owner:albatross` + `stream/review-burndown` query
 - Live backend formatter handoff: `#177`
 - Live QA smoke handoff: `#178`

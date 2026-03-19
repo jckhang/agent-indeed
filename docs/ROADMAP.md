@@ -1,6 +1,6 @@
 # Agent Indeed Roadmap
 
-Last updated: 2026-03-19
+Last updated: 2026-03-20
 
 ## Product North Star
 
@@ -65,6 +65,7 @@ Focus:
 - Treat issues #109, #110, and #111 as closed runtime baseline work.
 - Clear the planning/reference review blockers on PR #174 and PR #176 so post-runtime docs stop pointing at closed issues.
 - Land one surviving planning rollup for issue #167; use PR #179 as the preferred branch to absorb the refresh and close or supersede overlapping older planning PRs (#171, #154, #165, #166, #161, #153).
+- Keep the onboarding upload queue visible in the M1 checkpoint: PR #204 is the executable runtime slice, issue #205 is the frontend baseline follow-through after merge, and issue #206 is the QA evidence publication follow-through.
 - Keep PR #133 aligned to the published verify/award contract vocabulary after the planning refresh settles.
 - Move QA evidence forward through issue #11 and the canonical runtime handoff docs instead of reopening closed issue #120 or other merged formatter follow-ups.
 
@@ -105,7 +106,7 @@ Scope:
 
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
-- M1 (2026-03-20): close post-runtime planning/reference drift (#167, PR #174, PR #176) and keep verify/award follow-through on PR #133 tied to the merged contract baseline.
+- M1 (2026-03-20): close post-runtime planning/reference drift (#167, PR #174, PR #176), keep the onboarding upload review/evidence queue explicit (PR #204, issues #205/#206), and keep verify/award follow-through on PR #133 tied to the merged contract baseline.
 - M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA publish one canonical smoke evidence path through issue #11 and `docs/RUNTIME_EXECUTION_HANDOFF.md`.
 - M3 (2026-04-03): stabilize verify/award/audit evidence and run executable smoke checks against the merged runtime baseline.
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
