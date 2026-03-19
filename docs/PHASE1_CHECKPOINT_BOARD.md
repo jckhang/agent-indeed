@@ -8,8 +8,8 @@ This document keeps only the stable checkpoint structure and links to the live m
 | Checkpoint | Target date | Owners | Live issues | Live PRs | Review focus |
 | --- | --- | --- | --- | --- | --- |
 | M1 Contract Freeze + Upload | 2026-03-20 | albatross-dev-agent + kestrel | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M1+Contract+Freeze+%2B+Upload%22) | Post-runtime planning/reference cleanup plus verify/award contract adoption (planning review-burndown queue, PR #174, PR #133). |
-| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | Hold the merged runtime slice steady while backend publishes canonical smoke formatting and evidence (#177, PR #175). |
-| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | Formatter-backed smoke pass, QA packet updates, and final issue #11 evidence handoff (#178, PR #172, issue #11). |
+| M2 Matching + Bidding Baseline | 2026-03-27 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M2+Matching+%2B+Bidding+Baseline%22) | Hold the merged runtime slice steady while backend evidence stays anchored on merged PR #175 and the issue #11 replay path. |
+| M3 Verify + Agent Flow | 2026-04-03 | kestrel + lanzhou-fe-agent | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M3+Verify+%2B+Agent+Flow%22) | Smoke-command replay on merged PR #172 plus final issue #11 evidence handoff. |
 | M4 Audit + Beta Readiness | 2026-04-10 | albatross-dev-agent + kestrel + QA | [Milestone issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | [Milestone PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+milestone%3A%22M4+Audit+%2B+Beta+Readiness%22) | Final E2E evidence, audit trail sign-off, and security readiness closure (issue #11). |
 
 ## Metadata hygiene queries
@@ -27,8 +27,8 @@ Sprint pivot dated 2026-03-16 now uses these anchors by default:
 
 - Closed runtime baseline: `#109`, `#110`, `#111`
 - Live planning refresh: `owner:albatross` + `stream/review-burndown` query
-- Live backend formatter handoff: `#177`
-- Live QA smoke handoff: `#178`
+- Backend evidence baseline on `main`: merged PR #175
+- Smoke-command handoff on `main`: merged PR #172
 - Final evidence gate: `#11`
 
 ## Review routine
@@ -36,12 +36,13 @@ Sprint pivot dated 2026-03-16 now uses these anchors by default:
 1. Open milestone issue and PR links instead of editing status snapshots in-repo.
 2. Use labels such as `status/ready-next`, `status/in-review`, and owner labels to decide next merge or rebase action.
 3. Run the metadata hygiene queries and clear any missing milestone or priority gaps before posting the checkpoint.
-4. Use `docs/RUNTIME_EXECUTION_HANDOFF.md` and `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` for dated runtime evidence context instead of copying those volatile notes into this guide.
-5. Run the same-day planning sweep from the `owner:albatross` + `stream/review-burndown` query before the checkpoint comment so blocker notes, clean-order updates, and validation gaps all have a live GitHub trail.
-6. Keep at most one mergeable `dept/planning` checkpoint-sync PR open for that sweep; all other overlapping planning PRs should get signed merge/close rationale in GitHub instead of staying in parallel review.
-7. Treat missing validation evidence in a PR body/comment as a real blocker, even when the code diff looks complete.
-8. Capture only durable planning changes in repo docs; keep comments, review notes, and volatile state in GitHub threads.
-9. If merge-train triage uncovers a new durable blocker, open or link a follow-up issue instead of adding a status snapshot here.
+4. Use `docs/PHASE1_ACCEPTANCE_TRACE.md` to map the checkpoint back to the epic acceptance area and evidence expectation it is meant to close.
+5. Use `docs/RUNTIME_EXECUTION_HANDOFF.md` and `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` for dated runtime evidence context instead of copying those volatile notes into this guide.
+6. Run the same-day planning sweep from the `owner:albatross` + `stream/review-burndown` query before the checkpoint comment so blocker notes, clean-order updates, and validation gaps all have a live GitHub trail.
+7. Keep at most one mergeable `dept/planning` checkpoint-sync PR open for that sweep; all other overlapping planning PRs should get signed merge/close rationale in GitHub instead of staying in parallel review.
+8. Treat missing validation evidence in a PR body/comment as a real blocker, even when the code diff looks complete.
+9. Capture only durable planning changes in repo docs; keep comments, review notes, and volatile state in GitHub threads.
+10. If merge-train triage uncovers a new durable blocker, open or link a follow-up issue instead of adding a status snapshot here.
 
 ## When to edit this file
 

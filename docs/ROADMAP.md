@@ -14,6 +14,7 @@ Build a trustworthy agent dispatch network where managers can publish tasks, age
 - Keep API-first implementation aligned with OpenSpec artifacts.
 - Resolve repository readiness blockers (P0) before broad Phase 1 implementation.
 - Runtime implementation evidence is required before closing `Implement`-scoped issues (spec/docs-only PRs are not sufficient).
+- Epic acceptance reviews use `docs/PHASE1_ACCEPTANCE_TRACE.md` so milestone closure stays tied to executable evidence instead of doc-only status claims.
 
 ## Phase Plan
 
@@ -51,7 +52,7 @@ Scope:
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.
 - Lifecycle observability baseline for `upload -> match -> bid -> verify -> award`.
-- Closed-beta evidence handoff stays concentrated on issue #11 plus its immediate formatter/smoke follow-through issues (#177 and #178).
+- Closed-beta evidence handoff stays concentrated on issue #11 plus the merged backend evidence and smoke-command baselines on `main` (PR #175 and PR #172).
 
 Exit criteria:
 - Core APIs available and documented in `src/api/openapi.yaml`.
@@ -64,9 +65,9 @@ Exit criteria:
 Focus:
 - Treat issues #109, #110, and #111 as merged runtime baseline work.
 - Clear the planning/reference review blockers on PR #174 and PR #176 so post-runtime docs stop pointing at closed issues.
-- Land one surviving planning rollup for issue #167; use PR #179 as the preferred branch to absorb the refresh and close or supersede overlapping older planning PRs (#171, #154, #165, #166, #161, #153).
+- Use the live `owner:albatross` + `stream/review-burndown` query to keep only one surviving planning-sync PR per sweep and close or supersede overlapping older planning PRs.
 - Keep PR #133 aligned to the published verify/award contract vocabulary after the planning refresh settles.
-- Move QA evidence forward through issue #177, issue #178, and issue #11 instead of reopening closed issue #120.
+- Move QA evidence forward through merged PR #175, merged PR #172, and issue #11 instead of reopening closed issue #120.
 
 De-scoped from current sprint:
 - Planning-only follow-ups #106, #107, #108 were closed to avoid additional doc-layer churn.
@@ -77,9 +78,9 @@ De-scoped from current sprint:
 
 1. Merge PR #174 (`docs: refresh runtime handoff baseline`) after removing the last stale references to closed issue #120.
 2. Merge PR #176 (`docs: codify planning reference rules`) so contributor guidance matches the post-runtime review workflow.
-3. Refresh and merge PR #179 (`[P1-167] Refresh planning docs to post-runtime baseline`) as the single surviving planning rollup for issue #167.
-4. Close, restack, or fold overlapping planning refresh PRs (#171, #154, #165, #166, #161, #153) behind the merged #167 rollup instead of keeping multiple conflicting status snapshots open.
-5. Revisit PR #133 once the planning baseline is stable, then hand the canonical smoke evidence path to issue #177, issue #178, and issue #11.
+3. Merge one clean planning-sync refresh from the live `owner:albatross` + `stream/review-burndown` sweep and close or supersede overlapping planning rollups behind it.
+4. Revisit PR #133 once the planning baseline is stable and the verify/award checklist stays aligned to the published contract vocabulary.
+5. Keep issue #11 as the only live final evidence gate, using merged PR #175 and merged PR #172 as the reusable backend/smoke baseline on `main`.
 
 ### Phase 2: Execution & Trust Loop (Target: 2026-05 to 2026-06)
 
@@ -105,8 +106,8 @@ Scope:
 
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
-- M1 (2026-03-20): close post-runtime planning/reference drift (#167, PR #174, PR #176) and keep verify/award follow-through on PR #133 tied to the merged contract baseline.
-- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA publish one canonical smoke evidence path (#177, #178, issue #11).
+- M1 (2026-03-20): close post-runtime planning/reference drift (live planning sweep, PR #174, PR #176) and keep verify/award follow-through on PR #133 tied to the merged contract baseline.
+- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA keep one canonical smoke evidence path replayable on `main` (merged PR #175, merged PR #172, issue #11).
 - M3 (2026-04-03): stabilize verify/award/audit evidence and run executable smoke checks against the merged runtime baseline.
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
 - M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, and `docs/CLOSED_BETA_SECURITY_READINESS.md` so telemetry owners plus auth, secret-handling, and redaction follow-ons stay reviewable.
@@ -114,6 +115,7 @@ Scope:
 
 Checkpoint status board:
 - Review `docs/PHASE1_CHECKPOINT_BOARD.md` for milestone links, target owners, and checkpoint review prompts.
+- Use `docs/PHASE1_ACCEPTANCE_TRACE.md` to decide which acceptance area a checkpoint comment or review thread is actually closing.
 - Use `docs/PHASE1_EPIC_CHECKPOINT_TEMPLATE.md` when posting the weekly epic #2 checkpoint so the comment keeps the same Done/Blocked/Ready next/Validation evidence gaps shape plus owner handoff table.
 
 ## Phase 1 KPIs
