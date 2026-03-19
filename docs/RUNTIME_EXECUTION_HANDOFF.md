@@ -87,6 +87,11 @@ issue `#206`; keep the dispatch smoke transcript on issue `#11` and the onboardi
 smoke transcript on epic `#2` so reviewers can see both executable lanes without mixing
 their identifiers.
 
+When QA needs to attach the onboarding handoff to a PR or local evidence bundle, prefer
+`npm run --silent smoke:onboarding:evidence -- --signature <agent-name> --output-dir <path>`
+so the same run produces a signed markdown comment plus machine-readable smoke and
+contract-drift artifacts under one directory.
+
 The backend-owned reusable API packet for that final handoff lives in
 `docs/BACKEND_API_EXAMPLE_PACKET.md`; issue #11 and future QA runs should point at that
 doc instead of reconstructing payloads from PR review threads.

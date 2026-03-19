@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { buildSnapshot, assertNoDrift } from "../../scripts/check-runtime-contract-drift.js";
 
@@ -75,7 +77,11 @@ export function formatEpic2OnboardingEvidence({
   ].join("\n");
 }
 
-export async function runEpic2OnboardingEvidence({ log = console.log, signature } = {}) {
+export async function runEpic2OnboardingEvidence({
+  log = console.log,
+  outputDir,
+  signature
+} = {}) {
   let onboardingSmokeModule;
 
   try {
@@ -108,14 +114,50 @@ export async function runEpic2OnboardingEvidence({ log = console.log, signature 
     contractDrift,
     signature
   });
+  const artifactPaths = await writeEpic2OnboardingArtifacts({
+    markdown,
+    outputDir,
+    summary,
+    contractDrift
+  });
 
   log(markdown);
 
   return {
+    artifactPaths,
     summary,
     logLines,
     contractDrift,
     markdown
+  };
+}
+
+export async function writeEpic2OnboardingArtifacts({
+  markdown,
+  outputDir,
+  summary,
+  contractDrift
+} = {}) {
+  if (!outputDir) {
+    return null;
+  }
+
+  const resolvedOutputDir = path.resolve(outputDir);
+  const markdownPath = path.join(resolvedOutputDir, "epic2-onboarding-evidence.md");
+  const summaryPath = path.join(resolvedOutputDir, "onboarding-smoke-summary.json");
+  const contractDriftPath = path.join(resolvedOutputDir, "onboarding-contract-drift.json");
+
+  await mkdir(resolvedOutputDir, { recursive: true });
+  await Promise.all([
+    writeFile(markdownPath, `${markdown}\n`, "utf8"),
+    writeFile(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8"),
+    writeFile(contractDriftPath, `${JSON.stringify(contractDrift, null, 2)}\n`, "utf8")
+  ]);
+
+  return {
+    markdownPath,
+    summaryPath,
+    contractDriftPath
   };
 }
 
@@ -125,19 +167,24 @@ export function parseEpic2OnboardingEvidenceArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
 
-    if (arg === "--signature") {
+    if (arg === "--signature" || arg === "--output-dir") {
       const value = argv[index + 1];
 
       if (!value || value.startsWith("--")) {
-        throw new Error("--signature requires a value");
+        throw new Error(`missing value for ${arg}`);
       }
 
-      options.signature = value;
+      if (arg === "--signature") {
+        options.signature = value;
+      } else {
+        options.outputDir = value;
+      }
+
       index += 1;
       continue;
     }
 
-    throw new Error(`Unknown argument: ${arg}`);
+    throw new Error(`unknown argument: ${arg}`);
   }
 
   return options;
