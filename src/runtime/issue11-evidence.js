@@ -11,11 +11,15 @@ export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
   const negativePaths = findScenario(summary, "negative-paths");
   const evidenceLog = logLines.join("\n");
   const signedNote = signature ? `\n--${signature}` : "";
+  const evidenceCommand = signature
+    ? `npm run --silent smoke:issue11 -- --signature ${signature}`
+    : "npm run --silent smoke:issue11";
 
   return [
     "## Issue #11 executable smoke evidence",
     "",
-    `- Command: \`${summary.command}\``,
+    `- Evidence command: \`${evidenceCommand}\``,
+    `- Underlying smoke suite: \`${summary.command}\``,
     "- API examples: `docs/BACKEND_API_EXAMPLE_PACKET.md`",
     "- Handoff contract: `docs/RUNTIME_EXECUTION_HANDOFF.md`",
     "",
@@ -24,13 +28,17 @@ export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
     `- status: ${happyPath.status}`,
     `- taskId: \`${happyPath.taskId}\``,
     `- bidId: \`${happyPath.bidId}\``,
+    `- proofId: \`${happyPath.proofId}\``,
+    `- policyTraceId: \`${happyPath.policyTraceId}\``,
+    `- decisionTraceHash: \`${happyPath.decisionTraceHash}\``,
+    `- awardAuditId: \`${happyPath.awardAuditId}\``,
     `- verificationResult: \`${happyPath.verificationResult}\``,
     "",
     "### Negative checks",
     "",
     `- invalid signature: \`${invalidSignature.result}\` (${invalidSignature.reasonCodes.join(", ")})`,
     `- reveal without commit: \`${negativePaths.revealWithoutCommit}\``,
-    `- proof fail: \`${negativePaths.proofFail}\``,
+    `- proof fail: \`${negativePaths.proofFail}\` (${negativePaths.proofFailReasonCodes.join(", ")})`,
     `- award blocked: \`${negativePaths.awardBlocked}\``,
     "",
     "### Smoke log",
@@ -51,6 +59,7 @@ export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
 export async function runIssue11Evidence({ log = console.log, signature } = {}) {
   const logLines = [];
   const summary = await runDispatchSmokeSuite({
+    command: "npm run smoke:dispatch",
     log: (line) => {
       logLines.push(line);
     }

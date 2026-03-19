@@ -42,8 +42,9 @@ may choose the final script names, but they must surface one canonical command p
 their PR body and linked issue comments.
 
 For the current `main` runtime baseline, QA can use `npm run --silent smoke:issue11 -- --signature <agent-name>`
-to turn the merged smoke suite into one ready-to-paste issue `#11` evidence packet without
-manually rewriting the ids, error codes, or PASS-line transcript.
+as the canonical backend-owned issue `#11` evidence command. It turns the merged smoke suite
+into one ready-to-paste packet without manually rewriting the task/bid/proof ids, error
+codes, PASS-line transcript, or decision-trace fields.
 
 ## Evidence package
 
