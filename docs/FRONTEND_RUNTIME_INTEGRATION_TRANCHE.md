@@ -24,6 +24,7 @@ Execution dependencies remain explicit:
 - closed QA contract-drift sweep snapshot: `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` (captured after issue [#120](https://github.com/jckhang/agent-indeed/issues/120) closed on 2026-03-16)
 - live smoke evidence umbrella: [#11](https://github.com/jckhang/agent-indeed/issues/11)
 - closed frontend consumer verification pass: [#150](https://github.com/jckhang/agent-indeed/issues/150)
+- surviving frontend PR follow-through: [#200](https://github.com/jckhang/agent-indeed/pull/200)
 
 ## Consumer verification pass (2026-03-18)
 
@@ -41,7 +42,7 @@ Closed issue [#150](https://github.com/jckhang/agent-indeed/issues/150) captured
 Result:
 - checked-in contract surfaces verified for frontend documentation against the current API drafts
 - no new published-contract blocker found in the linked manager/agent docs during this pass
-- remaining risk stays in runtime execution readiness on top of the closed implementation baselines from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) and [#115](https://github.com/jckhang/agent-indeed/issues/115), plus the still-open smoke evidence follow-through in [#11](https://github.com/jckhang/agent-indeed/issues/11); the dated drift baseline now lives in `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md`, not in any open issue thread
+- remaining risk stays in runtime execution readiness on top of the closed implementation baselines from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) and [#115](https://github.com/jckhang/agent-indeed/issues/115), plus the still-open smoke evidence follow-through in [#11](https://github.com/jckhang/agent-indeed/issues/11) and PR [#200](https://github.com/jckhang/agent-indeed/pull/200); the dated drift baseline now lives in `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md`, not in any open issue thread
 
 Issue [#157](https://github.com/jckhang/agent-indeed/issues/157) narrows the review rule for this pass: if the docs say a read is part of the checked-in API baseline, reviewers should be able to find the exact path plus response type in both `src/api/openapi.yaml` and `src/api/contracts.ts`. A local stack still returning empty or lagging projection data is a runtime readiness gap, not proof that the contract path is unpublished.
 
@@ -50,7 +51,7 @@ Issue [#157](https://github.com/jckhang/agent-indeed/issues/157) narrows the rev
 Keep the post-merge follow-up list short and tied to currently published contracts:
 
 1. Runtime parity for award and verification refresh still depends on keeping the running service aligned with the closed implementation baselines from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) and [#115](https://github.com/jckhang/agent-indeed/issues/115), even though the read contracts are already present in the checked-in API drafts.
-2. QA still needs executable evidence that the publish -> shortlist -> commit -> reveal -> verification -> award path behaves the same under runtime conditions; `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` is the last closed drift-sweep snapshot, while issue [#11](https://github.com/jckhang/agent-indeed/issues/11) is the live smoke-evidence thread.
+2. QA still needs executable evidence that the publish -> shortlist -> commit -> reveal -> verification -> award path behaves the same under runtime conditions; `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` is the last closed drift-sweep snapshot, while issue [#11](https://github.com/jckhang/agent-indeed/issues/11) and PR [#200](https://github.com/jckhang/agent-indeed/pull/200) are the live smoke-evidence threads.
 3. Frontend docs should only describe a surface as part of the checked-in API baseline when reviewers can find both the exact path and the response type in `src/api/openapi.yaml` and `src/api/contracts.ts`; otherwise, record the gap as a follow-up instead of broadening runtime scope.
 
 ## Executable follow-up slice for issue #188
@@ -86,7 +87,7 @@ Reviewer quick-check on a fresh `origin/main` sync:
 - `git show origin/main:src/api/openapi.yaml | rg -n "/v1/tasks/\\{taskId\\}/(candidates|award|bids/\\{bidId\\}|proofs/\\{proofId\\})"`
 - `git show origin/main:src/api/contracts.ts | rg -n "interface (CandidateMatchListResponse|AwardDecisionDetail|BidStatusResponse|ProofStatusResponse)"`
 
-If a local runtime instance does not return those reads yet, treat that as runtime implementation lag relative to the closed baselines from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) / [#115](https://github.com/jckhang/agent-indeed/issues/115), not as permission for frontend docs to downgrade the checked-in contract baseline or relabel a published path as pending.
+If a local runtime instance does not return those reads yet, treat that as runtime implementation lag relative to the closed baselines from issues [#110](https://github.com/jckhang/agent-indeed/issues/110) / [#115](https://github.com/jckhang/agent-indeed/issues/115), and capture it on issue [#11](https://github.com/jckhang/agent-indeed/issues/11) or PR [#200](https://github.com/jckhang/agent-indeed/pull/200) instead of downgrading the checked-in contract baseline or relabeling a published path as pending.
 
 When this document says a surface is part of the checked-in API baseline, it means the path and response type are present in both checked-in API drafts; it does not mean every local runtime environment already serves populated projection data.
 
@@ -532,7 +533,7 @@ This runbook is the minimum reproducible handoff carried forward from closed iss
 
 ### 4. Capture evidence
 
-Record the following in the linked PR and, if new drift is discovered, in a fresh follow-up issue instead of reopening closed issue [#136](https://github.com/jckhang/agent-indeed/issues/136):
+Record the following in issue [#11](https://github.com/jckhang/agent-indeed/issues/11), PR [#200](https://github.com/jckhang/agent-indeed/pull/200), and, if new drift is discovered, a fresh follow-up issue instead of reopening closed issue [#136](https://github.com/jckhang/agent-indeed/issues/136):
 - runtime base commit or image/version under test
 - task id, bid id, and proof id used in the smoke path
 - whether manager shortlist and award-readiness reads returned runtime data
@@ -552,6 +553,6 @@ Whenever this handoff is referenced from a PR or issue comment:
 | --- | --- |
 | At least one manager flow and one agent flow execute against local runtime APIs end-to-end. | The runbook defines one concrete manager path and one concrete agent path against merged runtime endpoints on `main`. |
 | UI state transitions reflect runtime statuses and error reasons instead of placeholder-only states. | Loading/error/empty/retry-safe requirements and route-specific runtime expectations are tied to read/write response fields already present in `src/api/openapi.yaml` and `src/api/contracts.ts`. |
-| A reproducible local runbook and evidence links are posted back to the active PR or a new follow-up issue. | The local runtime runbook specifies the minimum evidence to post back to the current PR and any newly filed follow-up. |
+| A reproducible local runbook and evidence links are posted back to the live frontend evidence lane. | The local runtime runbook specifies the minimum evidence to post back to issue #11, PR #200, and any newly filed follow-up. |
 | Progress references the runtime implementation baseline without treating closed issues as active blockers. | The closed #110 / #115 baselines remain visible in the objective, execution dependency list, and runbook, while active smoke evidence stays on issue #11. |
 | Duplicate runtime docs are collapsed into one mergeable frontend handoff. | Issue #145 now points PRs #122, #125, and #132 at this tranche as the canonical merged-baseline handoff for wiring, payloads, and replay guidance. |

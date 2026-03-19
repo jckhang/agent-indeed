@@ -51,7 +51,7 @@ Scope:
 - PoMW verification baseline with identity-tier policy.
 - Auditable award events and minimal reputation writeback hook.
 - Lifecycle observability baseline for `upload -> match -> bid -> verify -> award`.
-- Closed-beta evidence handoff stays concentrated on issue #11 plus the canonical runtime command path in `docs/RUNTIME_EXECUTION_HANDOFF.md`.
+- Closed-beta evidence handoff stays concentrated on issue #11, `smoke:issue11`, the canonical runtime handoff docs, and PR #200.
 
 Exit criteria:
 - Core APIs available and documented in `src/api/openapi.yaml`.
@@ -66,7 +66,7 @@ Focus:
 - Clear the planning/reference review blockers on PR #174 and PR #176 so post-runtime docs stop pointing at closed issues.
 - Land one surviving planning rollup for issue #167; use PR #179 as the preferred branch to absorb the refresh and close or supersede overlapping older planning PRs (#171, #154, #165, #166, #161, #153).
 - Keep PR #133 aligned to the published verify/award contract vocabulary after the planning refresh settles.
-- Move QA evidence forward through issue #11 and the canonical runtime handoff docs instead of reopening closed issue #120 or other merged formatter follow-ups.
+- Move frontend runtime evidence forward through issue #11, `smoke:issue11`, the canonical runtime handoff docs, and PR #200 instead of reopening closed issue #120 or other merged formatter follow-ups.
 
 De-scoped from current sprint:
 - Planning-only follow-ups #106, #107, #108 were closed to avoid additional doc-layer churn.
@@ -79,7 +79,7 @@ De-scoped from current sprint:
 2. Merge PR #176 (`docs: codify planning reference rules`) so contributor guidance matches the post-runtime review workflow.
 3. Refresh and merge PR #179 (`[P1-167] Refresh planning docs to post-runtime baseline`) as the single surviving planning rollup for issue #167.
 4. Close, restack, or fold overlapping planning refresh PRs (#171, #154, #165, #166, #161, #153) behind the merged #167 rollup instead of keeping multiple conflicting status snapshots open.
-5. Revisit PR #133 once the planning baseline is stable, then keep the canonical smoke evidence path anchored to issue #11 plus `docs/RUNTIME_EXECUTION_HANDOFF.md`.
+5. Revisit PR #133 once the planning baseline is stable, then keep the canonical smoke evidence path anchored to issue #11, `smoke:issue11`, `docs/RUNTIME_EXECUTION_HANDOFF.md`, and PR #200.
 
 ### Phase 2: Execution & Trust Loop (Target: 2026-05 to 2026-06)
 
@@ -106,7 +106,7 @@ Scope:
 - M0 (Week 0): contribution workflow + tech stack baseline + P0 issue cleanup.
 - M0.5 (Week 0): architecture gap assessment + FE/BE track plan + hiring gap plan.
 - M1 (2026-03-20): close post-runtime planning/reference drift (#167, PR #174, PR #176) and keep verify/award follow-through on PR #133 tied to the merged contract baseline.
-- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while backend and QA publish one canonical smoke evidence path through issue #11 and `docs/RUNTIME_EXECUTION_HANDOFF.md`.
+- M2 (2026-03-27): hold the merged publish/match/commit/reveal/verify/award slice steady while the frontend evidence lane keeps issue #11, `smoke:issue11`, `docs/RUNTIME_EXECUTION_HANDOFF.md`, and PR #200 in sync.
 - M3 (2026-04-03): stabilize verify/award/audit evidence and run executable smoke checks against the merged runtime baseline.
 - M4 (2026-04-10): complete E2E coverage + audit/reputation hardening + security/compliance readiness review.
 - M4 readiness also requires `docs/OBSERVABILITY_BASELINE.md`, `docs/MVP_TELEMETRY_HANDOFF.md`, and `docs/CLOSED_BETA_SECURITY_READINESS.md` so telemetry owners plus auth, secret-handling, and redaction follow-ons stay reviewable.
