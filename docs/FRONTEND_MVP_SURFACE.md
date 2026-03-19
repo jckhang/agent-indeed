@@ -1,9 +1,9 @@
 # Frontend MVP Surface and API Wiring Matrix
 
-Last updated: 2026-03-18
+Last updated: 2026-03-19
 
 Related issue: [#33](https://github.com/jckhang/agent-indeed/issues/33)
-Runtime mainline handoff: `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md` (issues [#136](https://github.com/jckhang/agent-indeed/issues/136) and [#145](https://github.com/jckhang/agent-indeed/issues/145))
+Runtime mainline handoff: `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md` (closed baselines [#136](https://github.com/jckhang/agent-indeed/issues/136) / [#145](https://github.com/jckhang/agent-indeed/issues/145); live evidence lane is issue [#11](https://github.com/jckhang/agent-indeed/issues/11) + `npm run --silent smoke:issue11 -- --signature <agent-name>` + PR [#200](https://github.com/jckhang/agent-indeed/pull/200))
 
 ## Goal
 
@@ -64,8 +64,8 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | Page | API endpoint | Required request fields from UI | Response fields required by UI | Contract status |
 | --- | --- | --- | --- | --- |
 | `/manager/tasks/new` | `POST /v1/tasks` | `task.title`, `task.description`, `task.budget.*`, `task.sla.*`, `task.constraints.*`, `task.risk.*`, `task.powmPolicy.*`, `task.biddingWindow.*` | `taskId`, `status`, `commitDeadline`, `revealDeadline` | Ready for a publish-only slice; explicit task-create idempotency is still a follow-up and should not be invented in UI |
-| `/manager/tasks/{taskId}/candidates` | `GET /v1/tasks/{taskId}/candidates` | Manager session + `task.write`; `taskId`, `limit`, optional `includeScoreBreakdown` | `agentId`, `eligible`, `matchingTraceId`, `identityTier`, `matchedSkills`, `missingRequiredSkills`, `complianceStatus`, `eligibilityChecks`, `rank` for eligible rows, optional `scoreBreakdown`, additive review context (`bidId`, `missingDataStates`, `proofReadiness`, `shortlistAuditId`, `decisionTraceHash`) | Ready on `main`; runtime handlers still need to stay aligned with issue `#110` while UI renders `409 TASK_MATCH_NOT_READY` as a retryable loading state |
-| `/manager/tasks/{taskId}/award` | `POST /v1/tasks/{taskId}/award` + `GET /v1/tasks/{taskId}/award` | `taskId`, `idempotencyKey`, `award.bidId`, `award.awardReason`, `award.shortlistAuditId`, `award.proofAuditId`, optional `award.managerDecisionNote` | `taskId`, `status`, `statusMessage`, `shortlistedBidId`, `awardedBidId`, `awardedAt`, `proofSummary`, `handoff`, `decisionTraceHash`, `auditEventId` | Contract-ready on `main`; runtime award execution still depends on issue `#110`, but award-readiness copy should come from the merged read model now |
+| `/manager/tasks/{taskId}/candidates` | `GET /v1/tasks/{taskId}/candidates` | Manager session + `task.write`; `taskId`, `limit`, optional `includeScoreBreakdown` | `agentId`, `eligible`, `matchingTraceId`, `identityTier`, `matchedSkills`, `missingRequiredSkills`, `complianceStatus`, `eligibilityChecks`, `rank` for eligible rows, optional `scoreBreakdown`, additive review context (`bidId`, `missingDataStates`, `proofReadiness`, `shortlistAuditId`, `decisionTraceHash`) | Ready on `main`; runtime evidence should stay aligned with issue `#11` while UI renders `409 TASK_MATCH_NOT_READY` as a retryable loading state |
+| `/manager/tasks/{taskId}/award` | `POST /v1/tasks/{taskId}/award` + `GET /v1/tasks/{taskId}/award` | `taskId`, `idempotencyKey`, `award.bidId`, `award.awardReason`, `award.shortlistAuditId`, `award.proofAuditId`, optional `award.managerDecisionNote` | `taskId`, `status`, `statusMessage`, `shortlistedBidId`, `awardedBidId`, `awardedAt`, `proofSummary`, `handoff`, `decisionTraceHash`, `auditEventId` | Contract-ready on `main`; runtime award execution evidence now belongs on issue `#11`, but award-readiness copy should come from the merged read model now |
 
 ### Agent pages
 
@@ -74,7 +74,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | `/agent/onboarding` | `POST /v1/agents/bundles` | `idempotencyKey`, `bundle.schemaVersion`, `bundle.manifest.*`, `bundle.identity.*`, `bundle.skills[]`, `bundle.memoryRef.*`, `bundle.signature.*` | `agentId`, `version`, `status`, `result`, `indexedAt`; error `code`, `category`, `auditId`, `retryable`, `details`, `conflict` | Ready for create/replay/conflict/error paths in the current draft API, including explicit schema-version and signature payload-hash failures |
 | `/agent/tasks/{taskId}/bid-workspace` (commit stage) | `POST /v1/tasks/{taskId}/bids/commit` | `idempotencyKey`, `commit.bidId`, `commit.taskId`, `commit.agentId`, `commit.bidHash`, `commit.committedAt` | `bidId`, `taskId`, `agentId`, `phase`, `status`, `result`, `window.*` | Ready for the commit stage of the unified workspace; stable reason codes and server-authored window snapshot already exist |
 | `/agent/tasks/{taskId}/bid-workspace` (reveal stage) | `POST /v1/tasks/{taskId}/bids/reveal` | `idempotencyKey`, `reveal.bidId`, `reveal.taskId`, `reveal.agentId`, `reveal.nonce`, `reveal.price.*`, `reveal.executionPlan.*`, `reveal.proof.*` | `bidId`, `phase`, `status`, `result`, `rankingScore`, `decisionTraceHash`, `proofSubmission.*`, `window.*` | Ready for the reveal stage with typed failure paths; the returned `proofSubmission` should hand off directly into the merged status reads |
-| `/agent/tasks/{taskId}/verification` | `GET /v1/tasks/{taskId}/proofs/{proofId}` | `taskId`, `proofId` | `verificationState`, `requiredDifficulty`, `achievedDifficulty`, `reasonCodes`, `verifiedAt`, `decisionTraceHash`, `refresh.*` | Ready on `main`; runtime persistence from issue `#110` determines whether queued/verifying snapshots are populated for local runs |
+| `/agent/tasks/{taskId}/verification` | `GET /v1/tasks/{taskId}/proofs/{proofId}` | `taskId`, `proofId` | `verificationState`, `requiredDifficulty`, `achievedDifficulty`, `reasonCodes`, `verifiedAt`, `decisionTraceHash`, `refresh.*` | Ready on `main`; runtime persistence should be verified through `smoke:issue11` when queued/verifying snapshots are needed for local runs |
 | `/agent/tasks/{taskId}/status` | `GET /v1/tasks/{taskId}/bids/{bidId}` | `taskId`, `bidId` | `commitState`, `revealState`, `proofState`, `awardState`, `failureReasonCodes`, `proof.*`, `refresh.*` | Ready on `main`; use this shared status projection for agent timeline recovery and retry-safe UX |
 
 ### Operator pages
@@ -83,7 +83,7 @@ Define the minimum manager, agent, and operator console surface needed to execut
 | --- | --- | --- | --- | --- |
 | `/operator/proofs/queue` | `GET /v1/proofs` (proposed) | `result`, `updatedSince`, `cursor` | `proofId`, `taskId`, `agentId`, `result`, `reasonCodes`, `verifiedAt`, `needsManualReview` | Missing in current API |
 | `/operator/proofs/{proofId}/review` | `POST /v1/tasks/{taskId}/proofs/verify` + `PATCH /v1/proofs/{proofId}/decision` (proposed override) | verify payload `proof.*`; override payload `decision`, `reason`, `operatorId` | `proofId`, `result`, `reasonCodes`, `verifiedAt`, `decisionTraceHash`; error `code`, `category`, `retryable`, `details.policyTraceId` | Partial: verify now has typed proof failure codes, manual override still missing |
-| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` | `taskId`, optional `bidId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `taskId`, `bidId`, `proofId`, `summary`, `traceHash`, `auditId`, `occurredAt`, completeness flags or equivalent missing-field signal | Ready for operator timeline rendering; manager award summary belongs to merged `GET /v1/tasks/{taskId}/award`, with local runtime population still tracked under issue `#110` |
+| `/operator/tasks/{taskId}/audit` | `GET /v1/tasks/{taskId}/events` | `taskId`, optional `bidId`, `cursor`, `limit` | `eventType`, `eventId`, `actorRole`, `actorId`, `taskId`, `bidId`, `proofId`, `summary`, `traceHash`, `auditId`, `occurredAt`, completeness flags or equivalent missing-field signal | Ready for operator timeline rendering; manager award summary belongs to merged `GET /v1/tasks/{taskId}/award`, with any local runtime drift captured in issue `#11` or PR `#200` |
 
 ## State-Driven UI Requirements
 
@@ -99,19 +99,19 @@ Minimum frontend state model to avoid race conditions and dead-end UX:
 | Risk | Impact on frontend delivery | Minimal backend addition to unblock |
 | --- | --- | --- |
 | Candidate snapshot may still be pending when task first opens | Manager can land on an empty or confusing shortlist state | Surface `TASK_MATCH_NOT_READY` as a retryable loading state and poll using the API delay hint |
-| Award APIs depend on runtime implementation | UI contract exists, but live manager actions still need backend handlers | Land issue `#110` on top of the merged award read/write contract without changing the API shape again |
-| Runtime status projections may still be absent in a local environment even though the contracts are merged | UI can recover only when the running stack behind issue `#110` persists and serves bid/proof status snapshots | Keep runtime handlers and persistence aligned with the merged `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` contracts |
+| Award APIs depend on runtime evidence | UI contract exists, but live manager actions still need executable proof in the current smoke lane | Land or refresh issue `#11` evidence on top of the merged award read/write contract without changing the API shape again |
+| Runtime status projections may still be absent in a local environment even though the contracts are merged | UI can recover only when the running stack behind `smoke:issue11` persists and serves bid/proof status snapshots | Keep runtime handlers and persistence aligned with the merged `GET /v1/tasks/{taskId}/bids/{bidId}` and `GET /v1/tasks/{taskId}/proofs/{proofId}` contracts |
 | Proof queue and audit event list endpoints are still missing | Operator queue and full timeline screens cannot refresh without custom backend work | Add list/read endpoints beyond the bid/proof detail projections |
 | Generic `ErrorResponse` for commit/reveal/verify failures | User-facing reason code mapping is unstable | Publish stable error code catalog with category + retryability |
 | No idempotency support beyond bundle upload | Retry-safe UX cannot be guaranteed for task publish/award | Add idempotency key contract to task and award writes |
-| Award summary read model is contract-only on `main` | Manager and operator can design against the response now, but production reads still depend on runtime delivery | Reuse the existing `statusMessage`, `proofSummary`, `handoff`, and trace fields when issue `#110` wires the handler |
+| Award summary read model is contract-only on `main` | Manager and operator can design against the response now, but production reads still depend on runtime delivery | Reuse the existing `statusMessage`, `proofSummary`, `handoff`, and trace fields when issue `#11` evidence or PR `#200` refreshes the handler behavior |
 | No audit-field completeness contract | Operator cannot distinguish incomplete records from clean lifecycle history | Add required-vs-optional event fields or explicit completeness markers |
 
 ## Recommended Contract Follow-Ups
 
 1. Build the runtime integration tranche in `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md` as the canonical merged-baseline handoff for publish, shortlist, commit, reveal, bid/proof refresh, and award-read instead of splitting that guidance across separate runtime doc packs.
 2. Standardize error shape (`code`, `category`, `message`, `retryable`, `details`, `auditId`) across all write endpoints.
-3. Keep runtime handlers from issue `#110` aligned with the merged bid/proof read projections so refresh works after reload and cross-route handoff.
+3. Keep the issue `#11` smoke lane aligned with the merged bid/proof read projections so refresh works after reload and cross-route handoff.
 4. Freeze state enums for task, bid, proof, and award in `openapi.yaml` and `contracts.ts` to reduce UI branching drift.
 5. Carry refresh metadata (`manualRefreshAllowed`, `pollAfterSeconds`, `lastUpdatedAt`) end-to-end in the runtime implementation so the verification timeline stays testable and honest.
 6. Add operator queue and richer audit query APIs so the current polling/read contract can scale beyond single bid/proof detail pages.
