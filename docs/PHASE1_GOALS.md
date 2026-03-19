@@ -17,15 +17,15 @@ Ship the first usable agent dispatch loop for closed beta:
 
 - The runtime pivot delivered its baseline implementation threads and now moves into evidence and planning cleanup.
 - Runtime cutline decisions for open contract PRs live in `docs/RUNTIME_CUTLINE_2026-03-16.md`; use that table to decide which deltas block follow-through versus which are additive-safe.
-- Runtime command/evidence expectations live in `docs/RUNTIME_EXECUTION_HANDOFF.md`; use that handoff contract when issue #177, issue #178, or issue #11 claims executable progress.
+- Runtime command/evidence expectations live in `docs/RUNTIME_EXECUTION_HANDOFF.md`; use that handoff contract when checking progress against the closed implementation baselines from issues #109 and #110, the dated drift snapshot in `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md`, and the still-open smoke thread in issue #11.
 - Closed baseline issues from the pivot:
   - #109 backend runtime skeleton
   - #110 runnable dispatch vertical slice
   - #111 executable QA smoke/E2E checks
 - Active follow-through threads for the pivot:
   - #167 planning-doc refresh to the post-runtime baseline
-  - #177 canonical backend smoke formatter and evidence block
-  - #178 formatter-backed smoke pass that feeds issue #11
+  - issue #11 as the live smoke evidence umbrella for the canonical handoff command in `docs/RUNTIME_EXECUTION_HANDOFF.md`
+  - new runtime/QA follow-up issues only when fresh drift appears beyond the closed `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` snapshot
 - Planning-only follow-ups (#106, #107, #108) were closed to keep sprint bandwidth on runtime delivery.
 - QA prewrite-only tracks (#87, PR #84, PR #104) remain superseded by the executable evidence path on issue #11.
 - Closed issue #120 is a dated QA sweep baseline, not an active blocker.
@@ -37,7 +37,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - `AgentBundle` schema finalized (`manifest`, `identity`, `skills`, `memoryRef`).
 - Upload validation pipeline implemented (signature, schema, indexing, version conflict).
 - Memory supports index/encrypted reference mode (no raw memory required).
-- Onboarding write/read behavior is backed by the merged runtime baseline from issues #109 and #110.
+- Onboarding write/read behavior must stay executable from a local running service, using closed issues #109 and #110 as the baseline reference.
 
 ### G2. Task publication and matching baseline
 
@@ -49,21 +49,21 @@ Ship the first usable agent dispatch loop for closed beta:
   - compliance flags
 - Candidate shortlist read model also exposes additive review context (`missingDataStates`, `proofReadiness`, `shortlistAuditId`) so manager review does not hide partial evidence.
 - Candidate retrieval exposes a retryable "snapshot pending" state instead of returning an ambiguous empty shortlist during matching materialization.
-- Candidate shortlist behavior is expected to reflect the merged runtime baseline, not docs-only assumptions.
+- Candidate shortlist behavior must be backed by runtime state, not docs-only assumptions, with closed issue #110 treated as the baseline reference.
 - Soft ranking baseline:
   - success rate
   - latency
   - budget fit
   - historical similarity
-- Manager console baseline is captured in `docs/MANAGER_CONSOLE_BASELINE.md` so task publish, shortlist review, and award-state acceptance criteria stay reviewable while shortlist/award read-model gaps are still backend follow-ups.
-- The focused shortlist/award manager review slice is captured in `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` so fallback states and award blockers stay explicit while shortlist/award contracts remain under review.
+- Manager console baseline is captured in `docs/MANAGER_CONSOLE_BASELINE.md` so task publish, shortlist review, and award-state acceptance criteria stay reviewable while runtime execution catches up to the merged shortlist/award contracts on `main`.
+- The focused shortlist/award manager review slice is captured in `docs/MANAGER_SHORTLIST_REVIEW_AWARD_READINESS_UI_SLICE.md` so fallback states and award blockers stay explicit while runtime parity and QA evidence continue to close behind the merged contracts.
 
 ### G3. Bidding and PoMW baseline
 
 - Commit-reveal bidding APIs available.
 - Reveal rejected when no valid commit exists.
 - `ProofPack` accepted and verified with T0/T1/T2 policy mapping.
-- Commit/reveal/verify/award transitions persist through the merged runtime path and still need canonical smoke evidence for issue #11.
+- Commit/reveal/verify/award transitions must persist through the merged runtime path and still need canonical smoke evidence for issue #11, using closed issue #110 as the implementation baseline reference.
 - Runtime implementers should treat `docs/RUNTIME_CUTLINE_2026-03-16.md` as the current go/no-go rule for open contract PR dependencies while the follow-through stack finishes converging.
 - Agent bidding console baseline is captured in `docs/AGENT_BIDDING_CONSOLE_BASELINE.md`, with focused follow-through in `docs/AGENT_BID_COMMIT_REVEAL_WORKSPACE.md`, `docs/AGENT_VERIFICATION_TIMELINE_BASELINE.md`, and `docs/FRONTEND_RUNTIME_INTEGRATION_TRANCHE.md`, so commit/reveal and verification acceptance criteria stay tied to the merged bid/proof read contracts.
 - Agent-facing verification status uses explicit queued/verifying/terminal terminology and does not invent backend fields that are not yet contractually available.
@@ -98,7 +98,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Implementation-scoped issues are closed only when runtime code or executable test coverage is merged.
 - End-to-end happy path + key negative paths are covered by automated tests.
 - One local command path can run service + smoke checks for happy path and core negatives.
-- The canonical command path and evidence handoff into issue #11 are documented in `docs/RUNTIME_EXECUTION_HANDOFF.md` and the active formatter/smoke follow-through threads.
+- The canonical command path and evidence handoff into issue #11 are documented in `docs/RUNTIME_EXECUTION_HANDOFF.md`; closed formatter/drift work should stay as baseline references or dated snapshots rather than active blockers.
 - GitHub issues for Phase 1 epics/tasks are created and linked to this plan.
 - Every active P1 issue/PR is discoverable from the M1-M4 milestone links in `docs/PHASE1_CHECKPOINT_BOARD.md`.
 - Weekly epic #2 checkpoints use `docs/PHASE1_EPIC_CHECKPOINT_TEMPLATE.md` so owner handoffs and validation-evidence gaps stay consistent across review weeks.
