@@ -8,6 +8,8 @@ This directory holds the first runnable backend control-plane scaffold for Agent
 - Start with file watching: `npm run dev`
 - Run the end-to-end dispatch smoke suite: `npm run smoke:dispatch`
 - Print an issue-ready issue `#11` evidence packet: `npm run --silent smoke:issue11 -- --signature avery`
+- After the onboarding upload smoke path lands on `main`, print the epic `#2` onboarding evidence packet: `npm run --silent smoke:onboarding:evidence -- --signature avery`
+- Persist the onboarding evidence packet plus JSON artifacts locally: `npm run --silent smoke:onboarding:evidence -- --signature avery --output-dir ./artifacts/onboarding`
 - Run the built-in runtime tests: `npm test`
 - Run the bootstrap smoke flow: `npm run smoke:bootstrap`
 
@@ -63,6 +65,19 @@ npm run --silent smoke:issue11 -- --signature avery
 That command reuses the dispatch smoke suite, captures the PASS lines and JSON summary, and formats one markdown packet with the happy-path ids, negative-path reason codes, and links to the reusable handoff docs.
 
 `npm test` also shells this command end-to-end and asserts the PASS-line plus JSON-summary contract, so CI covers the exact smoke output shape that QA copies into issue evidence.
+
+After the onboarding runtime upload route merges, QA can also run:
+
+```bash
+npm run --silent smoke:onboarding:evidence -- --signature avery
+```
+
+That helper expects `src/runtime/onboarding-smoke.js` to exist on the current branch. When
+available, it reruns the onboarding smoke, confirms `npm run check:contract-drift` still
+publishes `/v1/agents/bundles`, and prints one ready-to-paste markdown packet for epic `#2`
+so issue `#206` can keep onboarding evidence separate from the issue `#11` dispatch lane.
+When `--output-dir <path>` is provided, it also writes the markdown packet plus the smoke
+summary and contract-drift confirmation as JSON files for local QA artifacts or PR uploads.
 
 Or run the bootstrap path end-to-end with one command:
 

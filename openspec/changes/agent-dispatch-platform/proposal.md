@@ -22,6 +22,7 @@
 - 增补 runtime 执行 handoff 契约，统一本地服务命令、smoke 命令与 issue #11 证据回写要求。
 - 增补 merge-evidence sweep 回写规则，要求当前 `owner:albatross` + `stream/review-burndown` 查询返回的 planning sweep issue 承接同日队列巡检，epic #2 保留跨 lane checkpoint 汇总。
 - 新增 backend API example packet，把 merged `smoke:dispatch` happy/negative path 产物整理成 issue #11 可直接引用的请求响应样例。
+- 增补 onboarding smoke evidence handoff，要求 QA 在 `smoke:onboarding` 合入 `main` 后通过固定命令 `npm run --silent smoke:onboarding:evidence -- --signature <agent-name>` 回贴上传/重放/hash-mismatch 结果，并附带 `/v1/agents/bundles` contract-drift 确认到 epic #2。
 
 ## Capabilities
 
@@ -39,6 +40,8 @@
 - 规划类 repo 文档改为稳定索引与 GitHub 查询入口，避免在仓库内复制高频变化的 issue / PR 状态。
 - 新增 `docs/MERGE_TRAIN_PLAYBOOK.md`，作为规划负责人推进 clean merge queue、dirty queue follow-up、validation evidence 审核与 blocker issue 升级的操作基线。
 - 新增 `docs/RUNTIME_EXECUTION_HANDOFF.md`，作为 runtime sprint 中 backend/QA/planning 的统一命令与证据交接基线。
+- 新增 onboarding evidence formatter 与固定 CLI 入口，减少 QA 在 epic #2 回贴上传 smoke 证据时手抄 agent/version/error code 与 route anchor，也避免评论里继续传播临时 `node ...` 调用方式。
+- 为 onboarding evidence formatter 增补 artifact export 选项，允许同一次 smoke 运行同时输出 signed markdown、smoke summary JSON 与 contract-drift JSON，便于 PR 附件和本地 QA 归档复用。
 - 明确当前 planning sweep issue 与 epic #2 的 GitHub 评论分工，并要求每次 checkpoint sweep 只保留一个 mergeable planning-sync PR，减少 review-burndown 期间重复回贴和状态漂移。
 - 将影响后续模块：Registry、Matching、Bidding、PoMW Verifier、Audit/Reputation、Settlement。
 - 该变更现阶段除了规格定义，也显式承接运行时落地任务，并要求以可执行实现和测试证据作为关闭实现 issue 的依据。

@@ -46,6 +46,11 @@ as the canonical backend-owned issue `#11` evidence command. It turns the merged
 into one ready-to-paste packet without manually rewriting the task/bid/proof ids, error
 codes, PASS-line transcript, or decision-trace fields.
 
+Once the onboarding upload smoke path lands on `main`, QA should pair that dispatch packet
+with `npm run --silent smoke:onboarding:evidence -- --signature <agent-name>` so epic `#2` gets
+the signed onboarding upload/replay/hash-mismatch transcript plus the matching
+`check:contract-drift` confirmation that `/v1/agents/bundles` is published.
+
 ## Evidence package
 
 Every PR or issue update claiming runtime progress must include enough evidence for a
@@ -76,6 +81,16 @@ Minimum evidence:
 Issue #11 remains the aggregation point for final beta-readiness evidence. Runtime PRs
 should link their evidence there rather than duplicating large transcripts across multiple
 planning docs.
+
+Epic `#2` remains the cross-lane checkpoint sink for the companion onboarding evidence in
+issue `#206`; keep the dispatch smoke transcript on issue `#11` and the onboarding upload
+smoke transcript on epic `#2` so reviewers can see both executable lanes without mixing
+their identifiers.
+
+When QA needs to attach the onboarding handoff to a PR or local evidence bundle, prefer
+`npm run --silent smoke:onboarding:evidence -- --signature <agent-name> --output-dir <path>`
+so the same run produces a signed markdown comment plus machine-readable smoke and
+contract-drift artifacts under one directory.
 
 The backend-owned reusable API packet for that final handoff lives in
 `docs/BACKEND_API_EXAMPLE_PACKET.md`; issue #11 and future QA runs should point at that
