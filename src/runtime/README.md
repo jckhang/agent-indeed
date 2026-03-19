@@ -7,6 +7,7 @@ This directory holds the first runnable backend control-plane scaffold for Agent
 - Start the service: `npm start`
 - Start with file watching: `npm run dev`
 - Run the end-to-end dispatch smoke suite: `npm run smoke:dispatch`
+- Run the onboarding upload smoke suite: `npm run smoke:onboarding`
 - Print an issue-ready issue `#11` evidence packet: `npm run --silent smoke:issue11 -- --signature avery`
 - Run the built-in runtime tests: `npm test`
 - Run the bootstrap smoke flow: `npm run smoke:bootstrap`
@@ -77,6 +78,7 @@ That command starts the runtime on an ephemeral port, checks `/healthz`, `/ready
 - `GET /healthz` - liveness and process metadata
 - `GET /readyz` - readiness plus in-memory storage checks
 - `GET /v1/runtime/summary` - counts for task/bid/proof/award/audit stores
+- `POST /v1/agents/bundles` - validate, version, and index a signed agent bundle
 - `POST /v1/tasks` - create a task using the current contract baseline
 - `GET /v1/tasks/{taskId}` - inspect a persisted task record from the runtime store
 - `GET /v1/tasks/{taskId}/award` - inspect manager-facing award readiness or awarded detail for one task
@@ -95,5 +97,7 @@ That command starts the runtime on an ephemeral port, checks `/healthz`, `/ready
 
 - Storage is intentionally in-memory for the first bootstrap slice.
 - IDs are deterministic, monotonic prefixes (`task_00000001`, `audit_00000001`, ...).
+- Agent upload ids are deterministic per manifest name (`agent_support_triage_agent`).
 - Persistence abstractions now cover task, bid, proof, award, and audit entities with deterministic ids.
+- Onboarding upload currently validates signer binding, canonical payload hash, schema version, version replay/conflict handling, and synchronous skill indexing.
 - This scaffold is the runtime base for the later dispatch vertical slice work.

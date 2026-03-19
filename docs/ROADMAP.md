@@ -52,6 +52,7 @@ Scope:
 - Auditable award events and minimal reputation writeback hook.
 - Lifecycle observability baseline for `upload -> match -> bid -> verify -> award`.
 - Closed-beta evidence handoff stays concentrated on issue #11 plus the canonical runtime command path in `docs/RUNTIME_EXECUTION_HANDOFF.md`.
+- Agent onboarding upload also has a local executable baseline through `npm run smoke:onboarding`, so epic #2 can demonstrate both onboarding and dispatch writes on `main`.
 
 Exit criteria:
 - Core APIs available and documented in `src/api/openapi.yaml`.

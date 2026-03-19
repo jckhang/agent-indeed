@@ -38,6 +38,7 @@ Ship the first usable agent dispatch loop for closed beta:
 - Upload validation pipeline implemented (signature, schema, indexing, version conflict).
 - Memory supports index/encrypted reference mode (no raw memory required).
 - Onboarding write/read behavior must stay executable from a local running service, using closed issues #109 and #110 as the baseline reference.
+- `npm run smoke:onboarding` now exercises the published `POST /v1/agents/bundles` route end-to-end, covering create, replay, and payload-hash mismatch behavior for local review.
 
 ### G2. Task publication and matching baseline
 
