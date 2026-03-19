@@ -62,6 +62,8 @@ npm run --silent smoke:issue11 -- --signature avery
 
 That command reuses the dispatch smoke suite, captures the PASS lines and JSON summary, and formats one markdown packet with the happy-path ids, negative-path reason codes, and links to the reusable handoff docs.
 
+`npm test` also shells this command end-to-end and asserts the PASS-line plus JSON-summary contract, so CI covers the exact smoke output shape that QA copies into issue evidence.
+
 Or run the bootstrap path end-to-end with one command:
 
 ```bash
