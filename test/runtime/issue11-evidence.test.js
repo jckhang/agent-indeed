@@ -1,8 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
 import { mkdtemp, readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
 import {
   formatIssue11Evidence,
@@ -127,4 +129,18 @@ test("parseIssue11EvidenceArgs rejects missing flag values and unknown arguments
     () => parseIssue11EvidenceArgs(["--bogus"]),
     /unknown argument: --bogus/
   );
+});
+
+test("issue11 evidence CLI exits non-zero for invalid flags", () => {
+  const cliPath = fileURLToPath(
+    new URL("../../src/runtime/issue11-evidence.js", import.meta.url)
+  );
+  const result = spawnSync(
+    process.execPath,
+    [cliPath, "--output-dir", "--signature", "avery"],
+    { encoding: "utf8" }
+  );
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /missing value for --output-dir/);
 });
