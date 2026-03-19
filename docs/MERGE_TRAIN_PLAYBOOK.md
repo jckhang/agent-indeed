@@ -6,6 +6,7 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
 
 - Move clean LGTM PRs quickly without reopening stale planning-doc churn.
 - Keep dirty follow-on PRs assigned, commented, and ready for their next rebase.
+- Keep at most one mergeable planning-sync PR open for a given checkpoint sweep.
 - Avoid copying volatile issue/PR state into repo docs when a GitHub query is a better source of truth.
 
 ## Queue queries
@@ -36,15 +37,16 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
    - dirty follow-ons: conflict/rebase needed, blocked by review comments, or missing literal validation evidence
 3. Merge the clean tranche in dependency-aware order, re-pulling `main` after each merge if the next PR depends on the newly merged contract/docs baseline.
 4. Before calling the queue clean, run the milestone/priority audit links and fix any missing `owner:*`, `priority/*`, `status/*`, `stream/*`, or milestone metadata on open runtime threads.
-5. For every dirty follow-on PR, leave a signed thread note that states:
+5. When multiple planning PRs cover the same checkpoint or rollup wording, choose one survivor PR, then leave signed merge/close rationale on the superseded PRs and record the survivor in the current planning sweep issue.
+6. For every dirty follow-on PR, leave a signed thread note that states:
    - the owner label already carrying the follow-up
    - why the PR is blocked or dirty
    - the exact next step (`rebase origin/main`, rerun validation, or address the named review comment)
    - whether a new blocker issue should be opened instead of growing the PR thread further
-6. Post the same-day sweep output in GitHub:
+7. Post the same-day sweep output in GitHub:
    - reply on the affected PR or live owner issue when the queue meaningfully changes
    - add or refresh the four-bucket checkpoint comment on epic #2 when the sweep changes merge order, blockers, or validation gaps
-7. Only update repo docs when the planning structure changes. Do not copy day-to-day issue/PR state into `docs/issues/PHASE1_ISSUES.md` or `docs/PHASE1_CHECKPOINT_BOARD.md`.
+8. Only update repo docs when the planning structure changes. Do not copy day-to-day issue/PR state into `docs/issues/PHASE1_ISSUES.md` or `docs/PHASE1_CHECKPOINT_BOARD.md`.
 
 ## Dirty follow-on note rubric
 
@@ -62,8 +64,9 @@ Use this rubric for frontend, backend, QA, and planning lanes so reviewers can s
 Keep the volatile merge-evidence record in GitHub, not in repo docs:
 
 1. Use the live planning sweep query plus issue #11 as the same-day sources for queue sweeps, reviewer-follow-up burndown, and validation-evidence collection.
-2. When the sweep changes the clean tranche, blocker ownership, or validation-gap list, mirror the result into epic #2 using the weekly checkpoint template below.
-3. If a blocker is resolved entirely inside one PR thread, reply on that PR with the signed validation rerun note first, then summarize the net queue change on epic #2 instead of copying the whole thread history into repo docs.
+2. Keep only one mergeable planning-sync PR attached to that sweep at a time; comment on the superseded PRs instead of keeping parallel checkpoint rewrites open.
+3. When the sweep changes the clean tranche, blocker ownership, or validation-gap list, mirror the result into epic #2 using the weekly checkpoint template below.
+4. If a blocker is resolved entirely inside one PR thread, reply on that PR with the signed validation rerun note first, then summarize the net queue change on epic #2 instead of copying the whole thread history into repo docs.
 
 ## Validation gates
 

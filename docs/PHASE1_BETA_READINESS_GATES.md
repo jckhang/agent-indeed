@@ -9,7 +9,7 @@ reviewable release gates for closed-beta readiness. It complements:
 - `docs/ROADMAP.md` for phase checkpoints and milestone dates
 - `docs/PHASE1_EPIC_STATUS.md` for the current issue/PR rollup
 - `docs/RUNTIME_CUTLINE_2026-03-16.md` for the runtime-start cutline on open contract deltas
-- `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` for the dated owner/blocker ledger during the 2026-03-20 push
+- the live planning sweep query plus issue #11 for same-day blocker/evidence handoff instead of closed historical sweep issues
 
 ## Gate Summary
 
@@ -19,7 +19,7 @@ reviewable release gates for closed-beta readiness. It complements:
 | Runtime happy-path execution | Blocked | One runnable `publish -> match -> commit -> reveal -> verify -> award` flow can be executed against a local service without manual interpretation. | issue #115, merged PR #129, merged PR #127 baseline, issue #111, issue #11 | Service run command, executable smoke/E2E output, linked request/response evidence |
 | Negative-scenario coverage | Blocked | QA can execute core failures (`invalid signature`, `reveal without commit`, `proof FAIL`, `award blocked`) with stable expected outcomes. | issue #120, issue #111, issue #11, merged PR #127 baseline, `docs/ERROR_CODE_RETRY_POLICY.md`, `docs/CLOSED_BETA_SECURITY_READINESS.md` | Runnable assertions, expected error/result matrix, regression evidence |
 | Audit evidence trail | In progress | Audit outputs expose key lifecycle transitions and award/proof context for operator review and beta sign-off. | merged PR #127, merged PR #92, `docs/MVP_TELEMETRY_HANDOFF.md`, `docs/OBSERVABILITY_BASELINE.md` | Audit event names, award trace fields, telemetry handoff checklist |
-| Execution + handoff hygiene | In progress | Roadmap/goals/epic/checkpoint docs and the live runtime queue all describe the same blockers and next actions. | issue #137, PR #140, PR #141, issue #115, PR #129, issue #120, issue #111, issue #11 | `docs/PHASE1_CHECKPOINT_BOARD.md`, `docs/PHASE1_EPIC_STATUS.md`, `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`, milestone/label queries stay aligned |
+| Execution + handoff hygiene | In progress | Roadmap/goals/epic/checkpoint docs and the live runtime queue all describe the same blockers and next actions. | issue #137, issue #115, issue #111, issue #11, current `owner:albatross` + `stream/review-burndown` planning sweep issue | `docs/PHASE1_CHECKPOINT_BOARD.md`, `docs/PHASE1_EPIC_STATUS.md`, current planning sweep query, issue #11 evidence thread, milestone/label queries stay aligned |
 
 ## Gate Details
 
@@ -38,7 +38,7 @@ Release note: if any active runtime branch changes enum names, required fields, 
 
 Happy-path readiness is runtime-first, not docs-first.
 
-While this gate remains blocked until the runnable flow exists, the runtime threads do not have to wait for every historical contract branch. Use `docs/RUNTIME_CUTLINE_2026-03-16.md` plus `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md` to separate true blockers from additive-safe follow-ups.
+While this gate remains blocked until the runnable flow exists, the runtime threads do not have to wait for every historical contract branch. Use `docs/RUNTIME_CUTLINE_2026-03-16.md` plus the current planning sweep / issue #11 evidence threads to separate true blockers from additive-safe follow-ups.
 
 Required outcome:
 
@@ -84,8 +84,8 @@ At minimum, these must stay in lockstep:
 - `docs/PHASE1_EPIC_STATUS.md`
 - `docs/PHASE1_GOALS.md`
 - `docs/ROADMAP.md`
-- `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`
-- runtime delivery threads (`#115`, `#159`, `#164`, `#165`, `#166`, `#161`, `#154`, `#153`, `#152`, `#133`, `#120`, `#111`, and blocked follow-through `#11`)
+- the current planning sweep issue returned by the `owner:albatross` + `stream/review-burndown` query
+- runtime delivery threads (`#115`, `#159`, `#164`, `#165`, `#166`, `#161`, `#154`, `#153`, `#152`, `#133`, `#111`, and blocked follow-through `#11`)
 
 ## Review Routine
 
