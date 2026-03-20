@@ -7,6 +7,7 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 import {
+  formatIssue11EvidenceCommand,
   formatIssue11Evidence,
   parseIssue11EvidenceArgs,
   readGitMetadata,
@@ -65,6 +66,18 @@ test("formatIssue11Evidence includes the smoke summary, logs, and signature", ()
   assert.match(markdown, /QUALITY_SCORE_BELOW_MINIMUM, HASHCASH_BITS_BELOW_MINIMUM/);
   assert.match(markdown, /TASK_AWARD_PRECONDITION_FAILED/);
   assert.match(markdown, /--avery/);
+});
+
+test("formatIssue11EvidenceCommand shell-quotes resolved artifact paths", () => {
+  const command = formatIssue11EvidenceCommand({
+    signature: "avery reviewer",
+    outputDir: "./artifacts/issue 11 bundle"
+  });
+
+  assert.equal(
+    command,
+    `npm run --silent smoke:issue11 -- --signature 'avery reviewer' --output-dir '${path.resolve("./artifacts/issue 11 bundle")}'`
+  );
 });
 
 test("runIssue11Evidence returns the smoke markdown packet", async () => {
@@ -177,6 +190,32 @@ test("parseIssue11EvidenceArgs rejects missing flag values and unknown arguments
     () => parseIssue11EvidenceArgs(["--bogus"]),
     /unknown argument: --bogus/
   );
+});
+
+test("issue11 evidence CLI writes artifacts for output directories with spaces", async () => {
+  const parentDir = await mkdtemp(path.join(os.tmpdir(), "issue11-evidence cli-"));
+  const outputDir = path.join(parentDir, "issue 11 bundle");
+  const cliPath = fileURLToPath(
+    new URL("../../src/runtime/issue11-evidence.js", import.meta.url)
+  );
+  const result = spawnSync(
+    process.execPath,
+    [cliPath, "--signature", "avery reviewer", "--output-dir", outputDir],
+    { encoding: "utf8" }
+  );
+
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /## Issue #11 executable smoke evidence/);
+
+  const manifest = JSON.parse(
+    await readFile(path.join(outputDir, "issue11-artifacts-manifest.json"), "utf8")
+  );
+  assert.equal(
+    manifest.evidenceCommand,
+    `npm run --silent smoke:issue11 -- --signature 'avery reviewer' --output-dir '${outputDir}'`
+  );
+  assert.equal(manifest.generatedArtifacts.markdownPath, path.join(outputDir, "issue11-evidence.md"));
+  assert.equal(manifest.generatedArtifacts.summaryPath, path.join(outputDir, "issue11-summary.json"));
 });
 
 test("issue11 evidence CLI exits non-zero for invalid flags", () => {

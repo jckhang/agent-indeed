@@ -8,15 +8,39 @@ function findScenario(summary, name) {
   return summary.scenarios.find((scenario) => scenario.name === name);
 }
 
+function formatShellArg(value) {
+  if (value === "") {
+    return "''";
+  }
+
+  if (/^[A-Za-z0-9_./:-]+$/.test(value)) {
+    return value;
+  }
+
+  return `'${value.replace(/'/g, `'\"'\"'`)}'`;
+}
+
+export function formatIssue11EvidenceCommand({ outputDir, signature } = {}) {
+  const commandParts = ["npm", "run", "--silent", "smoke:issue11", "--"];
+
+  if (signature) {
+    commandParts.push("--signature", signature);
+  }
+
+  if (outputDir) {
+    commandParts.push("--output-dir", path.resolve(outputDir));
+  }
+
+  return commandParts.map(formatShellArg).join(" ");
+}
+
 export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
   const happyPath = findScenario(summary, "happy-path");
   const invalidSignature = findScenario(summary, "invalid-signature");
   const negativePaths = findScenario(summary, "negative-paths");
   const evidenceLog = logLines.join("\n");
   const signedNote = signature ? `\n--${signature}` : "";
-  const evidenceCommand = signature
-    ? `npm run --silent smoke:issue11 -- --signature ${signature}`
-    : "npm run --silent smoke:issue11";
+  const evidenceCommand = formatIssue11EvidenceCommand({ signature });
 
   return [
     "## Issue #11 executable smoke evidence",
@@ -107,9 +131,10 @@ export async function writeIssue11Artifacts({
   const markdownPath = path.join(resolvedOutputDir, "issue11-evidence.md");
   const summaryPath = path.join(resolvedOutputDir, "issue11-summary.json");
   const manifestPath = path.join(resolvedOutputDir, "issue11-artifacts-manifest.json");
-  const evidenceCommand = signature
-    ? `npm run --silent smoke:issue11 -- --signature ${signature} --output-dir ${outputDir}`
-    : `npm run --silent smoke:issue11 -- --output-dir ${outputDir}`;
+  const evidenceCommand = formatIssue11EvidenceCommand({
+    outputDir: resolvedOutputDir,
+    signature
+  });
   const generatedAt = new Date().toISOString();
   const gitMetadata = readGitMetadata();
   const manifest = {
