@@ -13,6 +13,7 @@ const REQUIRED_RUNTIME_ROUTES = [
   "/healthz",
   "/readyz",
   "/v1/runtime/summary",
+  "/v1/agents/bundles",
   "/v1/tasks/{taskId}",
   "/v1/tasks/{taskId}/audit-events",
   "/v1/tasks/{taskId}/candidates",

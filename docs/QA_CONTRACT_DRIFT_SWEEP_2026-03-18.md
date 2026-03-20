@@ -23,7 +23,8 @@ Use `npm run check:contract-drift` when:
 
 - `src/api/openapi.yaml` and `src/api/contracts.ts` disagree on `ProofVerificationReasonCode`
 - `src/api/openapi.yaml` and `src/api/contracts.ts` disagree on `ProofVerifyErrorCode`
-- a required published runtime route disappears from OpenAPI
+- a required published runtime route disappears from OpenAPI, including the onboarding upload entry
+  point at `/v1/agents/bundles`
 
 The JSON output includes `src/api/openapi.yaml` line anchors for every required route plus
 OpenAPI/TypeScript anchors for both proof-verification enums, so review comments can cite the exact
@@ -41,6 +42,7 @@ Published runtime routes confirmed by the guard:
 - `/healthz` — `src/api/openapi.yaml:20`
 - `/readyz` — `src/api/openapi.yaml:33`
 - `/v1/runtime/summary` — `src/api/openapi.yaml:46`
+- `/v1/agents/bundles` — `src/api/openapi.yaml:59`
 - `/v1/tasks/{taskId}` — `src/api/openapi.yaml:307`
 - `/v1/tasks/{taskId}/audit-events` — `src/api/openapi.yaml:331`
 - `/v1/tasks/{taskId}/candidates` — `src/api/openapi.yaml:355`
