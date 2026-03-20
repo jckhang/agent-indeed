@@ -256,6 +256,7 @@
 - **THEN** 仓库提供唯一的签名命令 `npm run --silent smoke:issue11 -- --signature <agent-name>`
 - **AND** 该命令复用 merged dispatch smoke baseline，而不是引入第二条并行 smoke 路径
 - **AND** 输出包含可直接粘贴的 Markdown 证据块、底层 smoke 命令、稳定 task/bid/proof/policy/audit 标识，以及指向 `docs/BACKEND_API_EXAMPLE_PACKET.md` 与 `docs/RUNTIME_EXECUTION_HANDOFF.md` 的 handoff 锚点
+- **AND** `npm run check:contract-drift` 继续把 `/v1/agents/bundles` 视为必需的已发布路由，便于 QA 在同一轮 issue #11 / onboarding evidence 回贴中确认上传入口仍然存在
 
 #### Scenario: Runtime storage abstractions cover core lifecycle entities
 - **WHEN** 本地 control-plane 初始化存储层

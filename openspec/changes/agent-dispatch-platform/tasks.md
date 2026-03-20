@@ -41,6 +41,7 @@
 - [x] 5.2 打通可执行的 MVP 垂直路径（issue #110）：`publish -> match -> commit -> reveal -> verify -> award`，并持久化关键状态转移。
 - [x] 5.3 将 smoke/E2E 文档矩阵转为可执行校验（issue #111），并把验证证据回写 issue #11。
 - [x] 5.3.a 增加 QA contract-drift 回归校验（issue #120），自动比对 OpenAPI / TypeScript proof reason-code 与当前 runtime 路由基线，减少 review 期间的手工枚举漂移。
+- [x] 5.3.b 将 `/v1/agents/bundles` 纳入 QA contract-drift 发布路由基线，确保 onboarding 入口的 `main` 可见性可以和 issue #11 证据线程一起回放。
 - [x] 5.4 输出前端 runtime 集成 tranche 与本地 runbook（issue #136），串联 manager publish / shortlist / award-readiness 与 agent commit / reveal / status-refresh 路径。
 - [x] 5.5 收敛前端 runtime 文档队列（issue #145），把 wiring target、fixture pack 与 demo payload pack 合并进单一 mainline handoff。
 - [x] 5.6 输出 `docs/RUNTIME_EXECUTION_HANDOFF.md`，统一 runtime sprint 的本地命令契约、证据包与 issue #11 回写规则。
