@@ -23,6 +23,7 @@ Use these GitHub queries before a checkpoint comment so milestone views and runt
 - [Planning PRs missing work-package tags](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fplanning%22+-label%3A%22work%2Fonboarding-upload%22+-label%3A%22work%2Fevidence-handoff%22+-label%3A%22work%2Fcontract-vocabulary%22+-label%3A%22work%2Fepic-gates%22)
 - [QA PRs missing milestones](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fqa%22+no%3Amilestone)
 - [QA PRs missing work-package tags](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fqa%22+-label%3A%22work%2Fonboarding-upload%22+-label%3A%22work%2Fevidence-handoff%22+-label%3A%22work%2Fcontract-vocabulary%22+-label%3A%22work%2Fepic-gates%22)
+- Local audit mirror: `PATH="/opt/homebrew/opt/node/bin:$PATH" npm run check:work-item-metadata`
 - [Planning review-burndown queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22owner%3Aalbatross%22+label%3A%22stream%2Freview-burndown%22)
 - [Onboarding upload queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fonboarding-upload%22)
 - [Evidence handoff queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fevidence-handoff%22)

@@ -55,3 +55,4 @@
 - [x] 5.14 为 issue #186 收敛 planning sweep 规则：同一 checkpoint 只保留一个 mergeable planning-sync PR，并把 superseded PR 的 merge/close rationale 回写到 GitHub 线程。
 - [x] 5.15 为 issue #214 固化 M1 work-package 标签与 planning/QA 元数据审计查询，确保开放队列可按 onboarding upload、evidence handoff、contract vocabulary、epic gate hygiene 直接过滤。
 - [x] 5.16 为 issue #214 增补 repo-local planning/QA metadata audit 命令，允许在 merge-train sweep 中直接断言开放 PR 是否缺少 owner/priority/status/stream/work labels 或 milestone。
+- [x] 5.17 将 repo-local metadata audit 扩展到 planning/QA issue，并补齐 epic #2 的 milestone 使 issue/PR work-package 队列都能通过同一条断言。

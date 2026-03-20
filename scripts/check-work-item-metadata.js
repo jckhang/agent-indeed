@@ -1,16 +1,34 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const OWNER = "jckhang";
 const REPO = "agent-indeed";
-const REQUIRED_PREFIXES = ["owner:", "priority/", "status/", "work/"];
-const REQUIRED_STREAM_PREFIX = "stream/";
 const TRACKED_DEPARTMENTS = new Set(["dept/planning", "dept/qa"]);
+const EXACTLY_ONE_RULES = [
+  { name: "dept", match: (label) => label.startsWith("dept/") },
+  { name: "type", match: (label) => label.startsWith("type/") },
+  { name: "owner", match: (label) => label.startsWith("owner:") },
+  { name: "priority", match: (label) => label.startsWith("priority/") },
+  { name: "status", match: (label) => label.startsWith("status/") }
+];
+const REQUIRED_AT_LEAST_ONE_RULES = [
+  { name: "stream", match: (label) => label.startsWith("stream/") },
+  { name: "work", match: (label) => label.startsWith("work/") }
+];
 
 function parseArgs(argv) {
+  const kindArg = argv.find((arg) => arg.startsWith("--kind="));
+  const kind = kindArg ? kindArg.slice("--kind=".length) : "all";
+
+  if (!["all", "prs", "issues"].includes(kind)) {
+    throw new Error(`Unsupported --kind value: ${kind}`);
+  }
+
   return {
-    assert: argv.includes("--assert")
+    assert: argv.includes("--assert"),
+    kind
   };
 }
 
@@ -59,30 +77,34 @@ async function githubFetch(path, token) {
   return response.json();
 }
 
-function findMissing(labels, milestoneTitle) {
-  const missing = [];
+export function findMetadataProblems(labels, milestoneTitle) {
+  const problems = [];
 
-  for (const prefix of REQUIRED_PREFIXES) {
-    if (!labels.some((label) => label.startsWith(prefix))) {
-      missing.push(prefix);
+  for (const rule of EXACTLY_ONE_RULES) {
+    const count = labels.filter(rule.match).length;
+    if (count !== 1) {
+      problems.push(`${rule.name}=${count}`);
     }
   }
 
-  if (!labels.some((label) => label.startsWith(REQUIRED_STREAM_PREFIX))) {
-    missing.push(REQUIRED_STREAM_PREFIX);
+  for (const rule of REQUIRED_AT_LEAST_ONE_RULES) {
+    const count = labels.filter(rule.match).length;
+    if (count < 1) {
+      problems.push(`${rule.name}=0`);
+    }
   }
 
   if (!milestoneTitle) {
-    missing.push("milestone");
+    problems.push("milestone=0");
   }
 
-  return missing;
+  return problems;
 }
 
-function formatResult(issue) {
+export function formatResult(issue) {
   const labels = issue.labels.map((label) => label.name);
   const milestoneTitle = issue.milestone?.title ?? "";
-  const missing = findMissing(labels, milestoneTitle);
+  const problems = findMetadataProblems(labels, milestoneTitle);
   const department = labels.find((label) => TRACKED_DEPARTMENTS.has(label));
 
   return {
@@ -92,7 +114,7 @@ function formatResult(issue) {
     department,
     labels,
     milestoneTitle,
-    missing
+    problems
   };
 }
 
@@ -100,17 +122,15 @@ function printBucket(title, results) {
   console.log(`${title}: ${results.length}`);
   for (const result of results) {
     const milestone = result.milestoneTitle || "missing";
-    const missingSummary = result.missing.length > 0 ? result.missing.join(", ") : "none";
+    const problemSummary = result.problems.length > 0 ? result.problems.join(", ") : "none";
     console.log(
-      `- PR #${result.number} [${result.department}] milestone=${milestone} missing=${missingSummary}`
+      `- ${result.kind.toUpperCase()} #${result.number} [${result.department}] milestone=${milestone} problems=${problemSummary}`
     );
     console.log(`  ${result.url}`);
   }
 }
 
-async function main() {
-  const args = parseArgs(process.argv.slice(2));
-  const token = readGitHubToken();
+async function collectTrackedPulls(token) {
   const pulls = await githubFetch("/pulls?state=open&per_page=100", token);
   const tracked = [];
 
@@ -119,23 +139,58 @@ async function main() {
     const result = formatResult(issue);
 
     if (result.department) {
-      tracked.push(result);
+      tracked.push({
+        ...result,
+        kind: "pr"
+      });
     }
   }
 
-  const missing = tracked.filter((result) => result.missing.length > 0);
-  const healthy = tracked.filter((result) => result.missing.length === 0);
+  return tracked;
+}
 
-  console.log(`Tracked planning/QA PRs: ${tracked.length}`);
-  printBucket("Healthy", healthy);
-  printBucket("Missing metadata", missing);
+async function collectTrackedIssues(token) {
+  const issues = await githubFetch("/issues?state=open&per_page=100", token);
 
-  if (args.assert && missing.length > 0) {
+  return issues
+    .filter((issue) => !issue.pull_request)
+    .map(formatResult)
+    .filter((result) => result.department)
+    .map((result) => ({
+      ...result,
+      kind: "issue"
+    }));
+}
+
+export async function main() {
+  const args = parseArgs(process.argv.slice(2));
+  const token = readGitHubToken();
+  const trackedPulls = args.kind === "issues" ? [] : await collectTrackedPulls(token);
+  const trackedIssues = args.kind === "prs" ? [] : await collectTrackedIssues(token);
+  const tracked = [...trackedPulls, ...trackedIssues];
+  const unhealthy = tracked.filter((result) => result.problems.length > 0);
+  const healthy = tracked.filter((result) => result.problems.length === 0);
+
+  console.log(`Tracked planning/QA work items (${args.kind}): ${tracked.length}`);
+
+  if (trackedPulls.length > 0) {
+    printBucket("Healthy PRs", healthy.filter((result) => result.kind === "pr"));
+    printBucket("PRs with metadata problems", unhealthy.filter((result) => result.kind === "pr"));
+  }
+
+  if (trackedIssues.length > 0) {
+    printBucket("Healthy issues", healthy.filter((result) => result.kind === "issue"));
+    printBucket("Issues with metadata problems", unhealthy.filter((result) => result.kind === "issue"));
+  }
+
+  if (args.assert && unhealthy.length > 0) {
     process.exitCode = 1;
   }
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}
