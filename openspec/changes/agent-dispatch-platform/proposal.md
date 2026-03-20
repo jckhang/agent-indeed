@@ -22,6 +22,7 @@
 - 增补 runtime 执行 handoff 契约，统一本地服务命令、smoke 命令与 issue #11 证据回写要求。
 - 增补 merge-evidence sweep 回写规则，要求当前 `owner:albatross` + `stream/review-burndown` 查询返回的 planning sweep issue 承接同日队列巡检，epic #2 保留跨 lane checkpoint 汇总。
 - 新增 backend API example packet，把 merged `smoke:dispatch` happy/negative path 产物整理成 issue #11 可直接引用的请求响应样例。
+- 为 M1 / issue #11 存活线程补充 `work/*` 标签约束，并把 planning/QA issue/PR 队列的缺失 owner/priority/status/stream/milestone 元数据审计固定成可复用查询。
 
 ## Capabilities
 
@@ -40,5 +41,7 @@
 - 新增 `docs/MERGE_TRAIN_PLAYBOOK.md`，作为规划负责人推进 clean merge queue、dirty queue follow-up、validation evidence 审核与 blocker issue 升级的操作基线。
 - 新增 `docs/RUNTIME_EXECUTION_HANDOFF.md`，作为 runtime sprint 中 backend/QA/planning 的统一命令与证据交接基线。
 - 明确当前 planning sweep issue 与 epic #2 的 GitHub 评论分工，并要求每次 checkpoint sweep 只保留一个 mergeable planning-sync PR，减少 review-burndown 期间重复回贴和状态漂移。
+- 将开放的 M1 / issue #11 follow-through 线程收敛到 `work/onboarding-upload`、`work/evidence-handoff`、`work/contract-vocabulary`、`work/epic-gates` 四个稳定 work package，方便 checkpoint review 直接过滤。
+- 补一个 repo-local metadata audit 命令，直接枚举开放 planning / QA issue/PR 是否存在重复/缺失的 dept、type、owner、priority、status 标签，或缺少 stream、work-package label / milestone，减少只靠 GitHub 搜索链接逐个点开的成本。
 - 将影响后续模块：Registry、Matching、Bidding、PoMW Verifier、Audit/Reputation、Settlement。
 - 该变更现阶段除了规格定义，也显式承接运行时落地任务，并要求以可执行实现和测试证据作为关闭实现 issue 的依据。

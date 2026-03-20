@@ -22,9 +22,24 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
 - Validation-evidence gaps: [runtime PRs that still need pasted command output](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+label%3A%22status%2Fin-review%22)
 - Planning lane: [owner:albatross issues](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+label%3A%22owner%3Aalbatross%22)
 - Review-requested planning PRs: [owner:albatross PRs](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22owner%3Aalbatross%22)
+- Planning PR milestone audit: [open planning PRs missing milestones](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fplanning%22+no%3Amilestone)
+- Planning PR work-package audit: [open planning PRs missing work tags](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fplanning%22+-label%3A%22work%2Fonboarding-upload%22+-label%3A%22work%2Fevidence-handoff%22+-label%3A%22work%2Fcontract-vocabulary%22+-label%3A%22work%2Fepic-gates%22)
+- QA PR milestone audit: [open QA PRs missing milestones](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fqa%22+no%3Amilestone)
+- QA PR work-package audit: [open QA PRs missing work tags](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fqa%22+-label%3A%22work%2Fonboarding-upload%22+-label%3A%22work%2Fevidence-handoff%22+-label%3A%22work%2Fcontract-vocabulary%22+-label%3A%22work%2Fepic-gates%22)
 - Planning sweep query: [open planning follow-through](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22owner%3Aalbatross%22)
 - QA evidence anchor: [issue #11](https://github.com/jckhang/agent-indeed/issues/11)
+- Work package queue - onboarding upload: [open onboarding upload threads](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fonboarding-upload%22)
+- Work package queue - evidence handoff: [open evidence handoff threads](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fevidence-handoff%22)
+- Work package queue - contract vocabulary: [open contract vocabulary threads](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fcontract-vocabulary%22)
+- Work package queue - epic gates: [open epic gate threads](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fepic-gates%22)
 - Dated runtime blocker ledger: `docs/RUNTIME_UNBLOCKER_CONTROL_2026-03-17.md`
+
+## Local audit command
+
+Use the repo-local audit before or after the GitHub searches when you need one text report of every open planning/QA issue or PR that is still missing queue metadata:
+
+- `PATH="/opt/homebrew/opt/node/bin:$PATH" npm run check:work-item-metadata`
+- add `-- --assert` when you want the command to fail if any open planning/QA issue or PR has duplicate/missing `dept/*`, `type/*`, `owner:*`, `priority/*`, or `status/*` labels, or still lacks a `stream/*`, `work/*`, or milestone.
 
 ## Merge-train routine
 
@@ -36,7 +51,7 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
    - clean tranche: `LGTM` + mergeable/clean
    - dirty follow-ons: conflict/rebase needed, blocked by review comments, or missing literal validation evidence
 3. Merge the clean tranche in dependency-aware order, re-pulling `main` after each merge if the next PR depends on the newly merged contract/docs baseline.
-4. Before calling the queue clean, run the milestone/priority audit links and fix any missing `owner:*`, `priority/*`, `status/*`, `stream/*`, or milestone metadata on open runtime threads.
+4. Before calling the queue clean, run the milestone/priority/work-package audit links and fix any missing `owner:*`, `priority/*`, `status/*`, `stream/*`, `work/*`, or milestone metadata on open runtime, planning, and QA threads.
 5. When multiple planning PRs cover the same checkpoint or rollup wording, choose one survivor PR, then leave signed merge/close rationale on the superseded PRs and record the survivor in the current planning sweep issue.
 6. For every dirty follow-on PR, leave a signed thread note that states:
    - the owner label already carrying the follow-up

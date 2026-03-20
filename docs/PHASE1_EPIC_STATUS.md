@@ -1,9 +1,16 @@
 # Phase 1 Epic Status
 
-Last updated: 2026-03-19
+Last updated: 2026-03-20
 
 This document is the execution snapshot for epic #2 (`[Phase 1 Epic] Agent Dispatch Foundation MVP`).
 It complements `docs/PHASE1_GOALS.md` by mapping epic acceptance criteria to the current post-runtime issues and PR gates.
+
+## Work Package Filters
+
+- Onboarding upload: [open `work/onboarding-upload` threads](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fonboarding-upload%22)
+- Evidence handoff: [open `work/evidence-handoff` threads](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fevidence-handoff%22)
+- Contract vocabulary: [open `work/contract-vocabulary` threads](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fcontract-vocabulary%22)
+- Epic gate hygiene: [open `work/epic-gates` threads](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fepic-gates%22)
 
 ## Epic Objective
 

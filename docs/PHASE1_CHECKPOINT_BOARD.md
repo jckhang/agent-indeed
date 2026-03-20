@@ -19,7 +19,16 @@ Use these GitHub queries before a checkpoint comment so milestone views and runt
 - [Runtime issues missing milestones](https://github.com/jckhang/agent-indeed/issues?q=is%3Aissue+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+no%3Amilestone)
 - [Runtime PRs missing milestones](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+no%3Amilestone)
 - [Runtime PRs missing priority](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22stream%2Fruntime-execution%22+-label%3A%22priority%2FP0%22+-label%3A%22priority%2FP1%22)
+- [Planning PRs missing milestones](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fplanning%22+no%3Amilestone)
+- [Planning PRs missing work-package tags](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fplanning%22+-label%3A%22work%2Fonboarding-upload%22+-label%3A%22work%2Fevidence-handoff%22+-label%3A%22work%2Fcontract-vocabulary%22+-label%3A%22work%2Fepic-gates%22)
+- [QA PRs missing milestones](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fqa%22+no%3Amilestone)
+- [QA PRs missing work-package tags](https://github.com/jckhang/agent-indeed/pulls?q=is%3Apr+is%3Aopen+label%3A%22dept%2Fqa%22+-label%3A%22work%2Fonboarding-upload%22+-label%3A%22work%2Fevidence-handoff%22+-label%3A%22work%2Fcontract-vocabulary%22+-label%3A%22work%2Fepic-gates%22)
+- Local audit mirror: `PATH="/opt/homebrew/opt/node/bin:$PATH" npm run check:work-item-metadata`
 - [Planning review-burndown queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22owner%3Aalbatross%22+label%3A%22stream%2Freview-burndown%22)
+- [Onboarding upload queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fonboarding-upload%22)
+- [Evidence handoff queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fevidence-handoff%22)
+- [Contract vocabulary queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fcontract-vocabulary%22)
+- [Epic gate hygiene queue](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fepic-gates%22)
 
 ## Runtime pivot anchors
 
@@ -35,7 +44,7 @@ Sprint pivot dated 2026-03-16 now uses these anchors by default:
 
 1. Open milestone issue and PR links instead of editing status snapshots in-repo.
 2. Use labels such as `status/ready-next`, `status/in-review`, and owner labels to decide next merge or rebase action.
-3. Run the metadata hygiene queries and clear any missing milestone or priority gaps before posting the checkpoint.
+3. Run the metadata hygiene queries and clear any missing milestone, priority, or work-package gaps before posting the checkpoint.
 4. Use `docs/RUNTIME_EXECUTION_HANDOFF.md` and `docs/QA_CONTRACT_DRIFT_SWEEP_2026-03-18.md` for dated runtime evidence context instead of copying those volatile notes into this guide.
 5. Run the same-day planning sweep from the `owner:albatross` + `stream/review-burndown` query before the checkpoint comment so blocker notes, clean-order updates, and validation gaps all have a live GitHub trail.
 6. Keep at most one mergeable `dept/planning` checkpoint-sync PR open for that sweep; all other overlapping planning PRs should get signed merge/close rationale in GitHub instead of staying in parallel review.

@@ -76,6 +76,9 @@
 10. 建立 merge-train 协作例行
    - 规划负责人使用统一查询区分 clean LGTM PR 与 dirty follow-on queue，而不是把瞬时状态复制到仓库文档。
    - runtime 冲刺期间额外维护 review queue、dirty-but-approved queue 与 label audit 查询，优先发现缺少 status label、缺少 validation evidence，或已经 LGTM 但尚未 rebase 的活跃线程。
+   - 开放的 planning / QA follow-through 线程必须补齐 `work/*` 标签，并约束在 `work/onboarding-upload`、`work/evidence-handoff`、`work/contract-vocabulary`、`work/epic-gates` 四个 work package 内，避免 checkpoint 查询按标题猜测归属。
+   - 在仓库内提供一个可执行的 metadata audit 命令，复用 GitHub API 输出开放 planning / QA issue/PR 的重复/缺失标签与 milestone 列表，让 merge-train sweep 可以把搜索链接和命令行报表交叉校验，并把 taxonomy 的 “exactly one” 约束落实到自动检查。
+   - 里程碑与 owner/priority/status/stream/work 标签审计不能只覆盖 runtime 线程；planning / QA PR 队列也必须使用同一套 query 做缺失项补齐。
    - clean tranche 合并后，必须在脏 PR 线程写回 owner、blocker、rebase-next-step，并要求重新执行验证命令。
    - merge-train blocker note 必须同时说明：main 上发生了什么变化、当前 owner label、下一步命令/评审动作，以及是否需要新开 follow-up issue 保持 PR 聚焦。
    - 任何请求 re-review 的 PR 都必须附带 literal validation output；未贴出输出时，规划侧将其视为阻塞项而不是“默认已跑”。

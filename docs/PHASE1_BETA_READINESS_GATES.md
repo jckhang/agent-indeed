@@ -1,6 +1,6 @@
 # Phase 1 Beta Readiness Gates
 
-Last updated: 2026-03-19
+Last updated: 2026-03-20
 
 This document turns epic #2 (`[Phase 1 Epic] Agent Dispatch Foundation MVP`) into a small set of
 reviewable release gates for closed-beta readiness. It complements:
@@ -11,6 +11,13 @@ reviewable release gates for closed-beta readiness. It complements:
 - `docs/RUNTIME_CUTLINE_2026-03-16.md` for the runtime-start cutline on open contract deltas
 - `docs/RUNTIME_EXECUTION_HANDOFF.md` plus issue #11 for the canonical runnable evidence path on current `main`
 - the live planning sweep query for same-day blocker/handoff checks instead of closed historical sweep issues
+
+Use the shared work-package labels when scanning the surviving queue:
+
+- [Onboarding upload](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fonboarding-upload%22)
+- [Evidence handoff](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fevidence-handoff%22)
+- [Contract vocabulary](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fcontract-vocabulary%22)
+- [Epic gate hygiene](https://github.com/jckhang/agent-indeed/issues?q=is%3Aopen+label%3A%22work%2Fepic-gates%22)
 
 ## Gate Summary
 

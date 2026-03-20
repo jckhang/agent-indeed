@@ -53,3 +53,6 @@
 - [x] 5.12 刷新 checkpoint / merge-train 模板，移除对已关闭 issue #146 的活跃 blocker 依赖，改用 live planning sweep 查询与 issue #11 证据线程。
 - [x] 5.13 补充 issue #11 可直接复用的最小 SDK 片段与 smoke 标识符回写，确保 QA/beta consumer 不必从 PR 评论中手抄 `taskId` / `proofId` / `policyTraceId` / reason-code 证据。
 - [x] 5.14 为 issue #186 收敛 planning sweep 规则：同一 checkpoint 只保留一个 mergeable planning-sync PR，并把 superseded PR 的 merge/close rationale 回写到 GitHub 线程。
+- [x] 5.15 为 issue #214 固化 M1 work-package 标签与 planning/QA 元数据审计查询，确保开放队列可按 onboarding upload、evidence handoff、contract vocabulary、epic gate hygiene 直接过滤。
+- [x] 5.16 为 issue #214 增补 repo-local planning/QA metadata audit 命令，允许在 merge-train sweep 中直接断言开放 PR 是否存在重复/缺失的 dept/type/owner/priority/status 标签，或缺少 stream/work label / milestone。
+- [x] 5.17 将 repo-local metadata audit 扩展到 planning/QA issue，并补齐 epic #2 的 milestone 使 issue/PR work-package 队列都能通过同一条断言。
