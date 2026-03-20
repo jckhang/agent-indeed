@@ -39,7 +39,7 @@ Use this playbook when albatross is coordinating the active PR queue. It keeps l
 Use the repo-local audit before or after the GitHub searches when you need one text report of every open planning/QA issue or PR that is still missing queue metadata:
 
 - `PATH="/opt/homebrew/opt/node/bin:$PATH" npm run check:work-item-metadata`
-- add `-- --assert` when you want the command to fail if any open planning/QA issue or PR is still missing an owner, priority, status, stream, work-package label, or milestone.
+- add `-- --assert` when you want the command to fail if any open planning/QA issue or PR has duplicate/missing `dept/*`, `type/*`, `owner:*`, `priority/*`, or `status/*` labels, or still lacks a `stream/*`, `work/*`, or milestone.
 
 ## Merge-train routine
 
