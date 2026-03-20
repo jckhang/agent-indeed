@@ -1,9 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import os from "node:os";
+import path from "node:path";
+import { mkdtemp, readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
 import {
+  formatIssue11EvidenceCommand,
   formatIssue11Evidence,
-  runIssue11Evidence
+  parseIssue11EvidenceArgs,
+  readGitMetadata,
+  runIssue11Evidence,
+  writeIssue11Artifacts
 } from "../../src/runtime/issue11-evidence.js";
 
 test("formatIssue11Evidence includes the smoke summary, logs, and signature", () => {
@@ -59,6 +68,18 @@ test("formatIssue11Evidence includes the smoke summary, logs, and signature", ()
   assert.match(markdown, /--avery/);
 });
 
+test("formatIssue11EvidenceCommand shell-quotes resolved artifact paths", () => {
+  const command = formatIssue11EvidenceCommand({
+    signature: "avery reviewer",
+    outputDir: "./artifacts/issue 11 bundle"
+  });
+
+  assert.equal(
+    command,
+    `npm run --silent smoke:issue11 -- --signature 'avery reviewer' --output-dir '${path.resolve("./artifacts/issue 11 bundle")}'`
+  );
+});
+
 test("runIssue11Evidence returns the smoke markdown packet", async () => {
   const outputs = [];
   const result = await runIssue11Evidence({
@@ -76,4 +97,137 @@ test("runIssue11Evidence returns the smoke markdown packet", async () => {
   assert.match(result.markdown, /`policytrace_00000001`/);
   assert.match(result.markdown, /```json/);
   assert.match(outputs[0], /## Issue #11 executable smoke evidence/);
+});
+
+test("runIssue11Evidence writes markdown and summary artifacts when requested", async () => {
+  const outputDir = await mkdtemp(path.join(os.tmpdir(), "issue11-evidence-"));
+  const result = await runIssue11Evidence({
+    signature: "avery",
+    outputDir,
+    log: () => {}
+  });
+
+  assert.equal(result.artifactPaths.markdownPath, path.join(outputDir, "issue11-evidence.md"));
+  assert.equal(result.artifactPaths.summaryPath, path.join(outputDir, "issue11-summary.json"));
+  assert.equal(
+    result.artifactPaths.manifestPath,
+    path.join(outputDir, "issue11-artifacts-manifest.json")
+  );
+
+  const markdown = await readFile(result.artifactPaths.markdownPath, "utf8");
+  const summary = JSON.parse(await readFile(result.artifactPaths.summaryPath, "utf8"));
+  const manifest = JSON.parse(await readFile(result.artifactPaths.manifestPath, "utf8"));
+
+  assert.match(markdown, /## Issue #11 executable smoke evidence/);
+  assert.match(markdown, /--avery/);
+  assert.equal(summary.status, "ok");
+  assert.equal(summary.scenarios[0].name, "happy-path");
+  assert.match(manifest.generatedAt, /^\d{4}-\d{2}-\d{2}T/);
+  assert.equal(manifest.generatedArtifacts.manifestPath, result.artifactPaths.manifestPath);
+  assert.equal(manifest.repo.cwd, process.cwd());
+  assert.equal(manifest.evidenceIssue, 11);
+  assert.equal(
+    manifest.evidenceCommand,
+    `npm run --silent smoke:issue11 -- --signature avery --output-dir ${outputDir}`
+  );
+  assert.equal(manifest.generatedArtifacts.markdownPath, result.artifactPaths.markdownPath);
+  assert.equal(manifest.generatedArtifacts.summaryPath, result.artifactPaths.summaryPath);
+});
+
+test("writeIssue11Artifacts persists a self-describing manifest alongside exported files", async () => {
+  const outputDir = await mkdtemp(path.join(os.tmpdir(), "issue11-manifest-"));
+  const artifactPaths = await writeIssue11Artifacts({
+    markdown: "## Issue #11 executable smoke evidence\n--avery",
+    outputDir,
+    signature: "avery",
+    summary: {
+      command: "npm run smoke:dispatch",
+      status: "ok",
+      scenarios: []
+    }
+  });
+
+  const manifest = JSON.parse(await readFile(artifactPaths.manifestPath, "utf8"));
+
+  assert.equal(manifest.artifactVersion, 2);
+  assert.equal(manifest.signature, "avery");
+  assert.equal(manifest.smokeCommand, "npm run smoke:dispatch");
+  assert.equal(manifest.repo.cwd, process.cwd());
+  assert.equal(manifest.generatedArtifacts.markdownPath, artifactPaths.markdownPath);
+  assert.equal(manifest.generatedArtifacts.manifestPath, artifactPaths.manifestPath);
+  assert.equal(manifest.generatedArtifacts.summaryPath, artifactPaths.summaryPath);
+});
+
+test("readGitMetadata returns the current branch and commit when available", () => {
+  const metadata = readGitMetadata();
+
+  assert.match(metadata.commit, /^[0-9a-f]{40}$/);
+  assert.ok(metadata.branch);
+});
+
+test("parseIssue11EvidenceArgs accepts signature and output directory flags", () => {
+  assert.deepEqual(parseIssue11EvidenceArgs([
+    "--signature",
+    "avery",
+    "--output-dir",
+    "./artifacts/issue11"
+  ]), {
+    signature: "avery",
+    outputDir: "./artifacts/issue11"
+  });
+});
+
+test("parseIssue11EvidenceArgs rejects missing flag values and unknown arguments", () => {
+  assert.throws(
+    () => parseIssue11EvidenceArgs(["--signature"]),
+    /missing value for --signature/
+  );
+  assert.throws(
+    () => parseIssue11EvidenceArgs(["--output-dir", "--signature"]),
+    /missing value for --output-dir/
+  );
+  assert.throws(
+    () => parseIssue11EvidenceArgs(["--bogus"]),
+    /unknown argument: --bogus/
+  );
+});
+
+test("issue11 evidence CLI writes artifacts for output directories with spaces", async () => {
+  const parentDir = await mkdtemp(path.join(os.tmpdir(), "issue11-evidence cli-"));
+  const outputDir = path.join(parentDir, "issue 11 bundle");
+  const cliPath = fileURLToPath(
+    new URL("../../src/runtime/issue11-evidence.js", import.meta.url)
+  );
+  const result = spawnSync(
+    process.execPath,
+    [cliPath, "--signature", "avery reviewer", "--output-dir", outputDir],
+    { encoding: "utf8" }
+  );
+
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /## Issue #11 executable smoke evidence/);
+
+  const manifest = JSON.parse(
+    await readFile(path.join(outputDir, "issue11-artifacts-manifest.json"), "utf8")
+  );
+  assert.equal(
+    manifest.evidenceCommand,
+    `npm run --silent smoke:issue11 -- --signature 'avery reviewer' --output-dir '${outputDir}'`
+  );
+  assert.equal(manifest.generatedArtifacts.markdownPath, path.join(outputDir, "issue11-evidence.md"));
+  assert.equal(manifest.generatedArtifacts.summaryPath, path.join(outputDir, "issue11-summary.json"));
+});
+
+test("issue11 evidence CLI exits non-zero for invalid flags", () => {
+  const cliPath = fileURLToPath(
+    new URL("../../src/runtime/issue11-evidence.js", import.meta.url)
+  );
+  const result = spawnSync(
+    process.execPath,
+    [cliPath, "--output-dir", "--signature", "avery"],
+    { encoding: "utf8" }
+  );
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /missing value for --output-dir/);
 });

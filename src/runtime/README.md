@@ -8,6 +8,7 @@ This directory holds the first runnable backend control-plane scaffold for Agent
 - Start with file watching: `npm run dev`
 - Run the end-to-end dispatch smoke suite: `npm run smoke:dispatch`
 - Print an issue-ready issue `#11` evidence packet: `npm run --silent smoke:issue11 -- --signature avery`
+- Export the same issue `#11` packet to local artifacts: `npm run --silent smoke:issue11 -- --signature avery --output-dir ./artifacts/issue11`
 - Run the built-in runtime tests: `npm test`
 - Run the bootstrap smoke flow: `npm run smoke:bootstrap`
 
@@ -61,6 +62,18 @@ npm run --silent smoke:issue11 -- --signature avery
 ```
 
 That command reuses the dispatch smoke suite, captures the PASS lines and JSON summary, and formats one markdown packet with the happy-path ids, negative-path reason codes, and links to the reusable handoff docs.
+
+To keep the pasted stdout packet and save the same run into a local archive directory:
+
+```bash
+npm run --silent smoke:issue11 -- --signature avery --output-dir ./artifacts/issue11
+```
+
+That variant still prints the markdown packet to stdout and also writes `issue11-evidence.md`,
+`issue11-summary.json`, and `issue11-artifacts-manifest.json` into the requested directory
+for PR attachments, automation handoff, or local reruns. The manifest records the generated
+timestamp, current git branch/commit, and all exported artifact paths so downstream lanes can
+trace a copied artifact set back to the exact smoke run that produced it.
 
 `npm test` also shells this command end-to-end and asserts the PASS-line plus JSON-summary contract, so CI covers the exact smoke output shape that QA copies into issue evidence.
 

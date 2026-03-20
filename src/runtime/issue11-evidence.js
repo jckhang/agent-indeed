@@ -1,8 +1,37 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
+import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { runDispatchSmokeSuite } from "./dispatch-smoke.js";
 
 function findScenario(summary, name) {
   return summary.scenarios.find((scenario) => scenario.name === name);
+}
+
+function formatShellArg(value) {
+  if (value === "") {
+    return "''";
+  }
+
+  if (/^[A-Za-z0-9_./:-]+$/.test(value)) {
+    return value;
+  }
+
+  return `'${value.replace(/'/g, `'\"'\"'`)}'`;
+}
+
+export function formatIssue11EvidenceCommand({ outputDir, signature } = {}) {
+  const commandParts = ["npm", "run", "--silent", "smoke:issue11", "--"];
+
+  if (signature) {
+    commandParts.push("--signature", signature);
+  }
+
+  if (outputDir) {
+    commandParts.push("--output-dir", path.resolve(outputDir));
+  }
+
+  return commandParts.map(formatShellArg).join(" ");
 }
 
 export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
@@ -11,9 +40,7 @@ export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
   const negativePaths = findScenario(summary, "negative-paths");
   const evidenceLog = logLines.join("\n");
   const signedNote = signature ? `\n--${signature}` : "";
-  const evidenceCommand = signature
-    ? `npm run --silent smoke:issue11 -- --signature ${signature}`
-    : "npm run --silent smoke:issue11";
+  const evidenceCommand = formatIssue11EvidenceCommand({ signature });
 
   return [
     "## Issue #11 executable smoke evidence",
@@ -56,7 +83,11 @@ export function formatIssue11Evidence({ summary, logLines, signature } = {}) {
   ].join("\n");
 }
 
-export async function runIssue11Evidence({ log = console.log, signature } = {}) {
+export async function runIssue11Evidence({
+  log = console.log,
+  outputDir,
+  signature
+} = {}) {
   const logLines = [];
   const summary = await runDispatchSmokeSuite({
     command: "npm run smoke:dispatch",
@@ -69,31 +100,128 @@ export async function runIssue11Evidence({ log = console.log, signature } = {}) 
     logLines,
     signature
   });
+  const artifactPaths = await writeIssue11Artifacts({
+    markdown,
+    outputDir,
+    signature,
+    summary
+  });
 
   log(markdown);
 
   return {
+    artifactPaths,
     summary,
     logLines,
     markdown
   };
 }
 
-function parseArgs(argv) {
+export async function writeIssue11Artifacts({
+  markdown,
+  outputDir,
+  signature,
+  summary
+}) {
+  if (!outputDir) {
+    return null;
+  }
+
+  const resolvedOutputDir = path.resolve(outputDir);
+  const markdownPath = path.join(resolvedOutputDir, "issue11-evidence.md");
+  const summaryPath = path.join(resolvedOutputDir, "issue11-summary.json");
+  const manifestPath = path.join(resolvedOutputDir, "issue11-artifacts-manifest.json");
+  const evidenceCommand = formatIssue11EvidenceCommand({
+    outputDir: resolvedOutputDir,
+    signature
+  });
+  const generatedAt = new Date().toISOString();
+  const gitMetadata = readGitMetadata();
+  const manifest = {
+    artifactVersion: 2,
+    evidenceIssue: 11,
+    generatedAt,
+    repo: {
+      branch: gitMetadata.branch,
+      commit: gitMetadata.commit,
+      cwd: process.cwd()
+    },
+    evidenceCommand,
+    smokeCommand: summary.command,
+    signature: signature ?? null,
+    generatedArtifacts: {
+      manifestPath,
+      markdownPath,
+      summaryPath
+    }
+  };
+
+  await mkdir(resolvedOutputDir, { recursive: true });
+  await Promise.all([
+    writeFile(markdownPath, `${markdown}\n`, "utf8"),
+    writeFile(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8"),
+    writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8")
+  ]);
+
+  return {
+    manifestPath,
+    markdownPath,
+    summaryPath
+  };
+}
+
+export function readGitMetadata() {
+  const fallback = {
+    branch: null,
+    commit: null
+  };
+
+  try {
+    return {
+      branch: execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
+        cwd: process.cwd(),
+        encoding: "utf8"
+      }).trim(),
+      commit: execFileSync("git", ["rev-parse", "HEAD"], {
+        cwd: process.cwd(),
+        encoding: "utf8"
+      }).trim()
+    };
+  } catch {
+    return fallback;
+  }
+}
+
+export function parseIssue11EvidenceArgs(argv) {
   const options = {};
 
   for (let index = 0; index < argv.length; index += 1) {
-    if (argv[index] === "--signature") {
-      options.signature = argv[index + 1];
+    const arg = argv[index];
+
+    if (arg === "--signature" || arg === "--output-dir") {
+      const value = argv[index + 1];
+      if (!value || value.startsWith("--")) {
+        throw new Error(`missing value for ${arg}`);
+      }
+
+      if (arg === "--signature") {
+        options.signature = value;
+      } else {
+        options.outputDir = value;
+      }
+
       index += 1;
+      continue;
     }
+
+    throw new Error(`unknown argument: ${arg}`);
   }
 
   return options;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const options = parseArgs(process.argv.slice(2));
+  const options = parseIssue11EvidenceArgs(process.argv.slice(2));
 
   runIssue11Evidence(options).catch((error) => {
     console.error(error);

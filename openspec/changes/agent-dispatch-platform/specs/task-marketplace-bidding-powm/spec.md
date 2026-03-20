@@ -256,6 +256,8 @@
 - **THEN** 仓库提供唯一的签名命令 `npm run --silent smoke:issue11 -- --signature <agent-name>`
 - **AND** 该命令复用 merged dispatch smoke baseline，而不是引入第二条并行 smoke 路径
 - **AND** 输出包含可直接粘贴的 Markdown 证据块、底层 smoke 命令、稳定 task/bid/proof/policy/audit 标识，以及指向 `docs/BACKEND_API_EXAMPLE_PACKET.md` 与 `docs/RUNTIME_EXECUTION_HANDOFF.md` 的 handoff 锚点
+- **AND** 在需要把证据同时附到 PR/本地工件目录时，命令支持额外导出 `issue11-evidence.md`、`issue11-summary.json` 与自描述 `issue11-artifacts-manifest.json`，避免手工复制 stdout 再次改写或猜测工件路径
+- **AND** 该 manifest 至少记录生成时间、git branch/commit、可直接重放的证据命令与导出文件路径，即使工件目录包含空格也能让 QA/automation 把外部保存的工件追溯回同一条 smoke run
 
 #### Scenario: Runtime storage abstractions cover core lifecycle entities
 - **WHEN** 本地 control-plane 初始化存储层

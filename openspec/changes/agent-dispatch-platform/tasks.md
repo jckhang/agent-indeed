@@ -53,3 +53,7 @@
 - [x] 5.12 刷新 checkpoint / merge-train 模板，移除对已关闭 issue #146 的活跃 blocker 依赖，改用 live planning sweep 查询与 issue #11 证据线程。
 - [x] 5.13 补充 issue #11 可直接复用的最小 SDK 片段与 smoke 标识符回写，确保 QA/beta consumer 不必从 PR 评论中手抄 `taskId` / `proofId` / `policyTraceId` / reason-code 证据。
 - [x] 5.14 为 issue #186 收敛 planning sweep 规则：同一 checkpoint 只保留一个 mergeable planning-sync PR，并把 superseded PR 的 merge/close rationale 回写到 GitHub 线程。
+- [x] 5.15 为 issue #11 证据命令增加可选工件导出（Markdown + JSON），让 QA/automation 可复用同一份 smoke 结果回贴 issue、附到 PR、并保留本地归档。
+- [x] 5.15.a 为 issue #11 导出工件增加自描述 manifest，固定证据命令与产物路径，避免 PR/自动化侧重复猜测文件名。
+- [x] 5.15.b 为 issue #11 导出 manifest 增加生成时间、git branch/commit 与全量工件路径，确保跨 PR/本地归档的证据可以追溯到同一 smoke run。
+- [x] 5.15.c 为 issue #11 CLI 导出路径补充成功回归覆盖，并把 manifest 中的证据命令固化为可重放的 shell-safe 绝对路径，避免包含空格的工件目录破坏自动化复跑。
